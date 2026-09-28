@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Color Workspace - Tabs 1, 2, 3</title>
+<title>Color Workspace - Full Controls & Interactive Palette</title>
 <style>
     :root {
         --bg-main: #1a1a1a;
@@ -46,13 +46,24 @@
     }
     .control-item { display: flex; align-items: center; gap: 8px; }
     .control-item select {
-        background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px;
+        background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; cursor: pointer;
     }
     .control-item input[type="range"] { width: 80px; }
     .val-highlight { color: var(--accent); display: inline-block; width: 30px; text-align: right; }
+    
+    /* Editable Free-text color input group */
+    .color-input-group { background: #1a1a1a; border: 1px solid #444; border-radius: 4px; padding: 4px 8px; display: flex; align-items: center; gap: 6px; }
+    .color-input-group input[type="color"] { border: none; padding: 0; width: 20px; height: 20px; background: none; cursor: pointer; }
+    .color-input-field { background: #222; color: #fff; border: 1px solid #444; border-radius: 3px; padding: 2px 4px; font-family: monospace; font-size: 11px; text-align: center; }
+    .color-input-field.hex-input { width: 65px; }
+    .color-input-field.num-input { width: 36px; }
 
     /* Swatch Interactions */
-    .swatch { cursor: pointer; transition: transform 0.1s; position: relative; }
+    .swatch { 
+        cursor: pointer; transition: transform 0.1s; position: relative; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-family: monospace; font-weight: bold; overflow: hidden; padding: 2px; text-align: center;
+    }
     .swatch:hover { transform: scale(1.15); z-index: 10; box-shadow: 0 0 5px rgba(0,0,0,0.8); }
 
     /* Tab 1: Matrices */
@@ -63,16 +74,15 @@
         border-radius: 6px; padding: 15px; display: flex; flex-direction: column; align-items: center;
     }
     .matrix-title { color: var(--accent); font-size: 14px; margin-bottom: 15px; font-weight: bold; }
-    .grid-8x8 { display: grid; grid-template-columns: repeat(8, 25px); grid-template-rows: repeat(8, 25px); }
 
-    /* Tab 2: Dynamic Grid */
+    /* Tab 3: Dynamic Grid */
     .dynamic-grid-container {
         display: grid; gap: 1px; background-color: #000; border: 1px solid #444; width: fit-content;
     }
     .grid-cell { width: 35px; height: 35px; }
     .axis-label { background: #222; color: #888; font-size: 10px; display: flex; align-items: center; justify-content: center; }
 
-    /* Tab 3: Perceived Value Area (Matched Reference Layout) */
+    /* Tab 4: Perceived Value Area */
     .pv-chart-container {
         position: relative; width: 100%; height: 500px; background-color: #111;
         border: 1px solid var(--border-color); border-radius: 6px; overflow: auto;
@@ -99,9 +109,20 @@
         border-top: 1px solid #333; padding: 15px 20px; display: flex; align-items: center; gap: 20px; z-index: 1000;
     }
     .palette-title { font-weight: bold; font-size: 14px; width: 220px; }
-    .palette-slots { display: flex; gap: 8px; flex: 1; }
-    .palette-slot { width: 55px; height: 35px; border: 1px dashed #555; border-radius: 4px; background-color: transparent; }
-    .palette-slot.filled { border-style: solid; border-color: #000; }
+    .palette-slots { display: flex; gap: 8px; flex: 1; overflow-x: auto; padding-bottom: 5px; }
+    .palette-slot { 
+        width: 55px; height: 35px; border: 1px dashed #555; border-radius: 4px; background-color: transparent; 
+        position: relative; flex-shrink: 0; cursor: grab; display: flex; align-items: center; justify-content: center;
+    }
+    .palette-slot.filled { border-style: solid; border-color: #000; cursor: grab; }
+    .palette-slot.dragging { opacity: 0.4; }
+    .palette-slot.drag-over { border-color: var(--accent); transform: scale(1.05); }
+    .palette-slot .remove-btn {
+        position: absolute; top: -6px; right: -6px; background: #ff5555; color: #fff; border: none;
+        border-radius: 50%; width: 16px; height: 16px; font-size: 10px; font-weight: bold;
+        display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 10;
+    }
+    .palette-slot.filled:hover .remove-btn { display: flex; }
     .btn-clear { background-color: #333; color: #ff5555; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-clear:hover { background-color: #444; }
 </style>
@@ -110,8 +131,9 @@
 
 <div class="tabs-nav">
     <button class="tab-btn active" onclick="switchTab('tab1')">1. Colour Matrices</button>
-    <button class="tab-btn" onclick="switchTab('tab2')">2. Hue Constants</button>
-    <button class="tab-btn" onclick="switchTab('tab3')">3. Perceived Value Graph</button>
+    <button class="tab-btn" onclick="switchTab('tab2')">2. Custom Corner Matrix</button>
+    <button class="tab-btn" onclick="switchTab('tab3')">3. Hue Constants</button>
+    <button class="tab-btn" onclick="switchTab('tab4')">4. Perceived Value Graph</button>
 </div>
 
 <!-- TAB 1: Matrices -->
@@ -125,14 +147,26 @@
                 <option value="4">Groups of 4 (Quads)</option>
             </select>
         </div>
+        <div class="control-item">
+            <span>Resolution:</span>
+            <select id="t1-res" onchange="renderTab1()">
+                <option value="4">4 squares</option>
+                <option value="6">6 squares</option>
+                <option value="8" selected>8 squares</option>
+                <option value="10">10 squares</option>
+                <option value="12">12 squares</option>
+            </select>
+        </div>
         <div class="control-item"><span>Tint:</span> <span id="val-tint" class="val-highlight">0%</span> <input type="range" id="t1-tint" value="0" min="0" max="100" oninput="updateVal('val-tint', this.value); renderTab1()"></div>
         <div class="control-item"><span>Tone:</span> <span id="val-tone" class="val-highlight">0%</span> <input type="range" id="t1-tone" value="0" min="0" max="100" oninput="updateVal('val-tone', this.value); renderTab1()"></div>
         <div class="control-item"><span>Shade:</span> <span id="val-shade" class="val-highlight">0%</span> <input type="range" id="t1-shade" value="0" min="0" max="100" oninput="updateVal('val-shade', this.value); renderTab1()"></div>
         <div class="control-item"><span>Saturation:</span> <span id="val-sat" class="val-highlight">100%</span> <input type="range" id="t1-sat" value="100" min="0" max="200" oninput="updateVal('val-sat', this.value); renderTab1()"></div>
         <div class="control-item" style="margin-left:auto;">
-            <span>Show Value (%):</span> <input type="checkbox" id="glob-showval" onchange="renderAllTabs()">
-            <span>Track Iso-Line:</span> <input type="checkbox" id="glob-isoline" onchange="renderAllTabs()">
-            <input type="range" id="glob-isoval" value="50" min="0" max="100" oninput="renderAllTabs()">
+            <span>Show Perceived Value:</span> <input type="checkbox" id="t1-showval" onchange="renderTab1()">
+            <span>Show RGB/HSL/HEX:</span> <input type="checkbox" id="t1-showformats" onchange="renderTab1()">
+            <span>Track Perceived Value Iso-Line:</span> <input type="checkbox" id="t1-isoline" onchange="renderTab1()">
+            <input type="range" id="t1-isoval" value="50" min="0" max="100" oninput="updateVal('val-t1-iso', this.value); renderTab1()">
+            <span id="val-t1-iso" class="val-highlight">50%</span>
         </div>
     </div>
     <div class="matrix-section">
@@ -141,12 +175,103 @@
     </div>
 </div>
 
-<!-- TAB 2: Hue Constants -->
+<!-- TAB 2: Custom Corner Matrix -->
 <div id="tab2" class="tab-content">
+    <div class="controls-bar">
+        <!-- TL Corner -->
+        <div class="control-item">
+            <span>TL:</span>
+            <div class="color-input-group">
+                <input type="color" id="cc-tl-picker" value="#FF0000" oninput="syncPickerToText('tl')">
+                <input type="text" id="cc-tl-hex" class="color-input-field hex-input" value="#FF0000" oninput="syncTextToPicker('tl', 'hex')">
+                <input type="text" id="cc-tl-r" class="color-input-field num-input" value="255" oninput="syncTextToPicker('tl', 'rgb')">,
+                <input type="text" id="cc-tl-g" class="color-input-field num-input" value="0" oninput="syncTextToPicker('tl', 'rgb')">,
+                <input type="text" id="cc-tl-b" class="color-input-field num-input" value="0" oninput="syncTextToPicker('tl', 'rgb')">
+                <input type="text" id="cc-tl-h" class="color-input-field num-input" value="0" oninput="syncTextToPicker('tl', 'hsl')">°
+                <input type="text" id="cc-tl-s" class="color-input-field num-input" value="100" oninput="syncTextToPicker('tl', 'hsl')">%
+                <input type="text" id="cc-tl-l" class="color-input-field num-input" value="50" oninput="syncTextToPicker('tl', 'hsl')">%
+            </div>
+        </div>
+
+        <!-- TR Corner -->
+        <div class="control-item">
+            <span>TR:</span>
+            <div class="color-input-group">
+                <input type="color" id="cc-tr-picker" value="#FFFF00" oninput="syncPickerToText('tr')">
+                <input type="text" id="cc-tr-hex" class="color-input-field hex-input" value="#FFFF00" oninput="syncTextToPicker('tr', 'hex')">
+                <input type="text" id="cc-tr-r" class="color-input-field num-input" value="255" oninput="syncTextToPicker('tr', 'rgb')">,
+                <input type="text" id="cc-tr-g" class="color-input-field num-input" value="255" oninput="syncTextToPicker('tr', 'rgb')">,
+                <input type="text" id="cc-tr-b" class="color-input-field num-input" value="0" oninput="syncTextToPicker('tr', 'rgb')">
+                <input type="text" id="cc-tr-h" class="color-input-field num-input" value="60" oninput="syncTextToPicker('tr', 'hsl')">°
+                <input type="text" id="cc-tr-s" class="color-input-field num-input" value="100" oninput="syncTextToPicker('tr', 'hsl')">%
+                <input type="text" id="cc-tr-l" class="color-input-field num-input" value="50" oninput="syncTextToPicker('tr', 'hsl')">%
+            </div>
+        </div>
+
+        <!-- BL Corner -->
+        <div class="control-item">
+            <span>BL:</span>
+            <div class="color-input-group">
+                <input type="color" id="cc-bl-picker" value="#0000FF" oninput="syncPickerToText('bl')">
+                <input type="text" id="cc-bl-hex" class="color-input-field hex-input" value="#0000FF" oninput="syncTextToPicker('bl', 'hex')">
+                <input type="text" id="cc-bl-r" class="color-input-field num-input" value="0" oninput="syncTextToPicker('bl', 'rgb')">,
+                <input type="text" id="cc-bl-g" class="color-input-field num-input" value="0" oninput="syncTextToPicker('bl', 'rgb')">,
+                <input type="text" id="cc-bl-b" class="color-input-field num-input" value="255" oninput="syncTextToPicker('bl', 'rgb')">
+                <input type="text" id="cc-bl-h" class="color-input-field num-input" value="240" oninput="syncTextToPicker('bl', 'hsl')">°
+                <input type="text" id="cc-bl-s" class="color-input-field num-input" value="100" oninput="syncTextToPicker('bl', 'hsl')">%
+                <input type="text" id="cc-bl-l" class="color-input-field num-input" value="50" oninput="syncTextToPicker('bl', 'hsl')">%
+            </div>
+        </div>
+
+        <!-- BR Corner -->
+        <div class="control-item">
+            <span>BR:</span>
+            <div class="color-input-group">
+                <input type="color" id="cc-br-picker" value="#00FF00" oninput="syncPickerToText('br')">
+                <input type="text" id="cc-br-hex" class="color-input-field hex-input" value="#00FF00" oninput="syncTextToPicker('br', 'hex')">
+                <input type="text" id="cc-br-r" class="color-input-field num-input" value="0" oninput="syncTextToPicker('br', 'rgb')">,
+                <input type="text" id="cc-br-g" class="color-input-field num-input" value="255" oninput="syncTextToPicker('br', 'rgb')">,
+                <input type="text" id="cc-br-b" class="color-input-field num-input" value="0" oninput="syncTextToPicker('br', 'rgb')">
+                <input type="text" id="cc-br-h" class="color-input-field num-input" value="120" oninput="syncTextToPicker('br', 'hsl')">°
+                <input type="text" id="cc-br-s" class="color-input-field num-input" value="100" oninput="syncTextToPicker('br', 'hsl')">%
+                <input type="text" id="cc-br-l" class="color-input-field num-input" value="50" oninput="syncTextToPicker('br', 'hsl')">%
+            </div>
+        </div>
+
+        <div class="control-item">
+            <span>Resolution:</span>
+            <select id="cc-res" onchange="renderTab2Custom()">
+                <option value="4">4 squares</option>
+                <option value="6">6 squares</option>
+                <option value="8" selected>8 squares</option>
+                <option value="10">10 squares</option>
+                <option value="12">12 squares</option>
+            </select>
+        </div>
+        <div class="control-item"><span>Tint:</span> <span id="val-cc-tint" class="val-highlight">0%</span> <input type="range" id="cc-tint" value="0" min="0" max="100" oninput="updateVal('val-cc-tint', this.value); renderTab2Custom()"></div>
+        <div class="control-item"><span>Tone:</span> <span id="val-cc-tone" class="val-highlight">0%</span> <input type="range" id="cc-tone" value="0" min="0" max="100" oninput="updateVal('val-cc-tone', this.value); renderTab2Custom()"></div>
+        <div class="control-item"><span>Shade:</span> <span id="val-cc-shade" class="val-highlight">0%</span> <input type="range" id="cc-shade" value="0" min="0" max="100" oninput="updateVal('val-cc-shade', this.value); renderTab2Custom()"></div>
+        <div class="control-item"><span>Saturation:</span> <span id="val-cc-sat" class="val-highlight">100%</span> <input type="range" id="cc-sat" value="100" min="0" max="200" oninput="updateVal('val-cc-sat', this.value); renderTab2Custom()"></div>
+        <div class="control-item" style="margin-left:auto;">
+            <span>Show Perceived Value:</span> <input type="checkbox" id="cc-showval" onchange="renderTab2Custom()">
+            <span>Show RGB/HSL/HEX:</span> <input type="checkbox" id="cc-showformats" onchange="renderTab2Custom()">
+            <span>Track Perceived Value Iso-Line:</span> <input type="checkbox" id="cc-isoline" onchange="renderTab2Custom()">
+            <input type="range" id="cc-isoval" value="50" min="0" max="100" oninput="updateVal('val-cc-iso', this.value); renderTab2Custom()">
+            <span id="val-cc-iso" class="val-highlight">50%</span>
+        </div>
+    </div>
+    <div class="matrix-section">
+        <h3>Custom Corner Color Matrix</h3>
+        <div class="matrices-container" id="matrices-target-custom"></div>
+    </div>
+</div>
+
+<!-- TAB 3: Hue Constants -->
+<div id="tab3" class="tab-content">
     <div class="controls-bar">
         <div class="control-item">
             <span>Resolution:</span>
-            <select id="t2-res" onchange="renderTab2()">
+            <select id="t2-res" onchange="renderTab3()">
                 <option value="10">10° Intervals</option>
                 <option value="15" selected>15° Intervals</option>
                 <option value="30">30° Intervals</option>
@@ -155,7 +280,7 @@
         </div>
         <div class="control-item">
             <span>Display Format:</span>
-            <select id="t2-format" onchange="updateTab2Controls(); renderTab2();">
+            <select id="t2-format" onchange="updateTab2Controls(); renderTab3();">
                 <option value="1">1: Y=Sat, Slider=Lightness</option>
                 <option value="2">2: Y=Lightness, Slider=Sat</option>
                 <option value="3">3: Y=Brightness, Slider1=Tone, Slider2=Shade</option>
@@ -166,26 +291,28 @@
         </div>
         <div class="control-item" id="slider1-container">
             <span id="lbl-s1">Slider 1:</span> <span id="val-s1" class="val-highlight">50%</span> 
-            <input type="range" id="t2-s1" value="50" min="0" max="100" oninput="updateVal('val-s1', this.value); renderTab2()">
+            <input type="range" id="t2-s1" value="50" min="0" max="100" oninput="updateVal('val-s1', this.value); renderTab3()">
         </div>
         <div class="control-item" id="slider2-container" style="display:none;">
             <span id="lbl-s2">Slider 2:</span> <span id="val-s2" class="val-highlight">0%</span> 
-            <input type="range" id="t2-s2" value="0" min="0" max="100" oninput="updateVal('val-s2', this.value); renderTab2()">
+            <input type="range" id="t2-s2" value="0" min="0" max="100" oninput="updateVal('val-s2', this.value); renderTab3()">
         </div>
         <div class="control-item" style="margin-left:auto;">
-            <span>Show Value (%):</span> <input type="checkbox" id="t2-showval" onchange="renderTab2()">
-            <span>Track Iso-Line:</span> <input type="checkbox" id="t2-isoline" onchange="renderTab2()">
+            <span>Show Perceived Value:</span> <input type="checkbox" id="t2-showval" onchange="renderTab3()">
+            <span>Track Perceived Value Iso-Line:</span> <input type="checkbox" id="t2-isoline" onchange="renderTab3()">
+            <input type="range" id="t2-isoval" value="50" min="0" max="100" oninput="updateVal('val-t2-iso', this.value); renderTab3()">
+            <span id="val-t2-iso" class="val-highlight">50%</span>
         </div>
     </div>
     <div id="t2-container" style="overflow-x:auto;"></div>
 </div>
 
-<!-- TAB 3: Perceived Value Graph -->
-<div id="tab3" class="tab-content">
+<!-- TAB 4: Perceived Value Graph -->
+<div id="tab4" class="tab-content">
     <div class="controls-bar">
         <div class="control-item">
             <span>Resolution:</span>
-            <select id="t3-res" onchange="renderTab3()">
+            <select id="t3-res" onchange="renderTab4()">
                 <option value="10">10° Intervals</option>
                 <option value="15" selected>15° Intervals</option>
                 <option value="30">30° Intervals</option>
@@ -194,14 +321,16 @@
         </div>
         <div class="control-item">
             <span>Sorting:</span>
-            <select id="t3-sort" onchange="renderTab3()">
+            <select id="t3-sort" onchange="renderTab4()">
                 <option value="hue">Chronological Hue</option>
                 <option value="value">Perceived Value</option>
             </select>
         </div>
         <div class="control-item" style="margin-left:auto;">
-            <span>Show Value (%):</span> <input type="checkbox" id="t3-showval" onchange="renderTab3()">
-            <span>Track Iso-Line:</span> <input type="checkbox" id="t3-isoline" onchange="renderTab3()">
+            <span>Show Perceived Value:</span> <input type="checkbox" id="t3-showval" onchange="renderTab4()">
+            <span>Track Perceived Value Iso-Line:</span> <input type="checkbox" id="t3-isoline" onchange="renderTab4()">
+            <input type="range" id="t3-isoval" value="50" min="0" max="100" oninput="updateVal('val-t3-iso', this.value); renderTab4()">
+            <span id="val-t3-iso" class="val-highlight">50%</span>
         </div>
     </div>
     <div class="pv-chart-container">
@@ -238,13 +367,17 @@
     }
     function renderAllTabs() {
         renderTab1();
-        renderTab2();
+        renderTab2Custom();
         renderTab3();
+        renderTab4();
     }
 
     function hexToRgb(hex) {
-        const match = hex.replace('#','').match(/.{1,2}/g);
-        return { r: parseInt(match[0], 16), g: parseInt(match[1], 16), b: parseInt(match[2], 16) };
+        let cleanHex = hex.replace('#','');
+        if(cleanHex.length === 3) cleanHex = cleanHex.split('').map(x => x+x).join('');
+        const match = cleanHex.match(/.{1,2}/g);
+        if(!match || match.length < 3) return { r: 0, g: 0, b: 0 };
+        return { r: parseInt(match[0], 16) || 0, g: parseInt(match[1], 16) || 0, b: parseInt(match[2], 16) || 0 };
     }
     function rgbToHex(r, g, b) {
         const clamp = v => Math.max(0, Math.min(255, Math.round(v)));
@@ -268,9 +401,10 @@
             }
             h /= 6;
         }
-        return { h: h * 360, s: s * 100, l: l * 100 };
+        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
     }
     function hslToRgbObj(h, s, l) {
+        h = (h % 360 + 360) % 360;
         h /= 360; s /= 100; l /= 100;
         let r, g, b;
         if(s === 0) { r = g = b = l; } 
@@ -288,6 +422,9 @@
         }
         return { r: r * 255, g: g * 255, b: b * 255 };
     }
+    function getPerceivedValue(r, g, b) {
+        return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
+    }
     function applyAdjustments(rgb, tint, tone, shade, satRatio) {
         let hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
         hsl.s = Math.min(100, hsl.s * (satRatio / 100));
@@ -301,19 +438,72 @@
         base.r *= (1 - shade / 100); base.g *= (1 - shade / 100); base.b *= (1 - shade / 100);
         return rgbToHex(base.r, base.g, base.b);
     }
+    function getContrastTextColor(hex) {
+        const rgb = hexToRgb(hex);
+        return (((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000 >= 128) ? '#000' : '#FFF';
+    }
+
+    // --- Tab 2 Input Synchronization Logic ---
+    function updateAllFieldsForCorner(pos, rgb, hex, hsl) {
+        document.getElementById(`cc-${pos}-picker`).value = hex;
+        document.getElementById(`cc-${pos}-hex`).value = hex;
+        document.getElementById(`cc-${pos}-r`).value = Math.round(rgb.r);
+        document.getElementById(`cc-${pos}-g`).value = Math.round(rgb.g);
+        document.getElementById(`cc-${pos}-b`).value = Math.round(rgb.b);
+        document.getElementById(`cc-${pos}-h`).value = hsl.h;
+        document.getElementById(`cc-${pos}-s`).value = hsl.s;
+        document.getElementById(`cc-${pos}-l`).value = hsl.l;
+    }
+    function syncPickerToText(pos) {
+        const hex = document.getElementById(`cc-${pos}-picker`).value.toUpperCase();
+        const rgb = hexToRgb(hex);
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        updateAllFieldsForCorner(pos, rgb, hex, hsl);
+        renderTab2Custom();
+    }
+    function syncTextToPicker(pos, source) {
+        let rgb, hex, hsl;
+        if (source === 'hex') {
+            let val = document.getElementById(`cc-${pos}-hex`).value;
+            if(!val.startsWith('#')) val = '#' + val;
+            if(val.length !== 7) return;
+            hex = val.toUpperCase();
+            rgb = hexToRgb(hex);
+            hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        } else if (source === 'rgb') {
+            let r = parseFloat(document.getElementById(`cc-${pos}-r`).value) || 0;
+            let g = parseFloat(document.getElementById(`cc-${pos}-g`).value) || 0;
+            let b = parseFloat(document.getElementById(`cc-${pos}-b`).value) || 0;
+            rgb = { r, g, b };
+            hex = rgbToHex(r, g, b);
+            hsl = rgbToHsl(r, g, b);
+        } else if (source === 'hsl') {
+            let h = parseFloat(document.getElementById(`cc-${pos}-h`).value) || 0;
+            let s = parseFloat(document.getElementById(`cc-${pos}-s`).value) || 0;
+            let l = parseFloat(document.getElementById(`cc-${pos}-l`).value) || 0;
+            hsl = { h, s, l };
+            let rgbObj = hslToRgbObj(h, s, l);
+            rgb = { r: rgbObj.r, g: rgbObj.g, b: rgbObj.b };
+            hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+        }
+        updateAllFieldsForCorner(pos, rgb, hex, hsl);
+        renderTab2Custom();
+    }
 
     // --- Tab 1 ---
     function renderTab1() {
         const target = document.getElementById('matrices-target');
         target.innerHTML = '';
         const mode = document.getElementById('t1-mode').value;
+        const res = parseInt(document.getElementById('t1-res').value);
         const tint = parseInt(document.getElementById('t1-tint').value);
         const tone = parseInt(document.getElementById('t1-tone').value);
         const shade = parseInt(document.getElementById('t1-shade').value);
         const sat = parseInt(document.getElementById('t1-sat').value);
-        const showVal = document.getElementById('glob-showval').checked;
-        const trackIso = document.getElementById('glob-isoline').checked;
-        const isoVal = parseInt(document.getElementById('glob-isoval').value);
+        const showVal = document.getElementById('t1-showval').checked;
+        const showFormats = document.getElementById('t1-showformats').checked;
+        const trackIso = document.getElementById('t1-isoline').checked;
+        const isoVal = parseInt(document.getElementById('t1-isoval').value);
 
         let matricesData = [];
         const neutralCorners = ["#FFFFFF", "#808080", "#000000"];
@@ -355,32 +545,44 @@
             panel.className = 'matrix-panel';
             panel.innerHTML = `<div class="matrix-title">${data.title}</div>`;
             const grid = document.createElement('div');
-            grid.className = 'grid-8x8';
+            const cellSize = Math.max(30, Math.floor(240 / res));
+            grid.style.display = 'grid';
+            grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+            grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
             const tl = hexToRgb(data.tl), tr = hexToRgb(data.tr), bl = hexToRgb(data.bl), br = hexToRgb(data.br);
 
-            for(let y = 0; y < 8; y++) {
-                const yT = y / 7;
-                for(let x = 0; x < 8; x++) {
-                    const xT = x / 7;
+            for(let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for(let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
                     const top = lerpColorObj(tl, tr, xT);
                     const bot = lerpColorObj(bl, br, xT);
                     const baseRGB = lerpColorObj(top, bot, yT);
                     const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                    const rgbObj = hexToRgb(finalColor);
+                    const hslObj = rgbToHsl(rgbObj.r, rgbObj.g, rgbObj.b);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                    const textColor = getContrastTextColor(finalColor);
                     
                     const cell = document.createElement('div');
                     cell.className = 'swatch';
                     cell.style.backgroundColor = finalColor;
                     cell.onclick = () => addToPalette(finalColor);
 
-                    if (trackIso && Math.abs((xT * 100) - isoVal) < 7) cell.style.border = "2px solid #fff";
+                    let innerHtml = '';
                     if (showVal) {
-                        cell.innerText = Math.round((1 - yT) * 100) + '%';
-                        cell.style.fontSize = '8px';
-                        cell.style.display = 'flex';
-                        cell.style.alignItems = 'center';
-                        cell.style.justifyContent = 'center';
-                        cell.style.color = '#fff';
+                        innerHtml += `<div style="font-size:${Math.max(6, cellSize/4.5)}px; color:${textColor};">${pv}%</div>`;
                     }
+                    if (showFormats) {
+                        innerHtml += `<div style="font-size:${Math.max(4.5, cellSize/5.5)}px; line-height:1; color:${textColor};">` +
+                                     `${finalColor}<br>` +
+                                     `${rgbObj.r},${rgbObj.g},${rgbObj.b}<br>` +
+                                     `${hslObj.h}° ${hslObj.s}% ${hslObj.l}%` +
+                                     `</div>`;
+                    }
+                    cell.innerHTML = innerHtml;
+
+                    if (trackIso && Math.abs(pv - isoVal) < 3) cell.style.border = "2px solid #fff";
                     grid.appendChild(cell);
                 }
             }
@@ -389,7 +591,78 @@
         });
     }
 
-    // --- Tab 2 Controls & Engine ---
+    // --- TAB 2: Custom Corner Matrix ---
+    function renderTab2Custom() {
+        const target = document.getElementById('matrices-target-custom');
+        target.innerHTML = '';
+        const res = parseInt(document.getElementById('cc-res').value);
+        
+        const tlHex = document.getElementById('cc-tl-hex').value;
+        const trHex = document.getElementById('cc-tr-hex').value;
+        const blHex = document.getElementById('cc-bl-hex').value;
+        const brHex = document.getElementById('cc-br-hex').value;
+
+        const tint = parseInt(document.getElementById('cc-tint').value);
+        const tone = parseInt(document.getElementById('cc-tone').value);
+        const shade = parseInt(document.getElementById('cc-shade').value);
+        const sat = parseInt(document.getElementById('cc-sat').value);
+        const showVal = document.getElementById('cc-showval').checked;
+        const showFormats = document.getElementById('cc-showformats').checked;
+        const trackIso = document.getElementById('cc-isoline').checked;
+        const isoVal = parseInt(document.getElementById('cc-isoval').value);
+
+        const panel = document.createElement('div');
+        panel.className = 'matrix-panel';
+        panel.innerHTML = `<div class="matrix-title">Custom Corner Blend Matrix (${res}x${res})</div>`;
+        
+        const grid = document.createElement('div');
+        const cellSize = Math.max(35, Math.floor(300 / res));
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+        grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
+
+        const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+        for(let y = 0; y < res; y++) {
+            const yT = y / (res - 1 || 1);
+            for(let x = 0; x < res; x++) {
+                const xT = x / (res - 1 || 1);
+                const top = lerpColorObj(tl, tr, xT);
+                const bot = lerpColorObj(bl, br, xT);
+                const baseRGB = lerpColorObj(top, bot, yT);
+                const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                const rgbObj = hexToRgb(finalColor);
+                const hslObj = rgbToHsl(rgbObj.r, rgbObj.g, rgbObj.b);
+                const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                const textColor = getContrastTextColor(finalColor);
+                
+                const cell = document.createElement('div');
+                cell.className = 'swatch';
+                cell.style.backgroundColor = finalColor;
+                cell.onclick = () => addToPalette(finalColor);
+
+                let innerHtml = '';
+                if (showVal) {
+                    innerHtml += `<div style="font-size:${Math.max(6, cellSize/4.5)}px; color:${textColor};">${pv}%</div>`;
+                }
+                if (showFormats) {
+                    innerHtml += `<div style="font-size:${Math.max(4.5, cellSize/5.5)}px; line-height:1; color:${textColor};">` +
+                                 `${finalColor}<br>` +
+                                 `${rgbObj.r},${rgbObj.g},${rgbObj.b}<br>` +
+                                 `${hslObj.h}° ${hslObj.s}% ${hslObj.l}%` +
+                                 `</div>`;
+                }
+                cell.innerHTML = innerHtml;
+
+                if (trackIso && Math.abs(pv - isoVal) < 3) cell.style.border = "2px solid #fff";
+                grid.appendChild(cell);
+            }
+        }
+        panel.appendChild(grid);
+        target.appendChild(panel);
+    }
+
+    // --- Tab 3 Controls & Engine ---
     function updateTab2Controls() {
         const format = document.getElementById('t2-format').value;
         const s2Container = document.getElementById('slider2-container');
@@ -408,7 +681,7 @@
         }
     }
 
-    function renderTab2() {
+    function renderTab3() {
         const container = document.getElementById('t2-container');
         container.innerHTML = '';
         const res = parseInt(document.getElementById('t2-res').value);
@@ -417,6 +690,7 @@
         const s2Val = parseInt(document.getElementById('t2-s2').value);
         const showVal = document.getElementById('t2-showval').checked;
         const trackIso = document.getElementById('t2-isoline').checked;
+        const isoVal = parseInt(document.getElementById('t2-isoval').value);
 
         const hues = [];
         for(let h = 0; h < 360; h += res) hues.push(h);
@@ -457,19 +731,22 @@
                     color = applyAdjustments(rgb, 0, s2Val, rowPct, 100);
                 }
 
+                const rgbObj = hexToRgb(color);
+                const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell swatch';
                 cell.style.backgroundColor = color;
                 cell.onclick = () => addToPalette(color);
 
-                if (trackIso && row === 5) cell.style.border = "2px solid #fff";
+                if (trackIso && Math.abs(pv - isoVal) < 3) cell.style.border = "2px solid #fff";
                 if (showVal) {
-                    cell.innerText = rowPct + '%';
+                    cell.innerText = pv + '%';
                     cell.style.fontSize = '8px';
                     cell.style.display = 'flex';
                     cell.style.alignItems = 'center';
                     cell.style.justifyContent = 'center';
-                    cell.style.color = '#fff';
+                    cell.style.color = getContrastTextColor(color);
                 }
                 grid.appendChild(cell);
             });
@@ -483,14 +760,15 @@
         return div;
     }
 
-    // --- Tab 3 (Tiered Diagonal Cascade Reference Layout) ---
-    function renderTab3() {
+    // --- Tab 4 (Perceived Value Graph) ---
+    function renderTab4() {
         const target = document.getElementById('pv-plot-target');
         target.innerHTML = '';
         const res = parseInt(document.getElementById('t3-res').value);
         const sortMode = document.getElementById('t3-sort').value;
         const showVal = document.getElementById('t3-showval').checked;
         const trackIso = document.getElementById('t3-isoline').checked;
+        const isoVal = parseInt(document.getElementById('t3-isoval').value);
 
         let hues = [];
         for(let h = 0; h < 360; h += res) hues.push(h);
@@ -520,17 +798,18 @@
 
                 const rgb = hslToRgbObj(hue, Math.min(100, 35 + (val * 7)), 92 - (val * 7.5));
                 const color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                const pv = getPerceivedValue(rgb.r, rgb.g, rgb.b);
 
                 node.style.left = left + 'px';
                 node.style.top = top + 'px';
                 node.style.backgroundColor = color;
                 node.onclick = () => addToPalette(color);
 
-                if (trackIso && val === 7) node.style.border = "2px solid #fff";
+                if (trackIso && Math.abs(pv - isoVal) < 3) node.style.border = "2px solid #fff";
                 if (showVal) {
-                    node.innerText = 'V' + val;
+                    node.innerText = pv + '%';
                     node.style.fontSize = '7px';
-                    node.style.color = '#fff';
+                    node.style.color = getContrastTextColor(color);
                     node.style.display = 'flex';
                     node.style.alignItems = 'center';
                     node.style.justifyContent = 'center';
@@ -540,9 +819,10 @@
         });
     }
 
-    // --- Global Palette Logic ---
+    // --- Global Palette Logic with Drag & Drop / Removal ---
     const MAX_PALETTE = 16;
     let paletteColors = [];
+    let draggedIndex = null;
 
     function initPalette() {
         const container = document.getElementById('palette-slots-container');
@@ -551,30 +831,98 @@
             let slot = document.createElement('div');
             slot.className = 'palette-slot';
             slot.id = 'p-slot-' + i;
+            slot.dataset.index = i;
+            
+            // Drag and Drop event listeners
+            slot.addEventListener('dragstart', handleDragStart);
+            slot.addEventListener('dragover', handleDragOver);
+            slot.addEventListener('dragleave', handleDragLeave);
+            slot.addEventListener('drop', handleDrop);
+            slot.addEventListener('dragend', handleDragEnd);
+
             container.appendChild(slot);
         }
         updatePaletteUI();
     }
+
     function addToPalette(hex) {
         if (paletteColors.length < MAX_PALETTE) {
             paletteColors.push(hex);
             updatePaletteUI();
         }
     }
+
+    function removeFromPalette(index, event) {
+        event.stopPropagation();
+        paletteColors.splice(index, 1);
+        updatePaletteUI();
+    }
+
     function clearPalette() {
         paletteColors = [];
         updatePaletteUI();
     }
+
+    function handleDragStart(e) {
+        const index = parseInt(this.dataset.index);
+        if (isNaN(index) || index >= paletteColors.length) {
+            e.preventDefault();
+            return;
+        }
+        draggedIndex = index;
+        e.dataTransfer.effectAllowed = 'move';
+        this.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        const targetIndex = parseInt(this.dataset.index);
+        if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+            const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+            paletteColors.splice(targetIndex, 0, movedColor);
+            updatePaletteUI();
+        }
+    }
+
+    function handleDragEnd(e) {
+        document.querySelectorAll('.palette-slot').forEach(slot => {
+            slot.classList.remove('dragging', 'drag-over');
+        });
+        draggedIndex = null;
+    }
+
     function updatePaletteUI() {
         document.getElementById('palette-counter').innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
         for(let i = 0; i < MAX_PALETTE; i++) {
             const slot = document.getElementById('p-slot-' + i);
+            slot.innerHTML = '';
             if (i < paletteColors.length) {
                 slot.style.backgroundColor = paletteColors[i];
                 slot.classList.add('filled');
+                slot.setAttribute('draggable', 'true');
+
+                // Add remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '×';
+                removeBtn.title = 'Remove color';
+                removeBtn.onclick = (e) => removeFromPalette(i, e);
+                slot.appendChild(removeBtn);
             } else {
                 slot.style.backgroundColor = 'transparent';
                 slot.classList.remove('filled');
+                slot.removeAttribute('draggable');
             }
         }
     }
@@ -582,9 +930,10 @@
     window.onload = () => {
         initPalette();
         renderTab1();
+        renderTab2Custom();
         updateTab2Controls();
-        renderTab2();
-        setTimeout(renderTab3, 50);
+        renderTab3();
+        setTimeout(renderTab4, 50);
     };
 </script>
 </body>
