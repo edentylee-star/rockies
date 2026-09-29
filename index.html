@@ -3,18 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website Home</title>
+    <title>My Awesome Website</title>
+    <!-- Basic styling to make it look clean -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        header {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        nav ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        nav a:hover {
+            background-color: #2980b9;
+        }
+    </thstyle>
 </head>
 <body>
-    <h1>Welcome to My Website!</h1>
-    <p>This is my home page. Check out my other pages below:</p>
 
-    <!-- Navigation Links -->
-    <nav>
-        <ul>
-            <li><a href="about.html">About Me</a></li>
-            <li><a href="contact.html">Contact Page</a></li>
-        </ul>
-    </nav>
+    <header>
+        <h1>Welcome to My Website!</h1>
+        <p>Hi there! This is my homepage. I built this using HTML, and you can click the buttons below to explore my other pages.</p>
+        
+        <!-- Navigation Menu linking to other HTML files -->
+        <nav>
+            <ul>
+                <li><a href="about.html">About Me</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
 </body>
 </html>
