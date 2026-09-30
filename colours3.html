@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NCS Colour Atlas - Interactive Hue Wheel & Triangle</title>
+<title>NCS Colour Atlas - Interactive Workspace</title>
 <style>
     :root {
-        --panel-bg: #F7B5DA;
-        --panel-border: #e092c3;
+        --panel-bg: #B4E3F8;
+        --panel-border: #87cde8;
         --text-color: #222222;
         --white-bg: #FFFFFF;
     }
@@ -31,7 +31,7 @@
 
     header {
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
 
     h1 {
@@ -43,7 +43,7 @@
 
     p.subtitle {
         font-size: 14px;
-        color: #666;
+        color: #555;
     }
 
     .main-container {
@@ -58,16 +58,16 @@
         background-color: var(--panel-bg);
         border: 1px solid var(--panel-border);
         border-radius: 12px;
-        padding: 16px 24px;
-        margin-bottom: 25px;
+        padding: 14px 20px;
+        margin-bottom: 20px;
         text-align: center;
-        max-width: 600px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        max-width: 620px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     }
 
     .info-card h2 {
         font-size: 16px;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
     }
 
     .info-card p {
@@ -78,12 +78,12 @@
     /* Wheel Container */
     .wheel-wrapper {
         position: relative;
-        width: 520px;
-        height: 520px;
+        width: 500px;
+        height: 500px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 10px 0 30px 0;
+        margin: 10px 0 20px 0;
     }
 
     svg.hue-wheel {
@@ -95,7 +95,7 @@
     .hue-wedge {
         cursor: pointer;
         transition: transform 0.15s ease, stroke 0.15s ease;
-        transform-origin: 260px 260px;
+        transform-origin: 250px 250px;
     }
 
     .hue-wedge:hover {
@@ -131,13 +131,13 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.25s ease;
+        transition: opacity 0.2s ease;
         z-index: 1000;
     }
 
@@ -147,31 +147,41 @@
     }
 
     .modal-panel {
-        background-color: var(--panel-bg);
-        border: 2px solid var(--panel-border);
-        border-radius: 16px;
-        padding: 24px;
-        width: 90%;
-        max-width: 780px;
-        max-height: 90vh;
-        overflow-y: auto;
+        background-color: var(--white-bg);
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        width: 95%;
+        max-width: 980px;
+        height: 92vh;
+        max-height: 920px;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.25);
         position: relative;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.2);
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+    }
+
+    .modal-bar {
+        background-color: var(--panel-bg);
+        border-bottom: 1px solid var(--panel-border);
+        padding: 10px 20px;
+        display: flex;
         align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-bar-title {
+        font-size: 15px;
+        font-weight: bold;
     }
 
     .close-btn {
-        position: absolute;
-        top: 16px;
-        right: 18px;
         background: #ffffff;
-        border: 1px solid #ccc;
+        border: 1px solid #aaa;
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
         font-weight: bold;
         cursor: pointer;
         display: flex;
@@ -181,93 +191,60 @@
     }
 
     .close-btn:hover {
-        background-color: #eee;
+        background-color: #f0f0f0;
     }
 
-    .modal-header {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .modal-header h3 {
-        font-size: 22px;
-        margin-bottom: 4px;
-    }
-
-    .modal-header p {
-        font-size: 13px;
-        color: #444;
-    }
-
-    /* Triangle Display Area */
-    .triangle-container {
+    /* Atlas Page Content */
+    .atlas-page-canvas {
+        flex: 1;
         position: relative;
-        width: 100%;
+        background-color: #FFFFFF;
+        overflow: auto;
         display: flex;
-        flex-direction: column;
+        justify-content: center;
         align-items: center;
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 20px;
-        border: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
     }
 
-    .triangle-svg-container {
-        width: 100%;
-        max-width: 520px;
-        height: 380px;
-        position: relative;
-    }
-
-    .swatch-node {
-        cursor: pointer;
-        transition: transform 0.1s ease, stroke 0.1s ease;
-    }
-
-    .swatch-node:hover {
-        transform: scale(1.25);
-        stroke: #000;
-        stroke-width: 2px;
-        z-index: 20;
-    }
-
-    .axis-title {
-        font-size: 11px;
-        font-weight: bold;
-        fill: #555;
-        user-select: none;
-    }
-
-    /* Selected Swatch Info Panel */
-    .swatch-details {
-        margin-top: 15px;
+    /* Selected Swatch Info Bar */
+    .swatch-info-bar {
         background-color: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 8px;
-        padding: 12px 20px;
-        width: 100%;
-        max-width: 520px;
+        border-top: 1px solid var(--panel-border);
+        padding: 10px 20px;
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 15px;
     }
 
-    .color-preview-box {
-        width: 48px;
-        height: 48px;
-        border-radius: 6px;
-        border: 1px solid rgba(0,0,0,0.2);
+    .preview-swatch-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.3);
         flex-shrink: 0;
     }
 
-    .color-info-text {
-        font-size: 13px;
-        line-height: 1.4;
+    .info-text-details {
+        font-size: 12px;
+        line-height: 1.3;
     }
 
-    .color-info-text strong {
-        font-size: 15px;
-        display: block;
+    .info-text-details strong {
+        font-size: 14px;
+        color: #000;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    /* Interactive Swatches in SVG */
+    .atlas-swatch-rect {
+        cursor: pointer;
+        transition: transform 0.1s ease, stroke-width 0.1s ease;
+    }
+
+    .atlas-swatch-rect:hover {
+        stroke: #000000 !important;
+        stroke-width: 2px !important;
     }
 </style>
 </head>
@@ -275,41 +252,37 @@
 
 <header>
     <h1>NCS Colour Atlas Workspace</h1>
-    <p class="subtitle">Interactive Natural Color System® Hue Circle & Nuance Triangles</p>
+    <p class="subtitle">Interactive Natural Color System® Hue Circle & Atlas Page View</p>
 </header>
 
 <div class="main-container">
     <div class="info-card">
         <h2>NCS Colour Wheel</h2>
-        <p>Click on any of the 40 hues below (from <strong>-Y</strong> to <strong>-R</strong> to <strong>-B</strong> to <strong>-G</strong> with 9 intermediate steps each) to view its full NCS Colour Triangle showing nuance changes in Whiteness, Blackness, and Chromaticness.</p>
+        <p>Click on any of the 40 hues below (from <strong>-Y</strong> to <strong>-R</strong> to <strong>-B</strong> to <strong>-G</strong> with 9 intermediate steps each) to view its exact <strong>NCS Atlas Page</strong> with interactive color swatches.</p>
     </div>
 
     <div class="wheel-wrapper">
-        <svg id="hue-wheel-svg" class="hue-wheel" viewBox="0 0 520 520"></svg>
+        <svg id="hue-wheel-svg" class="hue-wheel" viewBox="0 0 500 500"></svg>
     </div>
 </div>
 
-<!-- Modal Pop-Up for NCS Color Changes (Triangle) -->
+<!-- Modal Pop-Up for NCS Color Atlas Page -->
 <div id="modal-overlay" class="modal-overlay">
     <div class="modal-panel">
-        <button class="close-btn" onclick="closeModal()">✕</button>
-        <div class="modal-header">
-            <h3 id="modal-hue-title">NCS Hue Page: -Y</h3>
-            <p>NCS Colour Triangle showing constant hue with changing Blackness ($s$) & Chromaticness ($c$)</p>
+        <div class="modal-bar">
+            <div class="modal-bar-title" id="modal-bar-title">NCS Colour Atlas - Page -Y</div>
+            <button class="close-btn" onclick="closeModal()">✕</button>
         </div>
 
-        <div class="triangle-container">
-            <div class="triangle-svg-container">
-                <svg id="triangle-svg" viewBox="0 0 500 360" style="width:100%; height:100%; overflow:visible;"></svg>
-            </div>
+        <div class="atlas-page-canvas">
+            <svg id="atlas-svg" viewBox="0 0 920 820" style="width:100%; height:100%; max-width:900px; max-height:800px;"></svg>
+        </div>
 
-            <div class="swatch-details" id="swatch-details">
-                <div id="preview-box" class="color-preview-box" style="background-color: #FFE600;"></div>
-                <div class="color-info-text">
-                    <strong id="detail-code">S 1070-Y</strong>
-                    <span id="detail-metrics">Blackness ($s$): 10% | Chromaticness ($c$): 70% | Whiteness ($w$): 20%</span><br>
-                    <span id="detail-hex" style="font-family: monospace; color: #555;">HEX: #FFE600</span>
-                </div>
+        <div class="swatch-info-bar">
+            <div id="preview-box" class="preview-swatch-box" style="background-color: #FFE600;"></div>
+            <div class="info-text-details">
+                <div><strong id="detail-code">S 0580-Y</strong> <span id="detail-hex" style="font-family: monospace; color: #444;">HEX: #FFE600</span></div>
+                <div id="detail-metrics" style="color:#333; margin-top:2px;">Blackness (s): 05% | Chromaticness (c): 80% | Whiteness (w): 15%</div>
             </div>
         </div>
     </div>
@@ -347,7 +320,6 @@
                     name = `-${q.start}${i * 10}${q.end}`;
                 }
 
-                // Linear RGB interpolation for wheel visualization
                 const t = i / 10;
                 const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
                 const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
@@ -367,14 +339,13 @@
     // Render 40-step Wheel SVG
     function renderWheel() {
         const svg = document.getElementById('hue-wheel-svg');
-        const cx = 260, cy = 260;
-        const rOuter = 210, rInner = 145;
+        const cx = 250, cy = 250;
+        const rOuter = 200, rInner = 140;
         const total = HUE_STEPS.length;
-        const anglePerStep = 360 / total; // 9 degrees per step
+        const anglePerStep = 360 / total;
 
         let html = '';
 
-        // Render Wedges starting from top (Y at 0 degrees = -90deg in SVG space)
         HUE_STEPS.forEach((hueObj, idx) => {
             const startAngle = idx * anglePerStep - 90 - (anglePerStep / 2);
             const endAngle = startAngle + anglePerStep;
@@ -396,33 +367,29 @@
                         <title>${hueObj.name}</title>
                      </path>`;
 
-            // Render Text labels around perimeter for primary/10-step markers
             const midAngle = (startAngle + endAngle) / 2;
             const rText = rOuter + 18;
             const tx = cx + rText * Math.cos(Math.PI * midAngle / 180);
             const ty = cy + rText * Math.sin(Math.PI * midAngle / 180);
 
-            // Print text for key steps
             if (idx % 2 === 0) {
                 html += `<text x="${tx}" y="${ty}" class="hue-text-label" onclick="openHueModal(${idx})">${hueObj.name}</text>`;
             }
         });
 
-        // Add Major Cardinal Labels (-Y, -R, -B, -G)
         const cardinals = [
-            { label: '-Y', x: cx, y: cy - rOuter - 38 },
-            { label: '-R', x: cx + rOuter + 42, y: cy },
-            { label: '-B', x: cx, y: cy + rOuter + 38 },
-            { label: '-G', x: cx - rOuter - 42, y: cy }
+            { label: '-Y', x: cx, y: cy - rOuter - 36 },
+            { label: '-R', x: cx + rOuter + 38, y: cy },
+            { label: '-B', x: cx, y: cy + rOuter + 36 },
+            { label: '-G', x: cx - rOuter - 38, y: cy }
         ];
 
         cardinals.forEach(c => {
             html += `<text x="${c.x}" y="${c.y}" class="cardinal-label">${c.label}</text>`;
         });
 
-        // Central Decorative Circle
         html += `<circle cx="${cx}" cy="${cy}" r="${rInner - 5}" fill="none" stroke="#e0e0e0" stroke-width="1" />`;
-        html += `<text x="${cx}" y="${cy - 8}" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">NCS</text>`;
+        html += `<text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">NCS</text>`;
         html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" fill="#777">Colour Circle</text>`;
 
         svg.innerHTML = html;
@@ -430,15 +397,14 @@
 
     renderWheel();
 
-    // NCS Nuance Triangle Calculation
-    // Given pure chromatic RGB, Whiteness w, Blackness s, Chromaticness c
+    // Color Nuance Calculation
     function calculateNuanceRGB(pureRGB, sPct, cPct) {
         const s = sPct / 100;
         const c = cPct / 100;
         const w = 1 - s - c;
 
         const W_RGB = [255, 255, 255];
-        const S_RGB = [30, 30, 30]; // Soft black for realistic NCS shade
+        const S_RGB = [25, 20, 15]; // Deep dark black
 
         const r = Math.round(w * W_RGB[0] + s * S_RGB[0] + c * pureRGB[0]);
         const g = Math.round(w * W_RGB[1] + s * S_RGB[1] + c * pureRGB[1]);
@@ -451,106 +417,224 @@
         return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
     }
 
-    let activeHueObj = null;
+    let activeHueIndex = 0;
 
     function openHueModal(hueIndex) {
-        activeHueObj = HUE_STEPS[hueIndex];
-        document.getElementById('modal-hue-title').innerText = `NCS Hue Page: ${activeHueObj.name}`;
+        activeHueIndex = hueIndex;
+        const hueObj = HUE_STEPS[hueIndex];
+        document.getElementById('modal-bar-title').innerText = `NCS Colour Atlas - Page ${hueObj.name}`;
         document.getElementById('modal-overlay').classList.add('active');
 
-        renderTriangle(activeHueObj);
+        renderAtlasPage(hueIndex);
     }
 
     function closeModal() {
         document.getElementById('modal-overlay').classList.remove('active');
     }
 
-    // Render NCS Colour Triangle (W, S, C)
-    function renderTriangle(hueObj) {
-        const svg = document.getElementById('triangle-svg');
+    // Render Exact NCS Atlas Page SVG Layout
+    function renderAtlasPage(hueIndex) {
+        const svg = document.getElementById('atlas-svg');
+        const hueObj = HUE_STEPS[hueIndex];
         svg.innerHTML = '';
 
-        // Triangle Coordinates:
-        // W (White) at Top-Left (50, 40)
-        // S (Black) at Bottom-Left (50, 320)
-        // C (Maximum Chromaticity) at Right Tip (440, 180)
-        const W_pos = { x: 50, y: 40 };
-        const S_pos = { x: 50, y: 320 };
-        const C_pos = { x: 440, y: 180 };
+        // Barycentric Triangle Vertices
+        // W at Top-Left (80, 40)
+        // S at Bottom-Left (80, 720)
+        // C at Right Tip (820, 420)
+        const W_pos = { x: 80, y: 40 };
+        const S_pos = { x: 80, y: 720 };
+        const C_pos = { x: 820, y: 420 };
 
-        // Standard NCS Atlas Blackness (s) & Chromaticness (c) steps
-        const sSteps = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
-        const cSteps = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+        function getCoord(s, c) {
+            const w = 100 - s - c;
+            const normW = w / 100;
+            const normS = s / 100;
+            const normC = c / 100;
+
+            const x = normW * W_pos.x + normS * S_pos.x + normC * C_pos.x;
+            const y = normW * W_pos.y + normS * S_pos.y + normC * C_pos.y;
+            return { x, y };
+        }
 
         let html = '';
 
-        // Draw outer triangle boundary lines
-        html += `<polygon points="${W_pos.x},${W_pos.y} ${S_pos.x},${S_pos.y} ${C_pos.x},${C_pos.y}" fill="none" stroke="#cccccc" stroke-width="1.5" />`;
+        // --- 1. Top Right Title & Mini Hue Wheel ---
+        const titleX = 760, titleY = 55;
+        html += `<text x="${titleX}" y="${titleY}" font-family="Times New Roman, serif" font-size="34" font-weight="bold" fill="#000" text-anchor="middle">${hueObj.name}</text>`;
 
-        // Labels W, S, C
-        html += `<text x="${W_pos.x - 25}" y="${W_pos.y}" class="axis-title">W (00)</text>`;
-        html += `<text x="${S_pos.x - 20}" y="${S_pos.y + 15}" class="axis-title">S (100)</text>`;
-        html += `<text x="${C_pos.x + 10}" y="${C_pos.y + 4}" class="axis-title">C (Max)</text>`;
+        // Mini Wheel (cx=760, cy=145, r=40)
+        const mcx = 760, mcy = 145, mrOuter = 40, mrInner = 28;
+        HUE_STEPS.forEach((hStep, idx) => {
+            const startA = idx * 9 - 90 - 4.5;
+            const endA = startA + 9;
 
-        // Render Swatches
-        // Barycentric mapping or grid coordinate mapping:
-        // Blackness s goes top-to-bottom (0 at W, 100 at S)
-        // Chromaticness c goes left-to-right (0 at W-S axis, 100 at C)
-        const validSwatches = [];
+            const mx1 = mcx + mrOuter * Math.cos(Math.PI * startA / 180);
+            const my1 = mcy + mrOuter * Math.sin(Math.PI * startA / 180);
+            const mx2 = mcx + mrOuter * Math.cos(Math.PI * endA / 180);
+            const my2 = mcy + mrOuter * Math.sin(Math.PI * endA / 180);
 
-        sSteps.forEach(s => {
-            cSteps.forEach(c => {
-                if (s + c <= 100) {
-                    const w = 100 - s - c;
+            const mx3 = mcx + mrInner * Math.cos(Math.PI * endA / 180);
+            const my3 = mcy + mrInner * Math.sin(Math.PI * endA / 180);
+            const mx4 = mcx + mrInner * Math.cos(Math.PI * startA / 180);
+            const my4 = mcy + mrInner * Math.sin(Math.PI * startA / 180);
 
-                    // Compute position inside the W-S-C triangle
-                    const normS = s / 100;
-                    const normC = c / 100;
-                    const normW = w / 100;
+            const mPath = `M ${mx1} ${my1} A ${mrOuter} ${mrOuter} 0 0 1 ${mx2} ${my2} L ${mx3} ${my3} A ${mrInner} ${mrInner} 0 0 0 ${mx4} ${my4} Z`;
+            const mFill = `rgb(${hStep.rgb[0]}, ${hStep.rgb[1]}, ${hStep.rgb[2]})`;
 
-                    const posX = normW * W_pos.x + normS * S_pos.x + normC * C_pos.x;
-                    const posY = normW * W_pos.y + normS * S_pos.y + normC * C_pos.y;
+            html += `<path d="${mPath}" fill="${mFill}" stroke="#ffffff" stroke-width="0.5" />`;
 
-                    const rgb = calculateNuanceRGB(hueObj.rgb, s, c);
-                    const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
-
-                    const sFormatted = s.toString().padStart(2, '0');
-                    const cFormatted = c.toString().padStart(2, '0');
-                    const code = `S ${sFormatted}${cFormatted}${hueObj.name}`;
-
-                    validSwatches.push({
-                        s, c, w, posX, posY, rgb, hex, code
-                    });
-                }
-            });
+            if (idx === hueIndex) {
+                // Highlight active hue on mini wheel
+                const midA = (startA + endA) / 2;
+                const px = mcx + (mrOuter + 7) * Math.cos(Math.PI * midA / 180);
+                const py = mcy + (mrOuter + 7) * Math.sin(Math.PI * midA / 180);
+                html += `<circle cx="${px}" cy="${py}" r="3.5" fill="#000000" />`;
+            }
         });
 
-        // Render interactive nodes
-        validSwatches.forEach(item => {
-            html += `<rect class="swatch-node" x="${item.posX - 9}" y="${item.posY - 9}" width="18" height="18" rx="3"
-                        fill="${item.hex}" stroke="#ffffff" stroke-width="1"
-                        onclick="selectSwatch('${item.code}', ${item.s}, ${item.c}, ${item.w}, '${item.hex}')">
-                        <title>${item.code} (s:${item.s}%, c:${item.c}%)</title>
-                     </rect>`;
+        // Mini Wheel Axis & Labels
+        html += `<line x1="${mcx}" y1="${mcy - mrOuter - 2}" x2="${mcx}" y2="${mcy + mrOuter + 2}" stroke="#000" stroke-width="0.8" />`;
+        html += `<line x1="${mcx - mrOuter - 2}" y1="${mcy}" x2="${mcx + mrOuter + 2}" y2="${mcy}" stroke="#000" stroke-width="0.8" />`;
+        html += `<text x="${mcx}" y="${mcy - mrOuter - 6}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-Y</text>`;
+        html += `<text x="${mcx + mrOuter + 12}" y="${mcy + 4}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-R</text>`;
+        html += `<text x="${mcx}" y="${mcy + mrOuter + 14}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-B</text>`;
+        html += `<text x="${mcx - mrOuter - 12}" y="${mcy + 4}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-G</text>`;
+
+
+        // --- 2. Bottom Right NCS Logo ---
+        const logoX = 850, logoY = 760;
+        html += `<g transform="translate(${logoX - 100}, ${logoY - 30})">
+                    <text x="50" y="20" font-family="Times New Roman, serif" font-size="30" font-weight="900" letter-spacing="-1">NCS</text>
+                    <!-- Overlapping circle logo icon -->
+                    <circle cx="78" cy="12" r="12" fill="none" stroke="#000" stroke-width="1.2" />
+                    <circle cx="78" cy="12" r="7" fill="none" stroke="#000" stroke-width="1" />
+                    <line x1="66" y1="12" x2="90" y2="12" stroke="#000" stroke-width="0.8" />
+                    <line x1="78" y1="0" x2="78" y2="24" stroke="#000" stroke-width="0.8" />
+                    <text x="50" y="30" font-family="sans-serif" font-size="6" font-weight="bold" fill="#333">Natural Color System®</text>
+                 </g>`;
+
+
+        // --- 3. Triangle Grid Lines ---
+        const sScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+        const cScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+
+        // Constant s lines (slopes down-right)
+        sScaleVals.forEach(s => {
+            const p1 = getCoord(s, 0);
+            const p2 = getCoord(s, 100 - s);
+            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
+        });
+
+        // Constant c lines (vertical-ish)
+        cScaleVals.forEach(c => {
+            const p1 = getCoord(0, c);
+            const p2 = getCoord(100 - c, c);
+            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
+        });
+
+        // Constant w lines (slopes up-right)
+        [10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(w => {
+            const p1 = getCoord(100 - w, 0);
+            const p2 = getCoord(0, 100 - w);
+            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
+        });
+
+
+        // --- 4. Axis Labels ---
+        // Left Blackness (s) Axis Labels
+        sScaleVals.forEach(s => {
+            const p = getCoord(s, 0);
+            const labelStr = s < 10 ? `0${s}` : `${s}`;
+            html += `<text x="${p.x - 22}" y="${p.y + 4}" font-family="Times New Roman, serif" font-size="16" fill="#000" text-anchor="end">${labelStr}</text>`;
+        });
+
+        // Bottom Chromaticness (c) Axis Labels
+        cScaleVals.forEach(c => {
+            const p = getCoord(100 - c, c);
+            const labelStr = c < 10 ? `0${c}` : `${c}`;
+            html += `<text x="${p.x}" y="${p.y + 26}" font-family="Times New Roman, serif" font-size="18" font-weight="bold" fill="#000" text-anchor="middle">${labelStr}</text>`;
+        });
+
+
+        // --- 5. Swatch Grid Definition ---
+        const standardSwatches = [
+            // s = 05
+            {s:5, c:5}, {s:5, c:10}, {s:5, c:20}, {s:5, c:30}, {s:5, c:40}, {s:5, c:50}, {s:5, c:60}, {s:5, c:70}, {s:5, c:80},
+            // s = 10
+            {s:10, c:5}, {s:10, c:10}, {s:10, c:20}, {s:10, c:30}, {s:10, c:40}, {s:10, c:50}, {s:10, c:60}, {s:10, c:70}, {s:10, c:80},
+            // s = 20
+            {s:20, c:5}, {s:20, c:10}, {s:20, c:20}, {s:20, c:30}, {s:20, c:40}, {s:20, c:50}, {s:20, c:60}, {s:20, c:70},
+            // s = 30
+            {s:30, c:5}, {s:30, c:10}, {s:30, c:20}, {s:30, c:30}, {s:30, c:40}, {s:30, c:50}, {s:30, c:60},
+            // s = 40
+            {s:40, c:10}, {s:40, c:20}, {s:40, c:30}, {s:40, c:40}, {s:40, c:50},
+            // s = 50
+            {s:50, c:10}, {s:50, c:20}, {s:50, c:30}, {s:50, c:40},
+            // s = 60
+            {s:60, c:10}, {s:60, c:20}, {s:60, c:30},
+            // s = 70
+            {s:70, c:10}, {s:70, c:20},
+            // s = 80
+            {s:80, c:10},
+            // Intermediate high-chroma swatches
+            {s:35, c:60}, {s:45, c:50}
+        ];
+
+        const swatchWidth = 38;
+        const swatchHeight = 30;
+
+        let activeSwatchData = null;
+
+        standardSwatches.forEach((sw) => {
+            const p = getCoord(sw.s, sw.c);
+            const rgb = calculateNuanceRGB(hueObj.rgb, sw.s, sw.c);
+            const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+
+            const sStr = sw.s < 10 ? `0${sw.s}` : `${sw.s}`;
+            const cStr = sw.c < 10 ? `0${sw.c}` : `${sw.c}`;
+            const codeStr = `S ${sStr}${cStr}${hueObj.name}`;
+
+            const rx = p.x - (swatchWidth / 2);
+            const ry = p.y - (swatchHeight / 2);
+
+            html += `<g onclick="selectAtlasSwatch('${codeStr}', ${sw.s}, ${sw.c}, ${100 - sw.s - sw.c}, '${hex}')">
+                        <rect class="atlas-swatch-rect" x="${rx}" y="${ry}" width="${swatchWidth}" height="${swatchHeight}" 
+                              fill="${hex}" stroke="#ffffff" stroke-width="1">
+                              <title>${codeStr}</title>
+                        </rect>
+                        <text x="${p.x}" y="${ry + swatchHeight + 10}" font-family="Arial, sans-serif" font-size="7.5" font-weight="600" fill="#000000" text-anchor="middle">${codeStr}</text>
+                     </g>`;
+
+            if (sw.s === 5 && sw.c === 80) {
+                activeSwatchData = { code: codeStr, s: sw.s, c: sw.c, w: 100 - sw.s - sw.c, hex: hex };
+            }
         });
 
         svg.innerHTML = html;
 
-        // Automatically select a vibrant default swatch on open (e.g. s:10, c:70 or highest c)
-        const defaultSwatch = validSwatches.find(item => item.s === 10 && item.c === 70) || validSwatches[0];
-        if (defaultSwatch) {
-            selectSwatch(defaultSwatch.code, defaultSwatch.s, defaultSwatch.c, defaultSwatch.w, defaultSwatch.hex);
+        if (!activeSwatchData) {
+            const defaultSw = standardSwatches[0];
+            const rgb = calculateNuanceRGB(hueObj.rgb, defaultSw.s, defaultSw.c);
+            const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+            const sStr = defaultSw.s < 10 ? `0${defaultSw.s}` : `${defaultSw.s}`;
+            const cStr = defaultSw.c < 10 ? `0${defaultSw.c}` : `${defaultSw.c}`;
+            activeSwatchData = { code: `S ${sStr}${cStr}${hueObj.name}`, s: defaultSw.s, c: defaultSw.c, w: 100 - defaultSw.s - defaultSw.c, hex: hex };
         }
+
+        selectAtlasSwatch(activeSwatchData.code, activeSwatchData.s, activeSwatchData.c, activeSwatchData.w, activeSwatchData.hex);
     }
 
-    function selectSwatch(code, s, c, w, hex) {
+    function selectAtlasSwatch(code, s, c, w, hex) {
         document.getElementById('detail-code').innerText = code;
-        document.getElementById('detail-metrics').innerText = `Blackness (s): ${s}% | Chromaticness (c): ${c}% | Whiteness (w): ${w}%`;
         document.getElementById('detail-hex').innerText = `HEX: ${hex}`;
+        const sFormatted = s < 10 ? `0${s}` : `${s}`;
+        const cFormatted = c < 10 ? `0${c}` : `${c}`;
+        const wFormatted = w < 10 ? `0${w}` : `${w}`;
+        document.getElementById('detail-metrics').innerText = `Blackness (s): ${sFormatted}% | Chromaticness (c): ${cFormatted}% | Whiteness (w): ${wFormatted}%`;
         document.getElementById('preview-box').style.backgroundColor = hex;
     }
 
-    // Close modal when clicking outside content
     window.onclick = function(event) {
         const overlay = document.getElementById('modal-overlay');
         if (event.target === overlay) {
