@@ -58,7 +58,7 @@
     .rgb-table { border-collapse: collapse; width: 100%; text-align: center; }
     .rgb-table th, .rgb-table td { border: 1px solid #333; padding: 8px 4px; }
     .rgb-table th { background: #2980b9; color: #ccc; font-size: 12px; }
-    .rgb-table td.value-col { background: #2980b9; font-weight: bold; font-family: monospace; font-size: 12px; color: #fff; width: 80px; }
+    .rgb-table td.value-col { background: #B4E3F8; font-weight: bold; font-family: monospace; font-size: 12px; color: #fff; width: 80px; }
     
     /* Swatches */
     .rgb-cell, .chart-swatch, .harmony-swatch, .mute-swatch, .wheel-swatch, .gradient-swatch { cursor: pointer; transition: transform 0.1s; position: relative; }
@@ -115,7 +115,7 @@
 
     /* Global Comparison Palette */
     .global-palette-bar {
-        position: fixed; bottom: 0; left: 0; right: 0; background-color: #2980b9;
+        position: fixed; bottom: 0; left: 0; right: 0; background-color: #B4E3F8;
         border-top: 1px solid #333; padding: 15px 20px; display: flex; align-items: center; gap: 20px; z-index: 1000;
     }
     .palette-title { font-weight: bold; font-size: 14px; width: 220px; }
@@ -199,8 +199,8 @@
     <div class="controls-bar">
         <div class="control-item">
             <span>Select Base Color:</span>
-            <input type="text" id="base-color-input" value="#FF8B00" oninput="updateHarmonies()" style="width: 90px;" />
-            <input type="color" id="base-color-picker" value="#FF8B00" oninput="syncColorInput(this.value)" />
+            <input type="text" id="base-color-input" value="#B4E3F8" oninput="updateHarmonies()" style="width: 90px;" />
+            <input type="color" id="base-color-picker" value="#B4E3F8" oninput="syncColorInput(this.value)" />
         </div>
         <div class="control-item">
             <span>Or Pick Saved Palette:</span>
@@ -241,7 +241,7 @@
 
         <!-- Harmonies Display Section -->
         <div class="harmony-workspace">
-            <h3 style="margin-top:0; color:#fff; font-size:16px;">Color Harmonies (RBY vs CMY Models)[cite: 7]</h3>
+            <h3 style="margin-top:0; color:#fff; font-size:16px;">Color Harmonies (RBY vs CMY Models)</h3>
             <div class="harmony-grid" id="harmony-grid"></div>
         </div>
     </div>
@@ -522,7 +522,7 @@
                     sat = 100 * t;
                     light = 65 - (t * 15);
                 }
-                if (i === 5) { sat = 0; light = 58; currentHue = 0; } // Exact center neutral grey[cite: 25]
+                if (i === 5) { sat = 0; light = 58; currentHue = 0; } // Exact center neutral grey
 
                 let [r, g, b] = hslToRgb(currentHue, sat, light);
                 let hex = rgbToHex(r, g, b);
