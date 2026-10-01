@@ -1,630 +1,787 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ruff RUFF</title>
-<style>
-    :root {
-        --panel-bg: #B4E3F8;
-        --panel-border: #87cde8;
-        --text-color: #222222;
-        --white-bg: #FFFFFF;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: var(--white-bg);
-        color: var(--text-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-    }
-
-    header {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-
-    h1 {
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        margin-bottom: 6px;
-    }
-
-    p.subtitle {
-        font-size: 14px;
-        color: #555;
-    }
-
-    .main-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        max-width: 900px;
-    }
-
-    .info-card {
-        background-color: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 12px;
-        padding: 14px 20px;
-        margin-bottom: 20px;
-        text-align: center;
-        max-width: 620px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-
-    .info-card h2 {
-        font-size: 16px;
-        margin-bottom: 4px;
-    }
-
-    .info-card p {
-        font-size: 13px;
-        line-height: 1.4;
-    }
-
-    /* Wheel Container */
-    .wheel-wrapper {
-        position: relative;
-        width: 500px;
-        height: 500px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 10px 0 20px 0;
-    }
-
-    svg.hue-wheel {
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-    }
-
-    .hue-wedge {
-        cursor: pointer;
-        transition: transform 0.15s ease, stroke 0.15s ease;
-        transform-origin: 250px 250px;
-    }
-
-    .hue-wedge:hover {
-        transform: scale(1.03);
-        stroke: #000;
-        stroke-width: 2px;
-        z-index: 10;
-    }
-
-    .cardinal-label {
-        font-size: 22px;
-        font-weight: 800;
-        fill: #111;
-        text-anchor: middle;
-        dominant-baseline: central;
-        user-select: none;
-    }
-
-    .hue-text-label {
-        font-size: 9px;
-        font-weight: 600;
-        fill: #444;
-        text-anchor: middle;
-        dominant-baseline: central;
-        user-select: none;
-        cursor: pointer;
-    }
-
-    /* Modal Pop-up */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 1000;
-    }
-
-    .modal-overlay.active {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .modal-panel {
-        background-color: var(--white-bg);
-        border: 1px solid #ccc;
-        border-radius: 12px;
-        width: 95%;
-        max-width: 980px;
-        height: 92vh;
-        max-height: 920px;
-        box-shadow: 0 12px 36px rgba(0,0,0,0.25);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .modal-bar {
-        background-color: var(--panel-bg);
-        border-bottom: 1px solid var(--panel-border);
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .modal-bar-title {
-        font-size: 15px;
-        font-weight: bold;
-    }
-
-    .close-btn {
-        background: #ffffff;
-        border: 1px solid #aaa;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.15s;
-    }
-
-    .close-btn:hover {
-        background-color: #f0f0f0;
-    }
-
-    /* Atlas Page Content */
-    .atlas-page-canvas {
-        flex: 1;
-        position: relative;
-        background-color: #FFFFFF;
-        overflow: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-    }
-
-    /* Selected Swatch Info Bar */
-    .swatch-info-bar {
-        background-color: var(--panel-bg);
-        border-top: 1px solid var(--panel-border);
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .preview-swatch-box {
-        width: 38px;
-        height: 38px;
-        border-radius: 4px;
-        border: 1px solid rgba(0,0,0,0.3);
-        flex-shrink: 0;
-    }
-
-    .info-text-details {
-        font-size: 12px;
-        line-height: 1.3;
-    }
-
-    .info-text-details strong {
-        font-size: 14px;
-        color: #000;
-        display: inline-block;
-        margin-right: 10px;
-    }
-
-    /* Interactive Swatches in SVG */
-    .atlas-swatch-rect {
-        cursor: pointer;
-        transition: transform 0.1s ease, stroke-width 0.1s ease;
-    }
-
-    .atlas-swatch-rect:hover {
-        stroke: #000000 !important;
-        stroke-width: 2px !important;
-    }
-</style>
-</head>
-<body>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palette Vault - NCS Colour Atlas & 40-Step Nuance Wheel</title>
     
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="main-container">
-    <div class="info-card">
-        <h2>rockies in a circle</h2>
-        <p>zoom zoom zoom</p>
-    </div>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        accent: {
+                            light: '#E6F4FA',
+                            DEFAULT: '#B4E3F8',
+                            hover: '#9BD6F3',
+                            border: '#22ACEC',
+                            dark: '#0284c7',
+                            text: '#0369a1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-    <div class="wheel-wrapper">
-        <svg id="hue-wheel-svg" class="hue-wheel" viewBox="0 0 500 500"></svg>
-    </div>
-</div>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+        }
 
-<!-- Modal Pop-Up for NCS Color Atlas Page -->
-<div id="modal-overlay" class="modal-overlay">
-    <div class="modal-panel">
-        <div class="modal-bar">
-            <div class="modal-bar-title" id="modal-bar-title">Y</div>
-            <button class="close-btn" onclick="closeModal()">✕</button>
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Hue Wedge Hover Animations */
+        .hue-wedge {
+            cursor: pointer;
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.15s ease, opacity 0.15s ease;
+            transform-origin: 250px 250px;
+        }
+        .hue-wedge:hover {
+            transform: scale(1.045);
+            stroke: #0284c7 !important;
+            stroke-width: 2.5px !important;
+            z-index: 30;
+        }
+
+        /* Labels and Text interactive states */
+        .hue-text-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8px;
+            font-weight: 700;
+            fill: #475569;
+            text-anchor: middle;
+            dominant-baseline: central;
+            user-select: none;
+            cursor: pointer;
+            transition: fill 0.15s ease, font-weight 0.15s ease;
+        }
+        .hue-text-label:hover {
+            fill: #0284c7;
+            font-size: 9.5px;
+        }
+
+        .cardinal-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            fill: #0369a1;
+            text-anchor: middle;
+            dominant-baseline: central;
+            user-select: none;
+        }
+
+        /* Glassmorphic Cards & Panels */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-vault {
+            background-color: #B4E3F8;
+            border: 1px solid #22ACEC;
+        }
+
+        /* Modal Overlay Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Swatch Rects in SVG Canvas */
+        .atlas-swatch-rect {
+            cursor: pointer;
+            transition: transform 0.12s ease, stroke-width 0.12s ease, filter 0.12s ease;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        .atlas-swatch-rect:hover {
+            stroke: #0284c7 !important;
+            stroke-width: 2.5px !important;
+            transform: scale(1.12);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            z-index: 40;
+        }
+
+        /* Drag and Drop Palette Slots */
+        .palette-slot {
+            transition: all 0.15s ease;
+        }
+        .palette-slot.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .palette-slot.drag-over {
+            border-color: #0284c7;
+            background-color: #E6F4FA;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-white text-slate-800 pb-32">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
+                        <i class="fa-solid fa-palette"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                            Palette Vault
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">NCS Atlas Engine</span>
+                        </h1>
+                        <p class="text-xs text-slate-500">Natural Colour System • 40-Step Hue Wheel & Barycentric Nuance Triangles</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-mono font-bold text-[#0369a1] bg-[#B4E3F8]/50 px-3 py-1.5 rounded-xl border border-[#22ACEC]/40">
+                        <i class="fa-solid fa-circle-nodes mr-1"></i> Perceptual s-c-w Space
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6 flex flex-col items-center">
+
+        <!-- INFO CARD -->
+        <div class="w-full max-w-3xl bg-[#B4E3F8]/40 border border-[#22ACEC] rounded-2xl p-5 shadow-sm space-y-2 text-center">
+            <div class="flex items-center justify-center space-x-2 text-[#0369a1] font-bold text-base">
+                <i class="fa-solid fa-circle-info"></i>
+                <h2>Interactive Natural Colour System (NCS) Wheel</h2>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed max-w-2xl mx-auto">
+                The Natural Colour System describes color as humans perceive it, built on 6 elementary perceptions: White (W), Black (S), Yellow (Y), Red (R), Blue (B), and Green (G). 
+                <span class="font-semibold text-slate-800">Click any wedge or label</span> on the 40-step circle below to open its corresponding Barycentric Color Nuance Page ($S - C - W$).
+            </p>
         </div>
 
-        <div class="atlas-page-canvas">
-            <svg id="atlas-svg" viewBox="0 0 920 820" style="width:100%; height:100%; max-width:900px; max-height:800px;"></svg>
+        <!-- HUE WHEEL CONTAINER -->
+        <div class="relative w-full max-w-[540px] aspect-square flex items-center justify-center my-2 p-2 glass-card rounded-3xl border border-slate-200 shadow-md">
+            <svg id="hue-wheel-svg" class="w-full h-full overflow-visible select-none" viewBox="0 0 500 500"></svg>
         </div>
 
-        <div class="swatch-info-bar">
-            <div id="preview-box" class="preview-swatch-box" style="background-color: #FFE600;"></div>
-            <div class="info-text-details">
-                <div><strong id="detail-code">S 0580-Y</strong> <span id="detail-hex" style="font-family: monospace; color: #444;">HEX: #FFE600</span></div>
-                <div id="detail-metrics" style="color:#333; margin-top:2px;">Blackness (s): 05% | Chromaticness (c): 80% | Whiteness (w): 15%</div>
+    </main>
+
+    <!-- BARYCENTRIC ATLAS MODAL POPUP -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-panel bg-white border border-slate-300 rounded-3xl w-11/12 max-w-4xl h-[90vh] max-h-[860px] shadow-2xl relative flex flex-col overflow-hidden">
+            
+            <!-- Modal Header Bar -->
+            <div class="modal-bar bg-[#B4E3F8] border-b border-[#22ACEC] px-6 py-3.5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="w-3.5 h-3.5 rounded-full bg-[#0369a1] border border-white"></span>
+                    <h3 id="modal-bar-title" class="font-bold text-slate-900 text-base font-mono">
+                        NCS Colour Atlas - Page -Y
+                    </h3>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-300 flex items-center justify-center font-bold text-sm transition-colors">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Atlas Triangle SVG Canvas Area -->
+            <div class="atlas-page-canvas flex-1 relative bg-white overflow-auto flex items-center justify-center p-4">
+                <svg id="atlas-svg" viewBox="0 0 920 820" class="w-full h-full max-w-[880px] max-h-[780px] select-none"></svg>
+            </div>
+
+            <!-- Swatch Inspector Info Bar -->
+            <div class="swatch-info-bar bg-[#B4E3F8]/60 border-t-2 border-[#22ACEC] px-6 py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                
+                <div class="flex items-center space-x-4">
+                    <div id="preview-box" class="w-12 h-12 rounded-xl border-2 border-slate-900/30 shadow-md flex-shrink-0 transition-all duration-150" style="background-color: #FFE600;"></div>
+                    
+                    <div class="text-xs space-y-0.5">
+                        <div class="flex items-center space-x-2">
+                            <span id="detail-code" class="font-bold text-slate-900 text-sm font-mono">S 0580-Y</span>
+                            <span id="detail-hex" class="font-mono text-slate-600 bg-white/80 px-2 py-0.5 rounded border border-slate-200">HEX: #FFE600</span>
+                            <span id="detail-pv" class="font-mono font-semibold text-[#0369a1] bg-sky-100 px-2 py-0.5 rounded border border-sky-200">Val: 88%</span>
+                        </div>
+                        <div id="detail-metrics" class="text-slate-700 font-mono text-[11px]">
+                            Blackness (s): 05% | Chromaticness (c): 80% | Whiteness (w): 15%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add to Global Palette Button -->
+                <button id="add-modal-swatch-btn" onclick="addCurrentModalSwatch()" class="px-4 py-2.5 bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-2 border border-sky-600">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Add to Global Palette</span>
+                </button>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Primary NCS Colors in sRGB
-    const NCS_PRIMARIES = {
-        Y: [255, 213, 0],   // Yellow
-        R: [227, 0, 34],    // Red
-        B: [0, 135, 202],   // Blue
-        G: [0, 158, 96]     // Green
-    };
+    <!-- GLOBAL COMPARISON PALETTE DRAWER -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#B4E3F8]/95 backdrop-blur-md border-t-2 border-[#22ACEC] shadow-2xl px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+            
+            <div class="flex items-center justify-between md:justify-start space-x-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-swatchbook text-[#0369a1] text-base"></i>
+                    <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Comparison Palette (0/16)</span>
+                </div>
+                <button onclick="clearPalette()" class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors">
+                    Clear
+                </button>
+            </div>
 
-    // Generate 40 Hue Steps (-Y -> -R -> -B -> -G)
-    const HUE_STEPS = [];
-    
-    function buildHueCircle() {
-        const quadrants = [
-            { start: 'Y', end: 'R' },
-            { start: 'R', end: 'B' },
-            { start: 'B', end: 'G' },
-            { start: 'G', end: 'Y' }
-        ];
+            <!-- Swatch Slots Container -->
+            <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1">
+                <!-- 16 slots injected dynamically -->
+            </div>
 
-        quadrants.forEach(q => {
-            const c1 = NCS_PRIMARIES[q.start];
-            const c2 = NCS_PRIMARIES[q.end];
+            <!-- Action Controls -->
+            <div class="flex items-center space-x-2">
+                <button onclick="copyAllPaletteHex()" class="px-3 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-sky-600">
+                    <i class="fa-solid fa-copy"></i> Copy All HEX
+                </button>
+            </div>
+        </div>
+    </div>
 
-            for (let i = 0; i < 10; i++) {
-                let name = "";
-                if (i === 0) {
-                    name = `-${q.start}`;
-                } else {
-                    name = `-${q.start}${i * 10}${q.end}`;
+    <!-- TOAST NOTIFICATION POPUP -->
+    <div id="toast" class="fixed bottom-24 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl border border-slate-700 text-xs font-mono font-bold opacity-0 pointer-events-none transition-all duration-300 flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-[#00f0ff]"></span>
+        <span id="toast-text">Copied to clipboard!</span>
+    </div>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        /* NCS COLOR CONSTANTS & ENDPOINTS */
+        const NCS_PRIMARIES = {
+            Y: [255, 213, 0],   // Primary Yellow
+            R: [227, 0, 34],    // Primary Red
+            B: [0, 135, 202],   // Primary Blue
+            G: [0, 158, 96]     // Primary Green
+        };
+
+        const HUE_STEPS = [];
+
+        function buildHueCircle() {
+            const quadrants = [
+                { start: 'Y', end: 'R' },
+                { start: 'R', end: 'B' },
+                { start: 'B', end: 'G' },
+                { start: 'G', end: 'Y' }
+            ];
+
+            quadrants.forEach(q => {
+                const c1 = NCS_PRIMARIES[q.start];
+                const c2 = NCS_PRIMARIES[q.end];
+
+                for (let i = 0; i < 10; i++) {
+                    let name = "";
+                    if (i === 0) {
+                        name = `-${q.start}`;
+                    } else {
+                        name = `-${q.start}${i * 10}${q.end}`;
+                    }
+
+                    const t = i / 10;
+                    const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
+                    const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
+                    const b = Math.round(c1[2] * (1 - t) + c2[2] * t);
+
+                    HUE_STEPS.push({
+                        name: name,
+                        cleanName: name.replace('-', ''),
+                        rgb: [r, g, b]
+                    });
                 }
-
-                const t = i / 10;
-                const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
-                const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
-                const b = Math.round(c1[2] * (1 - t) + c2[2] * t);
-
-                HUE_STEPS.push({
-                    name: name,
-                    cleanName: name.replace('-', ''),
-                    rgb: [r, g, b]
-                });
-            }
-        });
-    }
-
-    buildHueCircle();
-
-    // Render 40-step Wheel SVG
-    function renderWheel() {
-        const svg = document.getElementById('hue-wheel-svg');
-        const cx = 250, cy = 250;
-        const rOuter = 200, rInner = 140;
-        const total = HUE_STEPS.length;
-        const anglePerStep = 360 / total;
-
-        let html = '';
-
-        HUE_STEPS.forEach((hueObj, idx) => {
-            const startAngle = idx * anglePerStep - 90 - (anglePerStep / 2);
-            const endAngle = startAngle + anglePerStep;
-
-            const x1 = cx + rOuter * Math.cos(Math.PI * startAngle / 180);
-            const y1 = cy + rOuter * Math.sin(Math.PI * startAngle / 180);
-            const x2 = cx + rOuter * Math.cos(Math.PI * endAngle / 180);
-            const y2 = cy + rOuter * Math.sin(Math.PI * endAngle / 180);
-
-            const x3 = cx + rInner * Math.cos(Math.PI * endAngle / 180);
-            const y3 = cy + rInner * Math.sin(Math.PI * endAngle / 180);
-            const x4 = cx + rInner * Math.cos(Math.PI * startAngle / 180);
-            const y4 = cy + rInner * Math.sin(Math.PI * startAngle / 180);
-
-            const pathData = `M ${x1} ${y1} A ${rOuter} ${rOuter} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 0 0 ${x4} ${y4} Z`;
-            const fillColor = `rgb(${hueObj.rgb[0]}, ${hueObj.rgb[1]}, ${hueObj.rgb[2]})`;
-
-            html += `<path class="hue-wedge" d="${pathData}" fill="${fillColor}" stroke="#ffffff" stroke-width="1.2" onclick="openHueModal(${idx})">
-                        <title>${hueObj.name}</title>
-                     </path>`;
-
-            const midAngle = (startAngle + endAngle) / 2;
-            const rText = rOuter + 18;
-            const tx = cx + rText * Math.cos(Math.PI * midAngle / 180);
-            const ty = cy + rText * Math.sin(Math.PI * midAngle / 180);
-
-            if (idx % 2 === 0) {
-                html += `<text x="${tx}" y="${ty}" class="hue-text-label" onclick="openHueModal(${idx})">${hueObj.name}</text>`;
-            }
-        });
-
-        const cardinals = [
-            { label: '-Y', x: cx, y: cy - rOuter - 36 },
-            { label: '-R', x: cx + rOuter + 38, y: cy },
-            { label: '-B', x: cx, y: cy + rOuter + 36 },
-            { label: '-G', x: cx - rOuter - 38, y: cy }
-        ];
-
-        cardinals.forEach(c => {
-            html += `<text x="${c.x}" y="${c.y}" class="cardinal-label">${c.label}</text>`;
-        });
-
-        html += `<circle cx="${cx}" cy="${cy}" r="${rInner - 5}" fill="none" stroke="#e0e0e0" stroke-width="1" />`;
-        html += `<text x="${cx}" y="${cy - 6}" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">Click if we're besties...xd</text>`;
-        html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" fill="#777">rockie friends only</text>`;
-
-        svg.innerHTML = html;
-    }
-
-    renderWheel();
-
-    // Color Nuance Calculation
-    function calculateNuanceRGB(pureRGB, sPct, cPct) {
-        const s = sPct / 100;
-        const c = cPct / 100;
-        const w = 1 - s - c;
-
-        const W_RGB = [255, 255, 255];
-        const S_RGB = [25, 20, 15]; // Deep dark black
-
-        const r = Math.round(w * W_RGB[0] + s * S_RGB[0] + c * pureRGB[0]);
-        const g = Math.round(w * W_RGB[1] + s * S_RGB[1] + c * pureRGB[1]);
-        const b = Math.round(w * W_RGB[2] + s * S_RGB[2] + c * pureRGB[2]);
-
-        return [Math.max(0, Math.min(255, r)), Math.max(0, Math.min(255, g)), Math.max(0, Math.min(255, b))];
-    }
-
-    function rgbToHex(r, g, b) {
-        return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
-    }
-
-    let activeHueIndex = 0;
-
-    function openHueModal(hueIndex) {
-        activeHueIndex = hueIndex;
-        const hueObj = HUE_STEPS[hueIndex];
-        document.getElementById('modal-bar-title').innerText = `NCS Colour Atlas - Page ${hueObj.name}`;
-        document.getElementById('modal-overlay').classList.add('active');
-
-        renderAtlasPage(hueIndex);
-    }
-
-    function closeModal() {
-        document.getElementById('modal-overlay').classList.remove('active');
-    }
-
-    // Render Exact NCS Atlas Page SVG Layout
-    function renderAtlasPage(hueIndex) {
-        const svg = document.getElementById('atlas-svg');
-        const hueObj = HUE_STEPS[hueIndex];
-        svg.innerHTML = '';
-
-        // Barycentric Triangle Vertices
-        // W at Top-Left (80, 40)
-        // S at Bottom-Left (80, 720)
-        // C at Right Tip (820, 420)
-        const W_pos = { x: 80, y: 40 };
-        const S_pos = { x: 80, y: 720 };
-        const C_pos = { x: 820, y: 420 };
-
-        function getCoord(s, c) {
-            const w = 100 - s - c;
-            const normW = w / 100;
-            const normS = s / 100;
-            const normC = c / 100;
-
-            const x = normW * W_pos.x + normS * S_pos.x + normC * C_pos.x;
-            const y = normW * W_pos.y + normS * S_pos.y + normC * C_pos.y;
-            return { x, y };
+            });
         }
 
-        let html = '';
+        buildHueCircle();
 
-        // --- 1. Top Right Title & Mini Hue Wheel ---
-        const titleX = 760, titleY = 55;
-        html += `<text x="${titleX}" y="${titleY}" font-family="Times New Roman, serif" font-size="34" font-weight="bold" fill="#000" text-anchor="middle">${hueObj.name}</text>`;
+        /* RENDER 40-STEP HUE WHEEL SVG */
+        function renderWheel() {
+            const svg = document.getElementById('hue-wheel-svg');
+            const cx = 250, cy = 250;
+            const rOuter = 195, rInner = 135;
+            const total = HUE_STEPS.length;
+            const anglePerStep = 360 / total;
 
-        // Mini Wheel (cx=760, cy=145, r=40)
-        const mcx = 760, mcy = 145, mrOuter = 40, mrInner = 28;
-        HUE_STEPS.forEach((hStep, idx) => {
-            const startA = idx * 9 - 90 - 4.5;
-            const endA = startA + 9;
+            let html = '';
 
-            const mx1 = mcx + mrOuter * Math.cos(Math.PI * startA / 180);
-            const my1 = mcy + mrOuter * Math.sin(Math.PI * startA / 180);
-            const mx2 = mcx + mrOuter * Math.cos(Math.PI * endA / 180);
-            const my2 = mcy + mrOuter * Math.sin(Math.PI * endA / 180);
+            HUE_STEPS.forEach((hueObj, idx) => {
+                const startAngle = idx * anglePerStep - 90 - (anglePerStep / 2);
+                const endAngle = startAngle + anglePerStep;
 
-            const mx3 = mcx + mrInner * Math.cos(Math.PI * endA / 180);
-            const my3 = mcy + mrInner * Math.sin(Math.PI * endA / 180);
-            const mx4 = mcx + mrInner * Math.cos(Math.PI * startA / 180);
-            const my4 = mcy + mrInner * Math.sin(Math.PI * startA / 180);
+                const x1 = cx + rOuter * Math.cos(Math.PI * startAngle / 180);
+                const y1 = cy + rOuter * Math.sin(Math.PI * startAngle / 180);
+                const x2 = cx + rOuter * Math.cos(Math.PI * endAngle / 180);
+                const y2 = cy + rOuter * Math.sin(Math.PI * endAngle / 180);
 
-            const mPath = `M ${mx1} ${my1} A ${mrOuter} ${mrOuter} 0 0 1 ${mx2} ${my2} L ${mx3} ${my3} A ${mrInner} ${mrInner} 0 0 0 ${mx4} ${my4} Z`;
-            const mFill = `rgb(${hStep.rgb[0]}, ${hStep.rgb[1]}, ${hStep.rgb[2]})`;
+                const x3 = cx + rInner * Math.cos(Math.PI * endAngle / 180);
+                const y3 = cy + rInner * Math.sin(Math.PI * endAngle / 180);
+                const x4 = cx + rInner * Math.cos(Math.PI * startAngle / 180);
+                const y4 = cy + rInner * Math.sin(Math.PI * startAngle / 180);
 
-            html += `<path d="${mPath}" fill="${mFill}" stroke="#ffffff" stroke-width="0.5" />`;
+                const pathData = `M ${x1} ${y1} A ${rOuter} ${rOuter} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 0 0 ${x4} ${y4} Z`;
+                const fillColor = `rgb(${hueObj.rgb[0]}, ${hueObj.rgb[1]}, ${hueObj.rgb[2]})`;
 
-            if (idx === hueIndex) {
-                // Highlight active hue on mini wheel
-                const midA = (startA + endA) / 2;
-                const px = mcx + (mrOuter + 7) * Math.cos(Math.PI * midA / 180);
-                const py = mcy + (mrOuter + 7) * Math.sin(Math.PI * midA / 180);
-                html += `<circle cx="${px}" cy="${py}" r="3.5" fill="#000000" />`;
-            }
-        });
+                html += `<path class="hue-wedge" d="${pathData}" fill="${fillColor}" stroke="#ffffff" stroke-width="1.5" onclick="openHueModal(${idx})">
+                            <title>${hueObj.name}</title>
+                         </path>`;
 
-        // Mini Wheel Axis & Labels
-        html += `<line x1="${mcx}" y1="${mcy - mrOuter - 2}" x2="${mcx}" y2="${mcy + mrOuter + 2}" stroke="#000" stroke-width="0.8" />`;
-        html += `<line x1="${mcx - mrOuter - 2}" y1="${mcy}" x2="${mcx + mrOuter + 2}" y2="${mcy}" stroke="#000" stroke-width="0.8" />`;
-        html += `<text x="${mcx}" y="${mcy - mrOuter - 6}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-Y</text>`;
-        html += `<text x="${mcx + mrOuter + 12}" y="${mcy + 4}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-R</text>`;
-        html += `<text x="${mcx}" y="${mcy + mrOuter + 14}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-B</text>`;
-        html += `<text x="${mcx - mrOuter - 12}" y="${mcy + 4}" font-family="serif" font-size="11" font-weight="bold" text-anchor="middle">-G</text>`;
+                const midAngle = (startAngle + endAngle) / 2;
+                const rText = rOuter + 18;
+                const tx = cx + rText * Math.cos(Math.PI * midAngle / 180);
+                const ty = cy + rText * Math.sin(Math.PI * midAngle / 180);
 
+                if (idx % 2 === 0) {
+                    html += `<text x="${tx}" y="${ty}" class="hue-text-label" onclick="openHueModal(${idx})">${hueObj.name}</text>`;
+                }
+            });
 
+            const cardinals = [
+                { label: '-Y', x: cx, y: cy - rOuter - 38 },
+                { label: '-R', x: cx + rOuter + 38, y: cy },
+                { label: '-B', x: cx, y: cy + rOuter + 38 },
+                { label: '-G', x: cx - rOuter - 38, y: cy }
+            ];
 
-        // --- 2. Triangle Grid Lines ---
-        const sScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
-        const cScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+            cardinals.forEach(c => {
+                html += `<text x="${c.x}" y="${c.y}" class="cardinal-label">${c.label}</text>`;
+            });
 
-        // Constant s lines (slopes down-right)
-        sScaleVals.forEach(s => {
-            const p1 = getCoord(s, 0);
-            const p2 = getCoord(s, 100 - s);
-            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
-        });
+            html += `<circle cx="${cx}" cy="${cy}" r="${rInner - 6}" fill="#F0F9FF" stroke="#22ACEC" stroke-width="1.5" />`;
+            html += `<text x="${cx}" y="${cy - 8}" text-anchor="middle" font-size="15" font-weight="800" fill="#0369a1">NCS 40-Step Wheel</text>`;
+            html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Click wedge to inspect</text>`;
 
-        // Constant c lines (vertical-ish)
-        cScaleVals.forEach(c => {
-            const p1 = getCoord(0, c);
-            const p2 = getCoord(100 - c, c);
-            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
-        });
-
-        // Constant w lines (slopes up-right)
-        [10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(w => {
-            const p1 = getCoord(100 - w, 0);
-            const p2 = getCoord(0, 100 - w);
-            html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#111111" stroke-width="0.8" />`;
-        });
-
-
-        // --- 4. Axis Labels ---
-        // Left Blackness (s) Axis Labels
-        sScaleVals.forEach(s => {
-            const p = getCoord(s, 0);
-            const labelStr = s < 10 ? `0${s}` : `${s}`;
-            html += `<text x="${p.x - 22}" y="${p.y + 4}" font-family="Times New Roman, serif" font-size="16" fill="#000" text-anchor="end">${labelStr}</text>`;
-        });
-
-        // Bottom Chromaticness (c) Axis Labels
-        cScaleVals.forEach(c => {
-            const p = getCoord(100 - c, c);
-            const labelStr = c < 10 ? `0${c}` : `${c}`;
-            html += `<text x="${p.x}" y="${p.y + 26}" font-family="Times New Roman, serif" font-size="18" font-weight="bold" fill="#000" text-anchor="middle">${labelStr}</text>`;
-        });
-
-
-        // --- 5. Swatch Grid Definition ---
-        const standardSwatches = [
-            // s = 05
-            {s:5, c:5}, {s:5, c:10}, {s:5, c:20}, {s:5, c:30}, {s:5, c:40}, {s:5, c:50}, {s:5, c:60}, {s:5, c:70}, {s:5, c:80},
-            // s = 10
-            {s:10, c:5}, {s:10, c:10}, {s:10, c:20}, {s:10, c:30}, {s:10, c:40}, {s:10, c:50}, {s:10, c:60}, {s:10, c:70}, {s:10, c:80},
-            // s = 20
-            {s:20, c:5}, {s:20, c:10}, {s:20, c:20}, {s:20, c:30}, {s:20, c:40}, {s:20, c:50}, {s:20, c:60}, {s:20, c:70},
-            // s = 30
-            {s:30, c:5}, {s:30, c:10}, {s:30, c:20}, {s:30, c:30}, {s:30, c:40}, {s:30, c:50}, {s:30, c:60},
-            // s = 40
-            {s:40, c:10}, {s:40, c:20}, {s:40, c:30}, {s:40, c:40}, {s:40, c:50},
-            // s = 50
-            {s:50, c:10}, {s:50, c:20}, {s:50, c:30}, {s:50, c:40},
-            // s = 60
-            {s:60, c:10}, {s:60, c:20}, {s:60, c:30},
-            // s = 70
-            {s:70, c:10}, {s:70, c:20},
-            // s = 80
-            {s:80, c:10},
-            // Intermediate high-chroma swatches
-            {s:35, c:60}, {s:45, c:50}
-        ];
-
-        const swatchWidth = 38;
-        const swatchHeight = 38;
-
-        let activeSwatchData = null;
-
-        standardSwatches.forEach((sw) => {
-            const p = getCoord(sw.s, sw.c);
-            const rgb = calculateNuanceRGB(hueObj.rgb, sw.s, sw.c);
-            const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
-
-            const sStr = sw.s < 10 ? `0${sw.s}` : `${sw.s}`;
-            const cStr = sw.c < 10 ? `0${sw.c}` : `${sw.c}`;
-            const codeStr = `S ${sStr}${cStr}${hueObj.name}`;
-
-            const rx = p.x - (swatchWidth / 2);
-            const ry = p.y - (swatchHeight / 2);
-
-            html += `<g onclick="selectAtlasSwatch('${codeStr}', ${sw.s}, ${sw.c}, ${100 - sw.s - sw.c}, '${hex}')">
-                        <rect class="atlas-swatch-rect" x="${rx}" y="${ry}" width="${swatchWidth}" height="${swatchHeight}" 
-                              fill="${hex}" stroke="#ffffff" stroke-width="1">
-                              <title>${codeStr}</title>
-                        </rect>
-                        <text x="${p.x}" y="${ry + swatchHeight + 10}" font-family="Arial, sans-serif" font-size="7.5" font-weight="600" fill="#000000" text-anchor="middle">${codeStr}</text>
-                     </g>`;
-
-            if (sw.s === 5 && sw.c === 80) {
-                activeSwatchData = { code: codeStr, s: sw.s, c: sw.c, w: 100 - sw.s - sw.c, hex: hex };
-            }
-        });
-
-        svg.innerHTML = html;
-
-        if (!activeSwatchData) {
-            const defaultSw = standardSwatches[0];
-            const rgb = calculateNuanceRGB(hueObj.rgb, defaultSw.s, defaultSw.c);
-            const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
-            const sStr = defaultSw.s < 10 ? `0${defaultSw.s}` : `${defaultSw.s}`;
-            const cStr = defaultSw.c < 10 ? `0${defaultSw.c}` : `${defaultSw.c}`;
-            activeSwatchData = { code: `S ${sStr}${cStr}${hueObj.name}`, s: defaultSw.s, c: defaultSw.c, w: 100 - defaultSw.s - defaultSw.c, hex: hex };
+            svg.innerHTML = html;
         }
 
-        selectAtlasSwatch(activeSwatchData.code, activeSwatchData.s, activeSwatchData.c, activeSwatchData.w, activeSwatchData.hex);
-    }
+        /* COLOR MATH UTILITIES */
+        function calculateNuanceRGB(pureRGB, sPct, cPct) {
+            const s = sPct / 100;
+            const c = cPct / 100;
+            const w = 1 - s - c;
 
-    function selectAtlasSwatch(code, s, c, w, hex) {
-        document.getElementById('detail-code').innerText = code;
-        document.getElementById('detail-hex').innerText = `HEX: ${hex}`;
-        const sFormatted = s < 10 ? `0${s}` : `${s}`;
-        const cFormatted = c < 10 ? `0${c}` : `${c}`;
-        const wFormatted = w < 10 ? `0${w}` : `${w}`;
-        document.getElementById('detail-metrics').innerText = `Blackness (s): ${sFormatted}% | Chromaticness (c): ${cFormatted}% | Whiteness (w): ${wFormatted}%`;
-        document.getElementById('preview-box').style.backgroundColor = hex;
-    }
+            const W_RGB = [255, 255, 255];
+            const S_RGB = [25, 20, 15]; // Pure black perception base
 
-    window.onclick = function(event) {
-        const overlay = document.getElementById('modal-overlay');
-        if (event.target === overlay) {
-            closeModal();
+            const r = Math.round(w * W_RGB[0] + s * S_RGB[0] + c * pureRGB[0]);
+            const g = Math.round(w * W_RGB[1] + s * S_RGB[1] + c * pureRGB[1]);
+            const b = Math.round(w * W_RGB[2] + s * S_RGB[2] + c * pureRGB[2]);
+
+            return [Math.max(0, Math.min(255, r)), Math.max(0, Math.min(255, g)), Math.max(0, Math.min(255, b))];
         }
-    };
-</script>
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function getPerceivedValue(r, g, b) {
+            return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
+        }
+
+        function getContrastTextColor(hex) {
+            let cleanHex = hex.replace('#','');
+            let r = parseInt(cleanHex.substring(0,2), 16);
+            let g = parseInt(cleanHex.substring(2,4), 16);
+            let b = parseInt(cleanHex.substring(4,6), 16);
+            return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#0f172a' : '#ffffff';
+        }
+
+        /* MODAL DIALOG & BARYCENTRIC ATLAS PAGE */
+        let activeHueIndex = 0;
+        let currentModalSwatchHex = "#FFE600";
+
+        function openHueModal(hueIndex) {
+            activeHueIndex = hueIndex;
+            const hueObj = HUE_STEPS[hueIndex];
+            document.getElementById('modal-bar-title').innerText = `NCS Colour Atlas - Page ${hueObj.name}`;
+            document.getElementById('modal-overlay').classList.add('active');
+
+            renderAtlasPage(hueIndex);
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        function renderAtlasPage(hueIndex) {
+            const svg = document.getElementById('atlas-svg');
+            const hueObj = HUE_STEPS[hueIndex];
+            svg.innerHTML = '';
+
+            // Barycentric Vertices
+            const W_pos = { x: 80, y: 40 };
+            const S_pos = { x: 80, y: 720 };
+            const C_pos = { x: 820, y: 420 };
+
+            function getCoord(s, c) {
+                const w = 100 - s - c;
+                const normW = w / 100;
+                const normS = s / 100;
+                const normC = c / 100;
+
+                const x = normW * W_pos.x + normS * S_pos.x + normC * C_pos.x;
+                const y = normW * W_pos.y + normS * S_pos.y + normC * C_pos.y;
+                return { x, y };
+            }
+
+            let html = '';
+
+            // Top Right Title & Mini Wheel
+            const titleX = 760, titleY = 55;
+            html += `<text x="${titleX}" y="${titleY}" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#0369a1" text-anchor="middle">${hueObj.name}</text>`;
+
+            const mcx = 760, mcy = 145, mrOuter = 40, mrInner = 28;
+            HUE_STEPS.forEach((hStep, idx) => {
+                const startA = idx * 9 - 90 - 4.5;
+                const endA = startA + 9;
+
+                const mx1 = mcx + mrOuter * Math.cos(Math.PI * startA / 180);
+                const my1 = mcy + mrOuter * Math.sin(Math.PI * startA / 180);
+                const mx2 = mcx + mrOuter * Math.cos(Math.PI * endA / 180);
+                const my2 = mcy + mrOuter * Math.sin(Math.PI * endA / 180);
+
+                const mx3 = mcx + mrInner * Math.cos(Math.PI * endA / 180);
+                const my3 = mcy + mrInner * Math.sin(Math.PI * endA / 180);
+                const mx4 = mcx + mrInner * Math.cos(Math.PI * startA / 180);
+                const my4 = mcy + mrInner * Math.sin(Math.PI * startA / 180);
+
+                const mPath = `M ${mx1} ${my1} A ${mrOuter} ${mrOuter} 0 0 1 ${mx2} ${my2} L ${mx3} ${my3} A ${mrInner} ${mrInner} 0 0 0 ${mx4} ${my4} Z`;
+                const mFill = `rgb(${hStep.rgb[0]}, ${hStep.rgb[1]}, ${hStep.rgb[2]})`;
+
+                html += `<path d="${mPath}" fill="${mFill}" stroke="#ffffff" stroke-width="0.5" />`;
+
+                if (idx === hueIndex) {
+                    const midA = (startA + endA) / 2;
+                    const px = mcx + (mrOuter + 7) * Math.cos(Math.PI * midA / 180);
+                    const py = mcy + (mrOuter + 7) * Math.sin(Math.PI * midA / 180);
+                    html += `<circle cx="${px}" cy="${py}" r="3.5" fill="#0284c7" stroke="#ffffff" stroke-width="1" />`;
+                }
+            });
+
+            html += `<line x1="${mcx}" y1="${mcy - mrOuter - 2}" x2="${mcx}" y2="${mcy + mrOuter + 2}" stroke="#94a3b8" stroke-width="0.8" />`;
+            html += `<line x1="${mcx - mrOuter - 2}" y1="${mcy}" x2="${mcx + mrOuter + 2}" y2="${mcy}" stroke="#94a3b8" stroke-width="0.8" />`;
+            html += `<text x="${mcx}" y="${mcy - mrOuter - 6}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-Y</text>`;
+            html += `<text x="${mcx + mrOuter + 12}" y="${mcy + 3}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-R</text>`;
+            html += `<text x="${mcx}" y="${mcy + mrOuter + 13}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-B</text>`;
+            html += `<text x="${mcx - mrOuter - 12}" y="${mcy + 3}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-G</text>`;
+
+            // Grid lines
+            const sScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+            const cScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+
+            sScaleVals.forEach(s => {
+                const p1 = getCoord(s, 0);
+                const p2 = getCoord(s, 100 - s);
+                html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#cbd5e1" stroke-width="0.8" />`;
+            });
+
+            cScaleVals.forEach(c => {
+                const p1 = getCoord(0, c);
+                const p2 = getCoord(100 - c, c);
+                html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#cbd5e1" stroke-width="0.8" />`;
+            });
+
+            [10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(w => {
+                const p1 = getCoord(100 - w, 0);
+                const p2 = getCoord(0, 100 - w);
+                html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#e2e8f0" stroke-width="0.8" />`;
+            });
+
+            // Axis Labels
+            sScaleVals.forEach(s => {
+                const p = getCoord(s, 0);
+                const labelStr = s < 10 ? `0${s}` : `${s}`;
+                html += `<text x="${p.x - 18}" y="${p.y + 4}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#64748b" text-anchor="end">${labelStr}</text>`;
+            });
+
+            cScaleVals.forEach(c => {
+                const p = getCoord(100 - c, c);
+                const labelStr = c < 10 ? `0${c}` : `${c}`;
+                html += `<text x="${p.x}" y="${p.y + 24}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#0369a1" text-anchor="middle">${labelStr}</text>`;
+            });
+
+            // Swatch Grid
+            const standardSwatches = [
+                {s:5, c:5}, {s:5, c:10}, {s:5, c:20}, {s:5, c:30}, {s:5, c:40}, {s:5, c:50}, {s:5, c:60}, {s:5, c:70}, {s:5, c:80},
+                {s:10, c:5}, {s:10, c:10}, {s:10, c:20}, {s:10, c:30}, {s:10, c:40}, {s:10, c:50}, {s:10, c:60}, {s:10, c:70}, {s:10, c:80},
+                {s:20, c:5}, {s:20, c:10}, {s:20, c:20}, {s:20, c:30}, {s:20, c:40}, {s:20, c:50}, {s:20, c:60}, {s:20, c:70},
+                {s:30, c:5}, {s:30, c:10}, {s:30, c:20}, {s:30, c:30}, {s:30, c:40}, {s:30, c:50}, {s:30, c:60},
+                {s:40, c:10}, {s:40, c:20}, {s:40, c:30}, {s:40, c:40}, {s:40, c:50},
+                {s:50, c:10}, {s:50, c:20}, {s:50, c:30}, {s:50, c:40},
+                {s:60, c:10}, {s:60, c:20}, {s:60, c:30},
+                {s:70, c:10}, {s:70, c:20},
+                {s:80, c:10},
+                {s:35, c:60}, {s:45, c:50}
+            ];
+
+            const swatchWidth = 36;
+            const swatchHeight = 36;
+            let activeSwatchData = null;
+
+            standardSwatches.forEach((sw) => {
+                const p = getCoord(sw.s, sw.c);
+                const rgb = calculateNuanceRGB(hueObj.rgb, sw.s, sw.c);
+                const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+
+                const sStr = sw.s < 10 ? `0${sw.s}` : `${sw.s}`;
+                const cStr = sw.c < 10 ? `0${sw.c}` : `${sw.c}`;
+                const codeStr = `S ${sStr}${cStr}${hueObj.name}`;
+
+                const rx = p.x - (swatchWidth / 2);
+                const ry = p.y - (swatchHeight / 2);
+
+                html += `<g onclick="selectAtlasSwatch('${codeStr}', ${sw.s}, ${sw.c}, ${100 - sw.s - sw.c}, '${hex}', ${rgb[0]}, ${rgb[1]}, ${rgb[2]})">
+                            <rect class="atlas-swatch-rect" x="${rx}" y="${ry}" width="${swatchWidth}" height="${swatchHeight}" rx="5" 
+                                  fill="${hex}" stroke="#cbd5e1" stroke-width="1">
+                                  <title>${codeStr}</title>
+                            </rect>
+                            <text x="${p.x}" y="${ry + swatchHeight + 10}" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700" fill="#334155" text-anchor="middle">${codeStr}</text>
+                         </g>`;
+
+                if (sw.s === 5 && sw.c === 80) {
+                    activeSwatchData = { code: codeStr, s: sw.s, c: sw.c, w: 100 - sw.s - sw.c, hex: hex, r: rgb[0], g: rgb[1], b: rgb[2] };
+                }
+            });
+
+            svg.innerHTML = html;
+
+            if (!activeSwatchData) {
+                const defaultSw = standardSwatches[0];
+                const rgb = calculateNuanceRGB(hueObj.rgb, defaultSw.s, defaultSw.c);
+                const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+                const sStr = defaultSw.s < 10 ? `0${defaultSw.s}` : `${defaultSw.s}`;
+                const cStr = defaultSw.c < 10 ? `0${defaultSw.c}` : `${defaultSw.c}`;
+                activeSwatchData = { code: `S ${sStr}${cStr}${hueObj.name}`, s: defaultSw.s, c: defaultSw.c, w: 100 - defaultSw.s - defaultSw.c, hex: hex, r: rgb[0], g: rgb[1], b: rgb[2] };
+            }
+
+            selectAtlasSwatch(activeSwatchData.code, activeSwatchData.s, activeSwatchData.c, activeSwatchData.w, activeSwatchData.hex, activeSwatchData.r, activeSwatchData.g, activeSwatchData.b);
+        }
+
+        function selectAtlasSwatch(code, s, c, w, hex, r, g, b) {
+            currentModalSwatchHex = hex;
+            document.getElementById('detail-code').innerText = code;
+            document.getElementById('detail-hex').innerText = `HEX: ${hex}`;
+            
+            const pv = getPerceivedValue(r, g, b);
+            document.getElementById('detail-pv').innerText = `Val: ${pv}%`;
+
+            const sFormatted = s < 10 ? `0${s}` : `${s}`;
+            const cFormatted = c < 10 ? `0${c}` : `${c}`;
+            const wFormatted = w < 10 ? `0${w}` : `${w}`;
+            document.getElementById('detail-metrics').innerText = `Blackness (s): ${sFormatted}% | Chromaticness (c): ${cFormatted}% | Whiteness (w): ${wFormatted}%`;
+            document.getElementById('preview-box').style.backgroundColor = hex;
+        }
+
+        function addCurrentModalSwatch() {
+            addToPalette(currentModalSwatchHex);
+            copyToClipboard(currentModalSwatchHex);
+        }
+
+        /* GLOBAL PALETTE DRAWER LOGIC */
+        const MAX_PALETTE = 16;
+        let paletteColors = [];
+        let draggedIndex = null;
+
+        function initPalette() {
+            const container = document.getElementById('palette-slots-container');
+            container.innerHTML = '';
+            for (let i = 0; i < MAX_PALETTE; i++) {
+                let slot = document.createElement('div');
+                slot.className = 'palette-slot w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all relative overflow-hidden';
+                slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+
+                container.appendChild(slot);
+            }
+            updatePaletteUI();
+        }
+
+        function addToPalette(hex) {
+            if (paletteColors.length < MAX_PALETTE) {
+                paletteColors.push(hex);
+                updatePaletteUI();
+            } else {
+                showToast("Palette Bank is Full (16/16)");
+            }
+        }
+
+        function removeFromPalette(index, event) {
+            event.stopPropagation();
+            paletteColors.splice(index, 1);
+            updatePaletteUI();
+        }
+
+        function clearPalette() {
+            paletteColors = [];
+            updatePaletteUI();
+            showToast("Palette Cleared");
+        }
+
+        function copyAllPaletteHex() {
+            if (paletteColors.length === 0) {
+                showToast("Palette is empty!");
+                return;
+            }
+            copyToClipboard(paletteColors.join(', '));
+        }
+
+        function handleDragStart(e) {
+            const index = parseInt(this.dataset.index);
+            if (isNaN(index) || index >= paletteColors.length) {
+                e.preventDefault();
+                return;
+            }
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, movedColor);
+                updatePaletteUI();
+            }
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.palette-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            draggedIndex = null;
+        }
+
+        function updatePaletteUI() {
+            document.getElementById('palette-counter').innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
+            for (let i = 0; i < MAX_PALETTE; i++) {
+                const slot = document.getElementById('p-slot-' + i);
+                slot.innerHTML = '';
+                if (i < paletteColors.length) {
+                    const hex = paletteColors[i];
+                    slot.style.backgroundColor = hex;
+                    slot.className = 'palette-slot w-11 h-8 rounded-lg border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
+                    slot.setAttribute('draggable', 'true');
+
+                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.title = 'Remove color';
+                    removeBtn.onclick = (e) => removeFromPalette(i, e);
+                    slot.appendChild(removeBtn);
+
+                    slot.onclick = () => copyToClipboard(hex);
+                } else {
+                    slot.style.backgroundColor = 'transparent';
+                    slot.className = 'palette-slot w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all';
+                    slot.removeAttribute('draggable');
+                    slot.onclick = null;
+                }
+            }
+        }
+
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            showToast(`Copied ${text}`);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+        }
+
+        /* INITIALIZATION */
+        window.onload = () => {
+            renderWheel();
+            initPalette();
+        };
+
+        window.onclick = function(event) {
+            const overlay = document.getElementById('modal-overlay');
+            if (event.target === overlay) {
+                closeModal();
+            }
+        };
+    </script>
 </body>
 </html>
