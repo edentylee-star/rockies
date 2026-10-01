@@ -1,1 +1,1675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB Cube Color Slice & Corner Arc Explorer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        accent: {
+                            light: '#E6F4FA',
+                            DEFAULT: '#B4E3F8',
+                            hover: '#9BD6F3',
+                            dark: '#0284c7',
+                            text: '#0369a1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbars & slider styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Custom Accent Range Sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 9999px;
+            border: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #0284c7;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            transition: transform 0.1s ease, background-color 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            background: #0369a1;
+        }
+
+        /* Accent Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #0284c7;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #B4E3F8;
+        }
+
+        /* Hover Tooltip Overlay */
+        #global-tooltip {
+            pointer-events: none;
+            transition: opacity 0.1s ease, transform 0.1s ease;
+            z-index: 9999;
+        }
+
+        /* Swatch shadow effect */
+        .swatch-card {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .swatch-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px -2px rgba(0,0,0,0.12);
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background-color: #B4E3F8;
+            color: #0369a1;
+            font-weight: 600;
+        }
+
+        .grid-tile {
+            transition: transform 0.1s ease, border-color 0.1s ease;
+        }
+        .grid-tile:hover {
+            z-index: 10;
+            transform: scale(1.08);
+            outline: 2px solid #0284c7;
+        }
+
+        /* Canvas container crisp pixelation */
+        canvas.pixelated {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] shadow-inner font-bold text-xl">
+                        <i class="fa-solid fa-[#fa-cube] fa-cube"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                            RGB Cube Color Slice & Corner Arc Explorer
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-medium border border-sky-300">v2.5</span>
+                        </h1>
+                        <p class="text-xs text-slate-500">Interactive 3D Color Space Geometry & Perception Inspector</p>
+                    </div>
+                </div>
+
+                <!-- TABS NAVIGATION -->
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-sm font-medium">
+                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-[#fa-layer-group] fa-layer-group text-xs"></i>
+                        <span>Regular Slices</span>
+                    </button>
+                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-[#fa-[#fa-circle-notch]] fa-circle-notch text-xs"></i>
+                        <span>Corner Spherical Arcs</span>
+                    </button>
+                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-[#fa-chart-pie] fa-chart-pie text-xs"></i>
+                        <span>8 Corner Arc Sweeps</span>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ========================================================= -->
+        <!-- TAB 1: REGULAR RGB CUBE SLICES -->
+        <!-- ========================================================= -->
+        <section id="tab-content-1" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- CONTROLS PANEL (LEFT 4 COLS) -->
+                <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h2 class="font-bold text-slate-900 flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            Slice Controls
+                        </h2>
+                        <button onclick="resetTab1Controls()" class="text-xs text-sky-700 hover:text-sky-900 font-medium flex items-center gap-1">
+                            <i class="fa-solid fa-rotate-left text-xs"></i> Reset
+                        </button>
+                    </div>
+
+                    <!-- Cut Direction Dropdown -->
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Cut Direction Plane</label>
+                        <select id="t1-cut-direction" onchange="updateTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500 font-medium">
+                            <option value="X">Along X Axis (YZ Slices / Red Plane Cut)</option>
+                            <option value="Y">Along Y Axis (XZ Slices / Green Plane Cut)</option>
+                            <option value="Z" selected>Along Z Axis (XY Slices / Blue Plane Cut)</option>
+                            <option value="DIAG_X">Diagonal X Axis (Y=Z Plane Cut)</option>
+                            <option value="ADIAG_X">Anti-Diagonal X Axis (Y+Z=255 Plane Cut)</option>
+                            <option value="DIAG_Y">Diagonal Y Axis (X=Z Plane Cut)</option>
+                            <option value="ADIAG_Y">Anti-Diagonal Y Axis (X+Z=255 Plane Cut)</option>
+                            <option value="DIAG_Z">Diagonal Z Axis (X=Y Plane Cut)</option>
+                            <option value="ADIAG_Z">Anti-Diagonal Z Axis (X+Y=255 Plane Cut)</option>
+                        </select>
+                    </div>
+
+                    <!-- Slice Depth Slider -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="font-semibold uppercase tracking-wider text-slate-500">Slice Depth / Position</label>
+                            <span id="t1-depth-val" class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-bold">128 (50%)</span>
+                        </div>
+                        <input type="range" id="t1-depth" min="0" max="255" value="128" oninput="updateTab1()">
+                    </div>
+
+                    <!-- Grid Resolution Slider -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <label class="font-semibold uppercase tracking-wider text-slate-500">Grid Resolution</label>
+                            <span id="t1-res-val" class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-bold">16 x 16</span>
+                        </div>
+                        <input type="range" id="t1-res" min="4" max="64" step="4" value="16" oninput="updateTab1()">
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- COLOR MODIFIERS -->
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0369a1] bg-[#B4E3F8]/40 px-2.5 py-1 rounded-md inline-block">Color Modifiers</h3>
+
+                        <!-- Saturation -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Saturation</span>
+                                <span id="t1-sat-val" class="font-mono font-semibold text-slate-700">100%</span>
+                            </div>
+                            <input type="range" id="t1-sat" min="0" max="100" value="100" oninput="updateTab1()">
+                        </div>
+
+                        <!-- Tint (White Blend) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Tint (White Blend)</span>
+                                <span id="t1-tint-val" class="font-mono font-semibold text-slate-700">0%</span>
+                            </div>
+                            <input type="range" id="t1-tint" min="0" max="100" value="0" oninput="updateTab1()">
+                        </div>
+
+                        <!-- Tone (Gray Blend) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Tone (Gray Blend)</span>
+                                <span id="t1-tone-val" class="font-mono font-semibold text-slate-700">0%</span>
+                            </div>
+                            <input type="range" id="t1-tone" min="0" max="100" value="0" oninput="updateTab1()">
+                        </div>
+
+                        <!-- Shade (Black Blend) -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Shade (Black Blend)</span>
+                                <span id="t1-shade-val" class="font-mono font-semibold text-slate-700">0%</span>
+                            </div>
+                            <input type="range" id="t1-shade" min="0" max="100" value="0" oninput="updateTab1()">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- TOGGLES & OVERLAYS -->
+                    <div class="space-y-3 pt-1">
+                        <!-- Perceived Value Overlay -->
+                        <div class="flex items-center justify-between">
+                            <label for="t1-[#toggle-value]" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-[#fa-eye] fa-eye text-sky-600"></i> Show Perceived Value (%)
+                            </label>
+                            <input type="checkbox" id="t1-toggle-value" onchange="updateTab1()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7] cursor-pointer">
+                        </div>
+
+                        <!-- Track Iso-Line Contour -->
+                        <div class="flex items-center justify-between">
+                            <label for="t1-toggle-iso" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-[#fa-route] fa-route text-sky-600"></i> Track Iso-Luminance Contour
+                            </label>
+                            <input type="checkbox" id="t1-toggle-iso" onchange="updateTab1()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7] cursor-pointer" checked>
+                        </div>
+
+                        <!-- Target Iso Value slider when ISO line is enabled -->
+                        <div id="t1-iso-slider-container" class="space-y-1 pt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600 font-medium">Target Iso-Luminance</span>
+                                <span id="t1-iso-target-val" class="font-mono font-bold text-sky-700">50%</span>
+                            </div>
+                            <input type="range" id="t1-iso-target" min="0" max="100" value="50" oninput="updateTab1()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN CANVAS / GRID VIEW (RIGHT 8 COLS) -->
+                <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col items-center justify-between min-h-[500px]">
+                    <div class="w-full flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                        <div>
+                            <h3 id="t1-slice-title" class="font-bold text-slate-900 text-lg">Z-Axis Cut Slice (XY Plane)</h3>
+                            <p id="t1-slice-subtitle" class="text-xs text-slate-500">X = Red axis (Horizontal), Y = Green axis (Vertical), Z = Blue constant</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-[#B4E3F8] text-[#0369a1] font-semibold px-2.5 py-1 rounded-full border border-sky-300">
+                                Click tile to save color
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Container -->
+                    <div class="relative flex-grow flex items-center justify-center w-full my-2">
+                        <div class="relative bg-slate-100 p-2 rounded-2xl border border-slate-200 shadow-inner max-w-full">
+                            <canvas id="t1-canvas" class="pixelated rounded-lg cursor-crosshair max-w-full h-auto block" style="max-height: 480px; width: auto; aspect-ratio: 1/1;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Info Bar Footer -->
+                    <div class="w-full mt-4 bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+                        <div>
+                            <span class="text-slate-400 block font-medium">Hovered RGB</span>
+                            <span id="t1-info-rgb" class="font-mono font-bold text-slate-800">r: ---, g: ---, b: ---</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">HEX Code</span>
+                            <span id="t1-info-hex" class="font-mono font-bold text-slate-800">#------</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">HSL Value</span>
+                            <span id="t1-info-hsl" class="font-mono font-bold text-slate-800">---°, ---%, ---%</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block font-medium">Perceived Value</span>
+                            <span id="t1-info-value" class="font-mono font-bold text-sky-700">--.-%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- TAB 2: SPHERICAL / CIRCULAR ARC CUTS FROM ALL 8 RGB CORNERS -->
+        <!-- ========================================================= -->
+        <section id="tab-content-2" class="space-y-6 hidden">
+            <!-- GLOBAL CONTROLS TOP BAR -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            Spherical Arc Cuts from 8 RGB Cube Corners
+                        </h2>
+                        <p class="text-xs text-slate-500">Evaluates radial color slices projecting outward from all 8 vertices of the RGB color cube</p>
+                    </div>
+                    <button onclick="resetTab2Controls()" class="text-xs text-sky-700 hover:text-sky-900 font-medium flex items-center gap-1 self-start md:self-auto">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Tab 2
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Cut Plane Dropdown -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Cut Plane Geometry</label>
+                        <select id="t2-cut-plane" onchange="updateTab2()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
+                            <option value="XY" selected>XY Plane (Red vs Green)</option>
+                            <option value="YZ">YZ Plane (Green vs Blue)</option>
+                            <option value="XZ">XZ Plane (Red vs Blue)</option>
+                            <option value="SPHERICAL">Diagonal Spherical Arc (3D Shell)</option>
+                        </select>
+                    </div>
+
+                    <!-- Arc Radius Slider (R) -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="font-semibold uppercase tracking-wider text-slate-500">Arc Radius (R)</span>
+                            <span id="t2-radius-val" class="font-mono bg-slate-100 px-2 rounded font-bold text-slate-700">R = 0.50</span>
+                        </div>
+                        <input type="range" id="t2-radius" min="0.05" max="1.00" step="0.05" value="0.50" oninput="updateTab2()">
+                    </div>
+
+                    <!-- Grid Resolution Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="font-semibold uppercase tracking-wider text-slate-500">Grid Resolution</span>
+                            <span id="t2-res-val" class="font-mono bg-slate-100 px-2 rounded font-bold text-slate-700">8 x 8</span>
+                        </div>
+                        <input type="range" id="t2-res" min="4" max="24" step="2" value="8" oninput="updateTab2()">
+                    </div>
+
+                    <!-- Global Toggles -->
+                    <div class="flex flex-col justify-center space-y-2 pt-2 sm:pt-0">
+                        <label for="t2-toggle-value" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
+                            <input type="checkbox" id="t2-toggle-value" onchange="updateTab2()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7]">
+                            <span>Show Value (%) Overlay</span>
+                        </label>
+                        <label for="t2-toggle-iso" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
+                            <input type="checkbox" id="t2-toggle-iso" onchange="updateTab2()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7]" checked>
+                            <span>Track Iso-Line Contour</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Modifiers row -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-100 pt-3">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-500 font-medium">Saturation</span>
+                            <span id="t2-sat-val" class="font-mono font-semibold">100%</span>
+                        </div>
+                        <input type="range" id="t2-sat" min="0" max="100" value="100" oninput="updateTab2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-500 font-medium">Tint (White)</span>
+                            <span id="t2-tint-val" class="font-mono font-semibold">0%</span>
+                        </div>
+                        <input type="range" id="t2-tint" min="0" max="100" value="0" oninput="updateTab2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-500 font-medium">Tone (Gray)</span>
+                            <span id="t2-tone-val" class="font-mono font-semibold">0%</span>
+                        </div>
+                        <input type="range" id="t2-tone" min="0" max="100" value="0" oninput="updateTab2()">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-500 font-medium">Shade (Black)</span>
+                            <span id="t2-shade-val" class="font-mono font-semibold">0%</span>
+                        </div>
+                        <input type="range" id="t2-shade" min="0" max="100" value="0" oninput="updateTab2()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8 CORNER PANELS GRID -->
+            <div id="t2-corners-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                <!-- Rendered dynamically by JavaScript -->
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- TAB 3: 8 RGB CUBE CORNERS - 8 RADIUS ARC INCREMENTS -->
+        <!-- ========================================================= -->
+        <section id="tab-content-3" class="space-y-6 hidden">
+            <!-- HEADER CARD -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-xl flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            8 RGB Cube Corners — 8 Radius Arc Increments
+                        </h2>
+                        <p class="text-xs text-slate-600 mt-0.5">
+                            Quarter-circumference sweeps across 8 equal radius steps (R=32 to 255) with HSL & Tone variations.
+                        </p>
+                    </div>
+                    <button onclick="resetTab3Controls()" class="text-xs text-sky-700 hover:text-sky-900 font-medium flex items-center gap-1 self-start md:self-auto">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Tab 3
+                    </button>
+                </div>
+
+                <!-- CONTROLS BAR -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Cut Arc Sweep Plane -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Cut Arc Sweep Plane</label>
+                        <select id="t3-plane" onchange="updateTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
+                            <option value="XY" selected>XY Plane (Red-Green Sweep)</option>
+                            <option value="YZ">YZ Plane (Green-Blue Sweep)</option>
+                            <option value="XZ">XZ Plane (Red-Blue Sweep)</option>
+                            <option value="DIAG">3D Diagonal Arc Sweep</option>
+                        </select>
+                    </div>
+
+                    <!-- Saturation -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="font-semibold uppercase tracking-wider text-slate-500">Saturation</span>
+                            <span id="t3-sat-val" class="font-mono font-bold text-slate-700">100%</span>
+                        </div>
+                        <input type="range" id="t3-sat" min="0" max="100" value="100" oninput="updateTab3()">
+                    </div>
+
+                    <!-- Brightness -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="font-semibold uppercase tracking-wider text-slate-500">Brightness</span>
+                            <span id="t3-bright-val" class="font-mono font-bold text-slate-700">0%</span>
+                        </div>
+                        <input type="range" id="t3-bright" min="-100" max="100" value="0" oninput="updateTab3()">
+                    </div>
+
+                    <!-- Tone Intensity (Gray Blend) -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs">
+                            <span class="font-semibold uppercase tracking-wider text-slate-500">Tone Intensity</span>
+                            <span id="t3-tone-val" class="font-mono font-bold text-slate-700">0%</span>
+                        </div>
+                        <input type="range" id="t3-tone" min="0" max="100" value="0" oninput="updateTab3()">
+                    </div>
+
+                    <!-- Format Display Dropdown -->
+                    <div class="space-y-1">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Format Display</label>
+                        <select id="t3-format" onchange="updateTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
+                            <option value="HEX" selected>HEX (#RRGGBB)</option>
+                            <option value="RGB">RGB (R, G, B)</option>
+                            <option value="HSL">HSL (H°, S%, L%)</option>
+                            <option value="VALUE">Perceived Value (%)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D VISUAL REFERENCE DIAGRAM CONTAINER -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                <div class="flex flex-col md:flex-row items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-[#fa-cubes] fa-cubes text-sky-600"></i>
+                            Corner Cut Reference Diagram (3D Coordinate System)
+                        </h3>
+                        <p class="text-xs text-slate-500">Interactive 3D representation showing axes (X: Red, Y: Green, Z: Blue) and corner radial sweeps. Click & drag to rotate!</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <button onclick="reset3DCamera()" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition-colors border border-slate-200">
+                            Reset View
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative w-full flex justify-center bg-slate-900 rounded-xl overflow-hidden py-4 shadow-inner">
+                    <canvas id="t3-3d-canvas" class="w-full h-64 sm:h-80 cursor-grab active:cursor-grabbing block"></canvas>
+                    <div class="absolute bottom-3 right-3 text-[10px] text-slate-400 bg-slate-800/80 backdrop-blur px-2.5 py-1 rounded-md border border-slate-700">
+                        Drag to rotate 3D RGB space
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8 CORNER PANELS WITH 8 RADIUS INCREMENTS EACH -->
+            <div id="t3-corners-container" class="space-y-6">
+                <!-- Rendered dynamically by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================================= -->
+    <!-- FIXED / COLLAPSIBLE GLOBAL COMPARISON PALETTE DRAWER -->
+    <!-- ========================================================= -->
+    <div id="palette-drawer" class="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 transform translate-y-0 shadow-2xl">
+        <!-- HEADER / TOGGLE BAR -->
+        <div class="bg-[#B4E3F8] border-t border-sky-300 px-4 py-2.5 flex items-center justify-between cursor-pointer shadow-md select-none" onclick="togglePaletteDrawer()">
+            <div class="flex items-center space-x-3">
+                <span class="w-6 h-6 rounded-md bg-white text-[#0369a1] font-bold flex items-center justify-center text-xs shadow-sm">
+                    <i class="fa-solid fa-[#fa-palette] fa-palette"></i>
+                </span>
+                <span class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                    Global Comparison Palette
+                    <span id="palette-count-badge" class="bg-white/80 text-[#0369a1] text-xs px-2 py-0.5 rounded-full font-extrabold border border-sky-200">
+                        0 Swatches
+                    </span>
+                </span>
+            </div>
+
+            <div class="flex items-center space-x-3" onclick="event.stopPropagation()">
+                <!-- Swatch Format Select -->
+                <div class="flex items-center gap-1.5 text-xs text-slate-800 font-medium">
+                    <span class="hidden sm:inline">Format:</span>
+                    <select id="palette-format" onchange="renderPaletteSwatches()" class="bg-white text-slate-800 text-xs rounded-md border border-sky-300 px-2 py-1 font-semibold focus:outline-none">
+                        <option value="HEX" selected>Hex (#RRGGBB)</option>
+                        <option value="RGB">RGB (R, G, B)</option>
+                        <option value="HSL">HSL (H°, S%, L%)</option>
+                        <option value="VALUE">Perceived Value (%)</option>
+                    </select>
+                </div>
+
+                <!-- Copy All Button -->
+                <button onclick="copyPaletteToClipboard()" class="px-3 py-1 bg-white hover:bg-sky-50 text-[#0369a1] text-xs font-bold rounded-md border border-sky-300 shadow-sm transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-[#fa-copy] fa-copy"></i>
+                    <span class="hidden sm:inline">Copy Palette</span>
+                </button>
+
+                <!-- Clear Palette Button -->
+                <button onclick="clearPalette()" class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-md border border-red-200 transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span class="hidden sm:inline">Clear</span>
+                </button>
+
+                <!-- Expand / Collapse Icon -->
+                <button class="w-7 h-7 rounded-md bg-white/60 hover:bg-white text-slate-700 flex items-center justify-center transition-transform" id="drawer-toggle-icon">
+                    <i class="fa-solid fa-[#fa-chevron-down] fa-chevron-down text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- DRAWER CONTENT AREA -->
+        <div id="palette-body" class="bg-white border-t border-slate-200 p-4 max-h-48 overflow-y-auto">
+            <div id="palette-empty-msg" class="text-center py-6 text-slate-400 text-xs">
+                <i class="fa-solid fa-[#fa-hand-pointer] fa-hand-pointer text-xl mb-1 text-slate-300 block"></i>
+                No swatches added yet. Click any color tile or slice across Tabs 1, 2, or 3 to add colors here for comparison!
+            </div>
+            <div id="palette-grid" class="flex flex-wrap gap-2 hidden">
+                <!-- Swatches injected via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- GLOBAL TOOLTIP -->
+    <div id="global-tooltip" class="fixed opacity-0 bg-slate-900 text-white text-xs rounded-lg p-2.5 shadow-xl border border-slate-700 font-mono pointer-events-none transition-opacity duration-150">
+        <div id="tooltip-color-bar" class="h-2 rounded mb-1.5 w-full border border-white/20"></div>
+        <div id="tooltip-[#text-hex]" class="font-bold text-sky-300 text-sm mb-0.5">#FFFFFF</div>
+        <div id="tooltip-text-rgb" class="text-slate-300">RGB: 255, 255, 255</div>
+        <div id="tooltip-text-hsl" class="text-slate-300">HSL: 0°, 0%, 100%</div>
+        <div id="tooltip-text-val" class="text-amber-300 font-medium mt-0.5">Perceived Value: 100%</div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed top-16 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT APP CORE & COLOR COMPUTATIONS -->
+    <!-- ========================================================= -->
+    <script>
+        // GLOBAL APP STATE
+        let activeTab = 1;
+        let globalPalette = [];
+        let paletteDrawerExpanded = true;
+
+        // TAB 1 STATE
+        const state1 = {
+            res: 16,
+            cutDir: 'Z',
+            depth: 128,
+            sat: 100,
+            tint: 0,
+            tone: 0,
+            shade: 0,
+            showValue: false,
+            trackIso: true,
+            isoTarget: 50
+        };
+
+        // TAB 2 STATE
+        const state2 = {
+            res: 8,
+            cutPlane: 'XY',
+            radius: 0.50,
+            sat: 100,
+            tint: 0,
+            tone: 0,
+            shade: 0,
+            showValue: false,
+            trackIso: true
+        };
+
+        // TAB 3 STATE
+        const state3 = {
+            plane: 'XY',
+            sat: 100,
+            bright: 0,
+            tone: 0,
+            format: 'HEX'
+        };
+
+        // 3D CANVAS STATE FOR TAB 3
+        const cam3D = {
+            rotX: 25,
+            rotY: -35,
+            isDragging: false,
+            lastX: 0,
+            lastY: 0
+        };
+
+        const RGB_CORNERS = [
+            { name: "Black Corner", coords: [0, 0, 0], id: "black", label: "(0, 0, 0)" },
+            { name: "Red Corner", coords: [255, 0, 0], id: "red", label: "(255, 0, 0)" },
+            { name: "Green Corner", coords: [0, 255, 0], id: "green", label: "(0, 255, 0)" },
+            { name: "Blue Corner", coords: [0, 0, 255], id: "blue", label: "(0, 0, 255)" },
+            { name: "Yellow Corner", coords: [255, 255, 0], id: "yellow", label: "(255, 255, 0)" },
+            { name: "Cyan Corner", coords: [0, 255, 255], id: "cyan", label: "(0, 255, 255)" },
+            { name: "Magenta Corner", coords: [255, 0, 255], id: "magenta", label: "(255, 0, 255)" },
+            { name: "White Corner", coords: [255, 255, 255], id: "white", label: "(255, 255, 255)" }
+        ];
+
+        /* ========================================================= */
+        /* COLOR CONVERSION & MATHEMATICAL CALCULATIONS */
+        /* ========================================================= */
+
+        // Perceived Value / Luminance (ITU-R BT.709 standard)
+        function getPerceivedLuminance(r, g, b) {
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0;
+        }
+
+        // Apply Saturation, Tint, Tone, Shade, Brightness modifiers
+        function applyColorModifiers(r, g, b, satPct, tintPct, tonePct, shadePct, brightOffsetPct = 0) {
+            // 1. Saturation
+            const sat = satPct / 100.0;
+            const grayLum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            let rMod = grayLum + sat * (r - grayLum);
+            let gMod = grayLum + sat * (g - grayLum);
+            let bMod = grayLum + sat * (b - grayLum);
+
+            // 2. Tint (Blend towards White: 255)
+            const tint = tintPct / 100.0;
+            rMod = rMod + tint * (255 - rMod);
+            gMod = gMod + tint * (255 - gMod);
+            bMod = bMod + tint * (255 - bMod);
+
+            // 3. Tone (Blend towards Gray: 128)
+            const tone = tonePct / 100.0;
+            rMod = rMod + tone * (128 - rMod);
+            gMod = gMod + tone * (128 - gMod);
+            bMod = bMod + tone * (128 - bMod);
+
+            // 4. Shade (Blend towards Black: 0)
+            const shade = shadePct / 100.0;
+            rMod = rMod * (1.0 - shade);
+            gMod = gMod * (1.0 - shade);
+            bMod = bMod * (1.0 - shade);
+
+            // 5. Brightness Shift (if applicable)
+            if (brightOffsetPct !== 0) {
+                const shift = (brightOffsetPct / 100.0) * 255;
+                rMod += shift;
+                gMod += shift;
+                bMod += shift;
+            }
+
+            return [
+                Math.min(255, Math.max(0, Math.round(rMod))),
+                Math.min(255, Math.max(0, Math.round(gMod))),
+                Math.min(255, Math.max(0, Math.round(bMod)))
+            ];
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => {
+                const hex = Math.round(x).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join("").toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return [
+                Math.round(h * 360),
+                Math.round(s * 100),
+                Math.round(l * 100)
+            ];
+        }
+
+        function formatColor(r, g, b, formatStr) {
+            switch (formatStr) {
+                case 'HEX':
+                    return rgbToHex(r, g, b);
+                case 'RGB':
+                    return `rgb(${r}, ${g}, ${b})`;
+                case 'HSL':
+                    const [h, s, l] = rgbToHsl(r, g, b);
+                    return `hsl(${h}°, ${s}%, ${l}%)`;
+                case 'VALUE':
+                    const val = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
+                    return `${val}%`;
+                default:
+                    return rgbToHex(r, g, b);
+            }
+        }
+
+        /* ========================================================= */
+        /* TAB 1 RENDERING & ENGINE */
+        /* ========================================================= */
+        function updateTab1() {
+            state1.cutDir = document.getElementById('t1-cut-direction').value;
+            state1.depth = parseInt(document.getElementById('t1-depth').value);
+            state1.res = parseInt(document.getElementById('t1-res').value);
+            state1.sat = parseInt(document.getElementById('t1-sat').value);
+            state1.tint = parseInt(document.getElementById('t1-tint').value);
+            state1.tone = parseInt(document.getElementById('t1-tone').value);
+            state1.shade = parseInt(document.getElementById('t1-shade').value);
+            state1.showValue = document.getElementById('t1-toggle-value').checked;
+            state1.trackIso = document.getElementById('t1-toggle-iso').checked;
+            state1.isoTarget = parseInt(document.getElementById('t1-iso-target').value);
+
+            // UI updates
+            document.getElementById('t1-depth-val').innerText = `${state1.depth} (${Math.round(state1.depth/255*100)}%)`;
+            document.getElementById('t1-res-val').innerText = `${state1.res} x ${state1.res}`;
+            document.getElementById('t1-sat-val').innerText = `${state1.sat}%`;
+            document.getElementById('t1-tint-val').innerText = `${state1.tint}%`;
+            document.getElementById('t1-tone-val').innerText = `${state1.tone}%`;
+            document.getElementById('t1-shade-val').innerText = `${state1.shade}%`;
+            document.getElementById('t1-iso-target-val').innerText = `${state1.isoTarget}%`;
+
+            document.getElementById('t1-iso-slider-container').style.display = state1.trackIso ? 'block' : 'none';
+
+            // Title updates
+            const titles = {
+                'X': ['Red Axis Slice (YZ Plane)', 'Y = Green Axis (Horizontal), Z = Blue Axis (Vertical), X = Constant Red'],
+                'Y': ['Green Axis Slice (XZ Plane)', 'X = Red Axis (Horizontal), Z = Blue Axis (Vertical), Y = Constant Green'],
+                'Z': ['Blue Axis Slice (XY Plane)', 'X = Red Axis (Horizontal), Y = Green Axis (Vertical), Z = Constant Blue'],
+                'DIAG_X': ['Diagonal X Cut Plane (Y = Z)', 'Cross-section parameterized along Y = Z diagonal'],
+                'ADIAG_X': ['Anti-Diagonal X Cut Plane (Y + Z = 255)', 'Cross-section parameterized along Y + Z anti-diagonal'],
+                'DIAG_Y': ['Diagonal Y Cut Plane (X = Z)', 'Cross-section parameterized along X = Z diagonal'],
+                'ADIAG_Y': ['Anti-Diagonal Y Cut Plane (X + Z = 255)', 'Cross-section parameterized along X + Z anti-diagonal'],
+                'DIAG_Z': ['Diagonal Z Cut Plane (X = Y)', 'Cross-section parameterized along X = Y diagonal'],
+                'ADIAG_Z': ['Anti-Diagonal Z Cut Plane (X + Y = 255)', 'Cross-section parameterized along X + Y anti-diagonal']
+            };
+            document.getElementById('t1-slice-title').innerText = titles[state1.cutDir][0];
+            document.getElementById('t1-slice-subtitle').innerText = titles[state1.cutDir][1];
+
+            renderTab1Canvas();
+        }
+
+        function computeTab1RGB(i, j, res, cutDir, depth) {
+            const u = res === 1 ? 0.5 : i / (res - 1);
+            const v = res === 1 ? 0.5 : j / (res - 1);
+            const d = depth / 255.0;
+
+            let r = 0, g = 0, b = 0;
+
+            switch (cutDir) {
+                case 'X':
+                    r = d * 255; g = u * 255; b = v * 255;
+                    break;
+                case 'Y':
+                    r = u * 255; g = d * 255; b = v * 255;
+                    break;
+                case 'Z':
+                    r = u * 255; g = v * 255; b = d * 255;
+                    break;
+                case 'DIAG_X': // Y=Z offset by depth
+                    r = u * 255;
+                    g = v * 255;
+                    b = (v + (d - 0.5) * 2) * 255;
+                    break;
+                case 'ADIAG_X': // Y+Z=255 offset
+                    r = u * 255;
+                    g = v * 255;
+                    b = (2 * d - v) * 255;
+                    break;
+                case 'DIAG_Y': // X=Z
+                    g = u * 255;
+                    r = v * 255;
+                    b = (v + (d - 0.5) * 2) * 255;
+                    break;
+                case 'ADIAG_Y': // X+Z
+                    g = u * 255;
+                    r = v * 255;
+                    b = (2 * d - v) * 255;
+                    break;
+                case 'DIAG_Z': // X=Y
+                    b = u * 255;
+                    r = v * 255;
+                    g = (v + (d - 0.5) * 2) * 255;
+                    break;
+                case 'ADIAG_Z': // X+Y
+                    b = u * 255;
+                    r = v * 255;
+                    g = (2 * d - v) * 255;
+                    break;
+            }
+
+            // Clamp raw coordinates
+            r = Math.min(255, Math.max(0, r));
+            g = Math.min(255, Math.max(0, g));
+            b = Math.min(255, Math.max(0, b));
+
+            // Apply modifiers
+            return applyColorModifiers(r, g, b, state1.sat, state1.tint, state1.tone, state1.shade);
+        }
+
+        function renderTab1Canvas() {
+            const canvas = document.getElementById('t1-canvas');
+            const ctx = canvas.getContext('2d');
+            const res = state1.res;
+            const tileSize = 480 / res;
+            canvas.width = 480;
+            canvas.height = 480;
+
+            const gridLumData = [];
+
+            for (let j = 0; j < res; j++) {
+                gridLumData[j] = [];
+                for (let i = 0; i < res; i++) {
+                    const [r, g, b] = computeTab1RGB(i, j, res, state1.cutDir, state1.depth);
+                    const lum = getPerceivedLuminance(r, g, b);
+                    gridLumData[j][i] = { r, g, b, lum };
+
+                    ctx.fillStyle = `rgb(${r},${g},${b})`;
+                    ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
+
+                    // Tile border
+                    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+                    ctx.strokeRect(i * tileSize, j * tileSize, tileSize, tileSize);
+
+                    // Show Perceived Value Text overlay
+                    if (state1.showValue && tileSize >= 18) {
+                        const valPct = Math.round(lum * 100);
+                        ctx.fillStyle = lum > 0.5 ? '#000000' : '#ffffff';
+                        ctx.font = `${Math.max(9, Math.floor(tileSize * 0.32))}px JetBrains Mono, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(`${valPct}%`, (i + 0.5) * tileSize, (j + 0.5) * tileSize);
+                    }
+                }
+            }
+
+            // Draw Iso-Luminance contour lines/highlights
+            if (state1.trackIso) {
+                const targetLum = state1.isoTarget / 100.0;
+                const tolerance = 0.04; // +/- 4%
+
+                for (let j = 0; j < res; j++) {
+                    for (let i = 0; i < res; i++) {
+                        const { lum } = gridLumData[j][i];
+                        if (Math.abs(lum - targetLum) <= tolerance) {
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                            ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
+                            ctx.strokeStyle = '#0284c7';
+                            ctx.lineWidth = 2;
+                            ctx.strokeRect(i * tileSize + 1, j * tileSize + 1, tileSize - 2, tileSize - 2);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Tab 1 Mouse Hover & Click interaction
+        const t1Canvas = document.getElementById('t1-canvas');
+        t1Canvas.addEventListener('mousemove', (e) => {
+            const rect = t1Canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const res = state1.res;
+            const tileSize = rect.width / res;
+
+            const i = Math.min(res - 1, Math.max(0, Math.floor(x / tileSize)));
+            const j = Math.min(res - 1, Math.max(0, Math.floor(y / tileSize)));
+
+            const [r, g, b] = computeTab1RGB(i, j, res, state1.cutDir, state1.depth);
+            const hex = rgbToHex(r, g, b);
+            const [h, s, l] = rgbToHsl(r, g, b);
+            const valPct = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
+
+            document.getElementById('t1-info-rgb').innerText = `r: ${r}, g: ${g}, b: ${b}`;
+            document.getElementById('t1-info-hex').innerText = hex;
+            document.getElementById('t1-info-hsl').innerText = `${h}°, ${s}%, ${l}%`;
+            document.getElementById('t1-info-value').innerText = `${valPct}%`;
+
+            showGlobalTooltip(e.clientX, e.clientY, r, g, b);
+        });
+
+        t1Canvas.addEventListener('mouseleave', () => {
+            hideGlobalTooltip();
+        });
+
+        t1Canvas.addEventListener('click', (e) => {
+            const rect = t1Canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const res = state1.res;
+            const tileSize = rect.width / res;
+
+            const i = Math.min(res - 1, Math.max(0, Math.floor(x / tileSize)));
+            const j = Math.min(res - 1, Math.max(0, Math.floor(y / tileSize)));
+
+            const [r, g, b] = computeTab1RGB(i, j, res, state1.cutDir, state1.depth);
+            addSwatchToPalette(r, g, b, `Tab 1 (${state1.cutDir} Slice)`);
+        });
+
+        function resetTab1Controls() {
+            document.getElementById('t1-cut-direction').value = 'Z';
+            document.getElementById('t1-depth').value = 128;
+            document.getElementById('t1-res').value = 16;
+            document.getElementById('t1-sat').value = 100;
+            document.getElementById('t1-tint').value = 0;
+            document.getElementById('t1-tone').value = 0;
+            document.getElementById('t1-shade').value = 0;
+            document.getElementById('t1-toggle-value').checked = false;
+            document.getElementById('t1-toggle-iso').checked = true;
+            document.getElementById('t1-iso-target').value = 50;
+            updateTab1();
+        }
+
+        /* ========================================================= */
+        /* TAB 2 RENDERING & ENGINE */
+        /* ========================================================= */
+        function updateTab2() {
+            state2.cutPlane = document.getElementById('t2-cut-plane').value;
+            state2.radius = parseFloat(document.getElementById('t2-radius').value);
+            state2.res = parseInt(document.getElementById('t2-res').value);
+            state2.sat = parseInt(document.getElementById('t2-sat').value);
+            state2.tint = parseInt(document.getElementById('t2-tint').value);
+            state2.tone = parseInt(document.getElementById('t2-tone').value);
+            state2.shade = parseInt(document.getElementById('t2-shade').value);
+            state2.showValue = document.getElementById('t2-toggle-value').checked;
+            state2.trackIso = document.getElementById('t2-toggle-iso').checked;
+
+            document.getElementById('t2-radius-val').innerText = `R = ${state2.radius.toFixed(2)}`;
+            document.getElementById('t2-res-val').innerText = `${state2.res} x ${state2.res}`;
+            document.getElementById('t2-sat-val').innerText = `${state2.sat}%`;
+            document.getElementById('t2-tint-val').innerText = `${state2.tint}%`;
+            document.getElementById('t2-tone-val').innerText = `${state2.tone}%`;
+            document.getElementById('t2-shade-val').innerText = `${state2.shade}%`;
+
+            renderTab2CornerPanels();
+        }
+
+        function computeTab2CornerRGB(cornerCoords, i, j, res, plane, radius) {
+            const [cx, cy, cz] = cornerCoords; // 0 or 255
+            const u = res === 1 ? 0.5 : i / (res - 1);
+            const v = res === 1 ? 0.5 : j / (res - 1);
+
+            let dx = 0, dy = 0, dz = 0;
+            const rNorm = radius; // 0.05 to 1.00
+
+            if (plane === 'XY') {
+                const theta = u * (Math.PI / 2);
+                const r = v * rNorm;
+                dx = r * Math.cos(theta);
+                dy = r * Math.sin(theta);
+                dz = 0;
+            } else if (plane === 'YZ') {
+                const theta = u * (Math.PI / 2);
+                const r = v * rNorm;
+                dy = r * Math.cos(theta);
+                dz = r * Math.sin(theta);
+                dx = 0;
+            } else if (plane === 'XZ') {
+                const theta = u * (Math.PI / 2);
+                const r = v * rNorm;
+                dx = r * Math.cos(theta);
+                dz = r * Math.sin(theta);
+                dy = 0;
+            } else if (plane === 'SPHERICAL') {
+                const theta = u * (Math.PI / 2);
+                const phi = v * (Math.PI / 2);
+                dx = rNorm * Math.sin(phi) * Math.cos(theta);
+                dy = rNorm * Math.sin(phi) * Math.sin(theta);
+                dz = rNorm * Math.cos(phi);
+            }
+
+            // Direction out from corner vertex
+            let finalR = cx === 0 ? dx * 255 : 255 - dx * 255;
+            let finalG = cy === 0 ? dy * 255 : 255 - dy * 255;
+            let finalB = cz === 0 ? dz * 255 : 255 - dz * 255;
+
+            finalR = Math.min(255, Math.max(0, finalR));
+            finalG = Math.min(255, Math.max(0, finalG));
+            finalB = Math.min(255, Math.max(0, finalB));
+
+            return applyColorModifiers(finalR, finalG, finalB, state2.sat, state2.tint, state2.tone, state2.shade);
+        }
+
+        function renderTab2CornerPanels() {
+            const container = document.getElementById('t2-corners-grid');
+            container.innerHTML = '';
+
+            RGB_CORNERS.forEach((corner, cornerIdx) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-between space-y-3';
+
+                const header = document.createElement('div');
+                header.className = 'w-full flex items-center justify-between border-b border-slate-100 pb-2';
+                header.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-3.5 h-3.5 rounded-full border border-slate-300 shadow-sm" style="background-color: rgb(${corner.coords[0]}, ${corner.coords[1]}, ${corner.coords[2]})"></span>
+                        <span class="font-bold text-slate-800 text-xs">${corner.name}</span>
+                    </div>
+                    <span class="font-mono text-[10px] text-slate-400">${corner.label}</span>
+                `;
+
+                const canvas = document.createElement('canvas');
+                canvas.className = 'pixelated rounded-lg cursor-pointer border border-slate-200 shadow-inner block max-w-full';
+                canvas.width = 200;
+                canvas.height = 200;
+
+                const ctx = canvas.getContext('2d');
+                const res = state2.res;
+                const tileSize = 200 / res;
+
+                for (let j = 0; j < res; j++) {
+                    for (let i = 0; i < res; i++) {
+                        const [r, g, b] = computeTab2CornerRGB(corner.coords, i, j, res, state2.cutPlane, state2.radius);
+                        const lum = getPerceivedLuminance(r, g, b);
+
+                        ctx.fillStyle = `rgb(${r},${g},${b})`;
+                        ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
+                        ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                        ctx.strokeRect(i * tileSize, j * tileSize, tileSize, tileSize);
+
+                        if (state2.showValue && tileSize >= 18) {
+                            const valPct = Math.round(lum * 100);
+                            ctx.fillStyle = lum > 0.5 ? '#000' : '#fff';
+                            ctx.font = `${Math.max(8, Math.floor(tileSize * 0.35))}px JetBrains Mono, sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(`${valPct}%`, (i + 0.5) * tileSize, (j + 0.5) * tileSize);
+                        }
+
+                        if (state2.trackIso) {
+                            const targetLum = 0.5; // midpoint contour
+                            if (Math.abs(lum - targetLum) <= 0.05) {
+                                ctx.strokeStyle = '#0284c7';
+                                ctx.lineWidth = 1.5;
+                                ctx.strokeRect(i * tileSize + 0.5, j * tileSize + 0.5, tileSize - 1, tileSize - 1);
+                            }
+                        }
+                    }
+                }
+
+                // Interaction listeners for panel canvas
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const tSize = rect.width / res;
+                    const i = Math.min(res - 1, Math.max(0, Math.floor(x / tSize)));
+                    const j = Math.min(res - 1, Math.max(0, Math.floor(y / tSize)));
+
+                    const [r, g, b] = computeTab2CornerRGB(corner.coords, i, j, res, state2.cutPlane, state2.radius);
+                    showGlobalTooltip(e.clientX, e.clientY, r, g, b);
+                });
+
+                canvas.addEventListener('mouseleave', () => {
+                    hideGlobalTooltip();
+                });
+
+                canvas.addEventListener('click', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const tSize = rect.width / res;
+                    const i = Math.min(res - 1, Math.max(0, Math.floor(x / tSize)));
+                    const j = Math.min(res - 1, Math.max(0, Math.floor(y / tSize)));
+
+                    const [r, g, b] = computeTab2CornerRGB(corner.coords, i, j, res, state2.cutPlane, state2.radius);
+                    addSwatchToPalette(r, g, b, `${corner.name} Arc Cut`);
+                });
+
+                card.appendChild(header);
+                card.appendChild(canvas);
+                container.appendChild(card);
+            });
+        }
+
+        function resetTab2Controls() {
+            document.getElementById('t2-cut-plane').value = 'XY';
+            document.getElementById('t2-radius').value = 0.50;
+            document.getElementById('t2-res').value = 8;
+            document.getElementById('t2-sat').value = 100;
+            document.getElementById('t2-tint').value = 0;
+            document.getElementById('t2-tone').value = 0;
+            document.getElementById('t2-shade').value = 0;
+            document.getElementById('t2-toggle-value').checked = false;
+            document.getElementById('t2-toggle-iso').checked = true;
+            updateTab2();
+        }
+
+        /* ========================================================= */
+        /* TAB 3 RENDERING & 3D DIAGRAM ENGINE */
+        /* ========================================================= */
+        function updateTab3() {
+            state3.plane = document.getElementById('t3-plane').value;
+            state3.sat = parseInt(document.getElementById('t3-sat').value);
+            state3.bright = parseInt(document.getElementById('t3-bright').value);
+            state3.tone = parseInt(document.getElementById('t3-tone').value);
+            state3.format = document.getElementById('t3-format').value;
+
+            document.getElementById('t3-sat-val').innerText = `${state3.sat}%`;
+            document.getElementById('t3-bright-val').innerText = `${state3.bright}%`;
+            document.getElementById('t3-tone-val').innerText = `${state3.tone}%`;
+
+            renderTab3Corners();
+            renderTab33DCanvas();
+        }
+
+        function computeTab3ArcRGB(cornerCoords, rRadius, angleIndex, plane) {
+            const [cx, cy, cz] = cornerCoords;
+            const theta = (angleIndex / 7) * (Math.PI / 2); // 0 to 90 deg
+            const rNorm = rRadius / 255.0;
+
+            let dx = 0, dy = 0, dz = 0;
+
+            if (plane === 'XY') {
+                dx = rNorm * Math.cos(theta);
+                dy = rNorm * Math.sin(theta);
+                dz = 0;
+            } else if (plane === 'YZ') {
+                dy = rNorm * Math.cos(theta);
+                dz = rNorm * Math.sin(theta);
+                dx = 0;
+            } else if (plane === 'XZ') {
+                dx = rNorm * Math.cos(theta);
+                dz = rNorm * Math.sin(theta);
+                dy = 0;
+            } else if (plane === 'DIAG') {
+                const phi = Math.PI / 4;
+                dx = rNorm * Math.sin(phi) * Math.cos(theta);
+                dy = rNorm * Math.sin(phi) * Math.sin(theta);
+                dz = rNorm * Math.cos(phi);
+            }
+
+            let finalR = cx === 0 ? dx * 255 : 255 - dx * 255;
+            let finalG = cy === 0 ? dy * 255 : 255 - dy * 255;
+            let finalB = cz === 0 ? dz * 255 : 255 - dz * 255;
+
+            finalR = Math.min(255, Math.max(0, finalR));
+            finalG = Math.min(255, Math.max(0, finalG));
+            finalB = Math.min(255, Math.max(0, finalB));
+
+            return applyColorModifiers(finalR, finalG, finalB, state3.sat, 0, state3.tone, 0, state3.bright);
+        }
+
+        function renderTab3Corners() {
+            const container = document.getElementById('t3-corners-container');
+            container.innerHTML = '';
+
+            const radiiSteps = [32, 64, 96, 128, 160, 192, 224, 255];
+
+            RGB_CORNERS.forEach((corner) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between border-b border-slate-100 pb-3';
+                header.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="w-4 h-4 rounded-full border border-slate-300 shadow-sm" style="background-color: rgb(${corner.coords[0]}, ${corner.coords[1]}, ${corner.coords[2]})"></span>
+                        <h4 class="font-bold text-slate-900 text-sm sm:text-base">${corner.name} ${corner.label}</h4>
+                    </div>
+                    <span class="text-xs font-semibold px-2.5 py-1 bg-[#B4E3F8]/50 text-[#0369a1] rounded-full border border-sky-200">
+                        8 Radius Steps (R=32..255)
+                    </span>
+                `;
+
+                const rowsContainer = document.createElement('div');
+                rowsContainer.className = 'space-y-2';
+
+                radiiSteps.forEach((R) => {
+                    const row = document.createElement('div');
+                    row.className = 'flex flex-col sm:flex-row sm:items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-100';
+
+                    const label = document.createElement('div');
+                    label.className = 'w-20 font-mono text-xs font-bold text-slate-600 flex-shrink-0 flex items-center justify-between sm:justify-start gap-1';
+                    label.innerHTML = `<span class="text-slate-400">Radius:</span> R=${R}`;
+
+                    const swatchesGrid = document.createElement('div');
+                    swatchesGrid.className = 'grid grid-cols-8 gap-1.5 flex-grow';
+
+                    for (let step = 0; step < 8; step++) {
+                        const [r, g, b] = computeTab3ArcRGB(corner.coords, R, step, state3.plane);
+                        const codeStr = formatColor(r, g, b, state3.format);
+                        const lum = getPerceivedLuminance(r, g, b);
+
+                        const tile = document.createElement('div');
+                        tile.className = 'grid-tile h-9 rounded-lg cursor-pointer flex flex-col items-center justify-center p-1 relative shadow-sm border border-black/10';
+                        tile.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+                        // Formatted text snippet if hex/code fits
+                        const textEl = document.createElement('span');
+                        textEl.className = 'font-mono text-[9px] font-bold tracking-tighter truncate max-w-full select-none';
+                        textEl.style.color = lum > 0.5 ? '#0f172a' : '#ffffff';
+                        textEl.innerText = state3.format === 'HEX' ? codeStr : (state3.format === 'VALUE' ? codeStr : `${Math.round(step * 90 / 7)}°`);
+
+                        tile.appendChild(textEl);
+
+                        // Mouse Events
+                        tile.addEventListener('mousemove', (e) => {
+                            showGlobalTooltip(e.clientX, e.clientY, r, g, b);
+                        });
+                        tile.addEventListener('mouseleave', () => {
+                            hideGlobalTooltip();
+                        });
+                        tile.addEventListener('click', () => {
+                            addSwatchToPalette(r, g, b, `${corner.name} (R=${R}, ${Math.round(step * 90 / 7)}°)`);
+                        });
+
+                        swatchesGrid.appendChild(tile);
+                    }
+
+                    row.appendChild(label);
+                    row.appendChild(swatchesGrid);
+                    rowsContainer.appendChild(row);
+                });
+
+                card.appendChild(header);
+                card.appendChild(rowsContainer);
+                container.appendChild(card);
+            });
+        }
+
+        /* 3D DIAGRAM CANVAS ENGINE FOR TAB 3 */
+        function renderTab33DCanvas() {
+            const canvas = document.getElementById('t3-3d-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const scale = Math.min(canvas.width, canvas.height) * 0.32;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 3D Matrix Rotation Helper
+            const radX = (cam3D.rotX * Math.PI) / 180;
+            const radY = (cam3D.rotY * Math.PI) / 180;
+
+            function project(x, y, z) {
+                // Center normalized coordinates from [-1, 1]
+                let x1 = x * Math.cos(radY) - z * Math.sin(radY);
+                let z1 = x * Math.sin(radY) + z * Math.cos(radY);
+
+                let y2 = y * Math.cos(radX) - z1 * Math.sin(radX);
+                let z2 = y * Math.sin(radX) + z1 * Math.cos(radX);
+
+                const px = cx + x1 * scale;
+                const py = cy - y2 * scale;
+                return { px, py, depth: z2 };
+            }
+
+            // Cube 8 vertices in normalized [-0.5, 0.5] space
+            const cubeVertices = [
+                [-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5],
+                [-0.5, -0.5, 0.5],  [0.5, -0.5, 0.5],  [0.5, 0.5, 0.5],  [-0.5, 0.5, 0.5]
+            ];
+
+            const edges = [
+                [0,1], [1,2], [2,3], [3,0],
+                [4,5], [5,6], [6,7], [7,4],
+                [0,4], [1,5], [2,6], [3,7]
+            ];
+
+            // Draw Wireframe Cube
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            edges.forEach(([u, v]) => {
+                const p1 = project(...cubeVertices[u]);
+                const p2 = project(...cubeVertices[v]);
+                ctx.beginPath();
+                ctx.moveTo(p1.px, p1.py);
+                ctx.lineTo(p2.px, p2.py);
+                ctx.stroke();
+            });
+
+            // Draw Axes lines from Black Corner (-0.5, -0.5, -0.5)
+            const origin = project(-0.5, -0.5, -0.5);
+
+            // X Axis (Red)
+            const xAxis = project(0.7, -0.5, -0.5);
+            ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(xAxis.px, xAxis.py); ctx.stroke();
+            ctx.fillStyle = '#ef4444'; ctx.font = 'bold 12px Inter'; ctx.fillText('X (Red)', xAxis.px + 5, xAxis.py);
+
+            // Y Axis (Green)
+            const yAxis = project(-0.5, 0.7, -0.5);
+            ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(yAxis.px, yAxis.py); ctx.stroke();
+            ctx.fillStyle = '#22c55e'; ctx.font = 'bold 12px Inter'; ctx.fillText('Y (Green)', yAxis.px + 5, yAxis.py - 5);
+
+            // Z Axis (Blue)
+            const zAxis = project(-0.5, -0.5, 0.7);
+            ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(zAxis.px, zAxis.py); ctx.stroke();
+            ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 12px Inter'; ctx.fillText('Z (Blue)', zAxis.px + 5, zAxis.py + 10);
+
+            // Draw Arc Sweeps from All 8 Vertices
+            RGB_CORNERS.forEach(corner => {
+                const vx = (corner.coords[0] / 255.0) - 0.5;
+                const vy = (corner.coords[1] / 255.0) - 0.5;
+                const vz = (corner.coords[2] / 255.0) - 0.5;
+
+                // Vertex Point Sphere
+                const pVer = project(vx, vy, vz);
+                ctx.fillStyle = `rgb(${corner.coords[0]}, ${corner.coords[1]}, ${corner.coords[2]})`;
+                ctx.beginPath();
+                ctx.arc(pVer.px, pVer.py, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Draw 3 radius arc sweep curves
+                [0.3, 0.6, 0.9].forEach(rNorm => {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#B4E3F8';
+                    ctx.lineWidth = 1.5;
+
+                    for (let s = 0; s <= 12; s++) {
+                        const theta = (s / 12) * (Math.PI / 2);
+                        let dx = 0, dy = 0, dz = 0;
+
+                        if (state3.plane === 'XY') {
+                            dx = rNorm * Math.cos(theta); dy = rNorm * Math.sin(theta);
+                        } else if (state3.plane === 'YZ') {
+                            dy = rNorm * Math.cos(theta); dz = rNorm * Math.sin(theta);
+                        } else if (state3.plane === 'XZ') {
+                            dx = rNorm * Math.cos(theta); dz = rNorm * Math.sin(theta);
+                        } else {
+                            dx = rNorm * Math.sin(Math.PI/4) * Math.cos(theta);
+                            dy = rNorm * Math.sin(Math.PI/4) * Math.sin(theta);
+                            dz = rNorm * Math.cos(Math.PI/4);
+                        }
+
+                        let curX = vx + (corner.coords[0] === 0 ? dx : -dx);
+                        let curY = vy + (corner.coords[1] === 0 ? dy : -dy);
+                        let curZ = vz + (corner.coords[2] === 0 ? dz : -dz);
+
+                        const pt = project(curX, curY, curZ);
+                        if (s === 0) ctx.moveTo(pt.px, pt.py);
+                        else ctx.lineTo(pt.px, pt.py);
+                    }
+                    ctx.stroke();
+                });
+            });
+        }
+
+        // 3D Canvas Mouse Events
+        const canvas3D = document.getElementById('t3-3d-canvas');
+        canvas3D.addEventListener('mousedown', (e) => {
+            cam3D.isDragging = true;
+            cam3D.lastX = e.clientX;
+            cam3D.lastY = e.clientY;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!cam3D.isDragging) return;
+            const dx = e.clientX - cam3D.lastX;
+            const dy = e.clientY - cam3D.lastY;
+            cam3D.rotY += dx * 0.6;
+            cam3D.rotX += dy * 0.6;
+            cam3D.lastX = e.clientX;
+            cam3D.lastY = e.clientY;
+            renderTab33DCanvas();
+        });
+
+        window.addEventListener('mouseup', () => {
+            cam3D.isDragging = false;
+        });
+
+        function reset3DCamera() {
+            cam3D.rotX = 25;
+            cam3D.rotY = -35;
+            renderTab33DCanvas();
+        }
+
+        function resetTab3Controls() {
+            document.getElementById('t3-plane').value = 'XY';
+            document.getElementById('t3-sat').value = 100;
+            document.getElementById('t3-bright').value = 0;
+            document.getElementById('t3-tone').value = 0;
+            document.getElementById('t3-format').value = 'HEX';
+            updateTab3();
+        }
+
+        /* ========================================================= */
+        /* GLOBAL PALETTE DRAWER & UI MANAGEMENT */
+        /* ========================================================= */
+        function addSwatchToPalette(r, g, b, sourceLabel = "") {
+            const hex = rgbToHex(r, g, b);
+            globalPalette.push({ r, g, b, hex, label: sourceLabel, id: Date.now() + Math.random() });
+            renderPaletteSwatches();
+
+            // Auto expand drawer if hidden
+            if (!paletteDrawerExpanded) {
+                togglePaletteDrawer();
+            }
+
+            showToast(`Added ${hex} to Palette!`);
+        }
+
+        function removeSwatchFromPalette(id) {
+            globalPalette = globalPalette.filter(s => s.id !== id);
+            renderPaletteSwatches();
+        }
+
+        function clearPalette() {
+            globalPalette = [];
+            renderPaletteSwatches();
+            showToast("Palette cleared!");
+        }
+
+        function renderPaletteSwatches() {
+            const badge = document.getElementById('palette-count-badge');
+            const emptyMsg = document.getElementById('palette-empty-msg');
+            const grid = document.getElementById('palette-grid');
+            const formatStr = document.getElementById('palette-format').value;
+
+            badge.innerText = `${globalPalette.length} Swatches`;
+
+            if (globalPalette.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                grid.classList.add('hidden');
+                grid.innerHTML = '';
+                return;
+            }
+
+            emptyMsg.classList.add('hidden');
+            grid.classList.remove('hidden');
+            grid.innerHTML = '';
+
+            globalPalette.forEach(swatch => {
+                const code = formatColor(swatch.r, swatch.g, swatch.b, formatStr);
+                const lum = getPerceivedLuminance(swatch.r, swatch.g, swatch.b);
+
+                const item = document.createElement('div');
+                item.className = 'swatch-card flex items-center gap-2 p-1.5 bg-slate-50 border border-slate-200 rounded-lg shadow-sm hover:border-sky-300';
+
+                item.innerHTML = `
+                    <div class="w-7 h-7 rounded-md border border-black/10 shadow-inner flex-shrink-0" style="background-color: ${swatch.hex}"></div>
+                    <div class="flex flex-col">
+                        <span class="font-mono text-xs font-bold text-slate-800">${code}</span>
+                        <span class="text-[10px] text-slate-400 truncate max-w-[110px]">${swatch.label}</span>
+                    </div>
+                    <button onclick="removeSwatchFromPalette(${swatch.id})" class="text-slate-400 hover:text-red-500 ml-1 p-1 text-xs transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+
+                grid.appendChild(item);
+            });
+        }
+
+        function copyPaletteToClipboard() {
+            if (globalPalette.length === 0) {
+                showToast("Palette is empty!", "warning");
+                return;
+            }
+
+            const formatStr = document.getElementById('palette-format').value;
+            const textList = globalPalette.map(s => formatColor(s.r, s.g, s.b, formatStr)).join(', ');
+
+            // Use legacy execCommand for iFrame iframe safety
+            const textArea = document.createElement("textarea");
+            textArea.value = textList;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            showToast(`Copied ${globalPalette.length} colors to clipboard!`);
+        }
+
+        function togglePaletteDrawer() {
+            const body = document.getElementById('palette-body');
+            const icon = document.getElementById('drawer-toggle-icon');
+            paletteDrawerExpanded = !paletteDrawerExpanded;
+
+            if (paletteDrawerExpanded) {
+                body.classList.remove('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                body.classList.add('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+
+        /* TOOLTIP CONTROLLER */
+        function showGlobalTooltip(x, y, r, g, b) {
+            const tooltip = document.getElementById('global-tooltip');
+            const colorBar = document.getElementById('tooltip-color-bar');
+            const textHex = document.getElementById('tooltip-text-hex');
+            const textRgb = document.getElementById('tooltip-text-rgb');
+            const textHsl = document.getElementById('tooltip-text-hsl');
+            const textVal = document.getElementById('tooltip-text-val');
+
+            const hex = rgbToHex(r, g, b);
+            const [h, s, l] = rgbToHsl(r, g, b);
+            const valPct = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
+
+            colorBar.style.backgroundColor = `rgb(${r},${g},${b})`;
+            textHex.innerText = hex;
+            textRgb.innerText = `RGB: ${r}, ${g}, ${b}`;
+            textHsl.innerText = `HSL: ${h}°, ${s}%, ${l}%`;
+            textVal.innerText = `Perceived Value: ${valPct}%`;
+
+            tooltip.style.left = `${Math.min(window.innerWidth - 180, x + 15)}px`;
+            tooltip.style.top = `${Math.min(window.innerHeight - 130, y + 15)}px`;
+            tooltip.style.opacity = '1';
+        }
+
+        function hideGlobalTooltip() {
+            document.getElementById('global-tooltip').style.opacity = '0';
+        }
+
+        /* TOAST NOTIFICATION ENGINE */
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 bg-white text-slate-800 ${type === 'warning' ? 'border-amber-300' : 'border-sky-300'}`;
+
+            toast.innerHTML = `
+                <span class="w-2 h-2 rounded-full ${type === 'warning' ? 'bg-amber-500' : 'bg-[#0284c7]'}"></span>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        /* TAB SWITCHING MANAGER */
+        function switchTab(tabNum) {
+            activeTab = tabNum;
+
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`tab-btn-${i}`);
+                const content = document.getElementById(`tab-content-${i}`);
+
+                if (i === tabNum) {
+                    btn.classList.add('active');
+                    content.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('active');
+                    content.classList.add('hidden');
+                }
+            }
+
+            if (tabNum === 1) updateTab1();
+            if (tabNum === 2) updateTab2();
+            if (tabNum === 3) updateTab3();
+        }
+
+        // INITIALIZE APP ON WINDOW LOAD
+        window.onload = function() {
+            updateTab1();
+            updateTab2();
+            updateTab3();
+        };
+
+        window.addEventListener('resize', () => {
+            if (activeTab === 3) renderTab33DCanvas();
+        });
+    </script>
+</body>
+</html>
