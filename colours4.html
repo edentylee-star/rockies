@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rockie road</title>
+    <title>RGB Cube Color Slice & Corner Arc Explorer</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -146,6 +146,29 @@
             z-index: 2000;
         }
 
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
+        }
+
         .nav-tools-dropdown {
             position: relative;
             display: inline-block;
@@ -231,9 +254,18 @@
     <!-- TOP NAVIGATION HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
-                <!-- Left Section: Navigation Panel & App Title -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+                
+                <!-- Left Section: Home Link & Dropdown Switcher + App Title -->
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+                    
                     <div class="nav-header-left">
+                        <!-- Back to Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Back to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
                         <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
@@ -277,7 +309,7 @@
                 </div>
 
                 <!-- TABS NAVIGATION -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-medium self-start lg:self-auto">
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-medium self-start md:self-auto">
                     <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
                         <i class="fa-solid fa-layer-group text-xs"></i>
                         <span>Regular Slices</span>
