@@ -1646,7 +1646,7 @@
             showToast("Copied code to clipboard!");
         }
 
-        /* MINIMALIST CARD GENERATION (PURE SWATCH RECTANGLES WITH SMALL HEX & RGB ONLY) */
+        /* MINIMALIST CARD GENERATION (PURE SWATCH RECTANGLES WITH SMALL HEX ONLY) */
         function downloadMinimalPaletteCard(fileType = 'png') {
             if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
                 showToast("No active palette colors to download!", "warning");
