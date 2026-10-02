@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>meow</title>
+    <title>RGB Cube Color Slice & Corner Arc Explorer</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font: Inter -->
+    <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -26,6 +27,7 @@
                             light: '#E6F4FA',
                             DEFAULT: '#B4E3F8',
                             hover: '#9BD6F3',
+                            border: '#22ACEC',
                             dark: '#0284c7',
                             text: '#0369a1'
                         }
@@ -36,13 +38,13 @@
     </script>
 
     <style>
-        /* Custom scrollbars & slider styling */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
             color: #0f172a;
         }
 
+        /* Custom Scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -84,30 +86,21 @@
             -webkit-appearance: none;
             margin-top: -6px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            transition: transform 0.1s ease, background-color 0.15s ease;
+            transition: transform 0.15s ease, background-color 0.15s ease;
         }
         input[type=range]::-webkit-slider-thumb:hover {
             transform: scale(1.15);
             background: #0369a1;
         }
 
-        /* Accent Toggle Switch */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #0284c7;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #B4E3F8;
-        }
-
         /* Hover Tooltip Overlay */
         #global-tooltip {
             pointer-events: none;
-            transition: opacity 0.1s ease, transform 0.1s ease;
+            transition: opacity 0.1s ease;
             z-index: 9999;
         }
 
-        /* Swatch shadow effect */
+        /* Swatch Card Animations */
         .swatch-card {
             transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
@@ -116,6 +109,7 @@
             box-shadow: 0 6px 12px -2px rgba(0,0,0,0.12);
         }
 
+        /* Tab Active State */
         .tab-btn {
             position: relative;
             transition: all 0.2s ease;
@@ -123,9 +117,11 @@
         .tab-btn.active {
             background-color: #B4E3F8;
             color: #0369a1;
-            font-weight: 600;
+            font-weight: 700;
+            border-color: #22ACEC;
         }
 
+        /* Grid Tile Hover */
         .grid-tile {
             transition: transform 0.1s ease, border-color 0.1s ease;
         }
@@ -135,43 +131,196 @@
             outline: 2px solid #0284c7;
         }
 
-        /* Canvas container crisp pixelation */
+        /* Canvas Crisp Rendering */
         canvas.pixelated {
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+        }
+
+        /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
+        .nav-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2000;
+        }
+
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
+        }
+
+        .nav-tools-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-dropdown-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 6px;
+            min-width: 220px;
+            background-color: #ffffff;
+            border: 1.5px solid #22ACEC;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 2100;
+        }
+
+        .nav-tools-dropdown.open .nav-dropdown-content,
+        .nav-tools-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .nav-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-dropdown-item:hover {
+            background-color: #B4E3F8;
+            color: #0284c7;
+        }
+
+        .nav-dropdown-item.active-tool {
+            background-color: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
 
-    <!-- TOP HEADER NAVBAR -->
+    <!-- TOP NAVIGATION HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] shadow-inner font-bold text-xl">
-                        <i class="fa-solid fa-[#fa-cube] fa-cube"></i>
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
+                
+                <!-- Left Section: Navigation Panel & App Title -->
+                <div class="flex flex-wrap items-center gap-3">
+                    
+                    <div class="nav-header-left">
+                        <!-- Back to Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Back to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
+                        <!-- Navigation Dropdown Switcher -->
+                        <div id="nav-dropdown-container" class="nav-tools-dropdown">
+                            <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
+                                <span>Rockie Navigation</span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </button>
+
+                            <div class="nav-dropdown-content">
+                                <a href="index.html" class="nav-dropdown-item">
+                                    <span>🪨</span> rockie home
+                                </a>
+                                <a href="colours2.html" class="nav-dropdown-item">
+                                    <span>🍀</span> square rockies
+                                </a>
+                                <a href="colours3.html" class="nav-dropdown-item">
+                                    <span>🍁</span> circle rockies
+                                </a>
+                                <a href="colours4.html" class="nav-dropdown-item active-tool">
+                                    <span>🌼</span> cube rockies
+                                </a>
+                                <a href="colours5.html" class="nav-dropdown-item">
+                                    <span>🌸</span> collected rockies
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            RGB Cube Color Slice & Corner Arc Explorer
-                        </h1>
-                        <p class="text-xs text-slate-500">some rockie (road) slices</p>
+
+                    <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
+
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-lg">
+                            <i class="fa-solid fa-cube"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                                RGB Cube Color Slice & Corner Arc Explorer
+                            </h1>
+                            <p class="text-[11px] text-slate-500">some rockie (road) slices</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- TABS NAVIGATION -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-sm font-medium">
-                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
-                        <i class="fa-solid fa-[#fa-layer-group] fa-layer-group text-xs"></i>
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-medium self-start lg:self-auto">
+                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-layer-group text-xs"></i>
                         <span>Regular Slices</span>
                     </button>
-                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
-                        <i class="fa-solid fa-[#fa-[#fa-circle-notch]] fa-circle-notch text-xs"></i>
+                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-circle-notch text-xs"></i>
                         <span>Corner Spherical Arcs</span>
                     </button>
-                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
-                        <i class="fa-solid fa-[#fa-chart-pie] fa-chart-pie text-xs"></i>
+                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                        <i class="fa-solid fa-chart-pie text-xs"></i>
                         <span>8 Corner Arc Sweeps</span>
                     </button>
                 </nav>
@@ -191,7 +340,7 @@
                 <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <h2 class="font-bold text-slate-900 flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC] inline-block"></span>
                             Slice Controls
                         </h2>
                         <button onclick="resetTab1Controls()" class="text-xs text-sky-700 hover:text-sky-900 font-medium flex items-center gap-1">
@@ -202,7 +351,7 @@
                     <!-- Cut Direction Dropdown -->
                     <div class="space-y-1.5">
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Cut Direction Plane</label>
-                        <select id="t1-cut-direction" onchange="updateTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500 font-medium">
+                        <select id="t1-cut-direction" onchange="updateTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2.5 focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500 font-medium">
                             <option value="X">Along X Axis (YZ Slices / Red Plane Cut)</option>
                             <option value="Y">Along Y Axis (XZ Slices / Green Plane Cut)</option>
                             <option value="Z" selected>Along Z Axis (XY Slices / Blue Plane Cut)</option>
@@ -237,7 +386,7 @@
 
                     <!-- COLOR MODIFIERS -->
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0369a1] bg-[#B4E3F8]/40 px-2.5 py-1 rounded-md inline-block">Color Modifiers</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0369a1] bg-[#B4E3F8]/40 px-2.5 py-1 rounded-md inline-block border border-sky-200">Color Modifiers</h3>
 
                         <!-- Saturation -->
                         <div class="space-y-1">
@@ -282,8 +431,8 @@
                     <div class="space-y-3 pt-1">
                         <!-- Perceived Value Overlay -->
                         <div class="flex items-center justify-between">
-                            <label for="t1-[#toggle-value]" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
-                                <i class="fa-solid fa-[#fa-eye] fa-eye text-sky-600"></i> Show Perceived Value (%)
+                            <label for="t1-toggle-value" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-sky-600"></i> Show Perceived Value (%)
                             </label>
                             <input type="checkbox" id="t1-toggle-value" onchange="updateTab1()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7] cursor-pointer">
                         </div>
@@ -291,12 +440,12 @@
                         <!-- Track Iso-Line Contour -->
                         <div class="flex items-center justify-between">
                             <label for="t1-toggle-iso" class="text-xs font-semibold text-slate-700 cursor-pointer flex items-center gap-2">
-                                <i class="fa-solid fa-[#fa-route] fa-route text-sky-600"></i> Track Iso-Luminance Contour
+                                <i class="fa-solid fa-route text-sky-600"></i> Track Iso-Luminance Contour
                             </label>
                             <input type="checkbox" id="t1-toggle-iso" onchange="updateTab1()" class="w-4 h-4 text-sky-600 rounded focus:ring-sky-500 accent-[#0284c7] cursor-pointer" checked>
                         </div>
 
-                        <!-- Target Iso Value slider when ISO line is enabled -->
+                        <!-- Target Iso Value slider -->
                         <div id="t1-iso-slider-container" class="space-y-1 pt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                             <div class="flex justify-between text-xs">
                                 <span class="text-slate-600 font-medium">Target Iso-Luminance</span>
@@ -360,7 +509,7 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC] inline-block"></span>
                             Spherical Arc Cuts from 8 RGB Cube Corners
                         </h2>
                         <p class="text-xs text-slate-500">Evaluates radial color slices projecting outward from all 8 vertices of the RGB color cube</p>
@@ -374,7 +523,7 @@
                     <!-- Cut Plane Dropdown -->
                     <div class="space-y-1">
                         <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Cut Plane Geometry</label>
-                        <select id="t2-cut-plane" onchange="updateTab2()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
+                        <select id="t2-cut-plane" onchange="updateTab2()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
                             <option value="XY" selected>XY Plane (Red vs Green)</option>
                             <option value="YZ">YZ Plane (Green vs Blue)</option>
                             <option value="XZ">XZ Plane (Red vs Blue)</option>
@@ -461,7 +610,7 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-2">
                     <div>
                         <h2 class="font-bold text-slate-900 text-xl flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC] inline-block"></span>
                             8 RGB Cube Corners — 8 Radius Arc Increments
                         </h2>
                         <p class="text-xs text-slate-600 mt-0.5">
@@ -531,7 +680,7 @@
                 <div class="flex flex-col md:flex-row items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-2">
                     <div>
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-[#fa-cubes] fa-cubes text-sky-600"></i>
+                            <i class="fa-solid fa-cubes text-sky-600"></i>
                             Corner Cut Reference Diagram (3D Coordinate System)
                         </h3>
                         <p class="text-xs text-slate-500">Interactive 3D representation showing axes (X: Red, Y: Green, Z: Blue) and corner radial sweeps. Click & drag to rotate!</p>
@@ -566,7 +715,7 @@
         <div class="bg-[#B4E3F8] border-t border-sky-300 px-4 py-2.5 flex items-center justify-between cursor-pointer shadow-md select-none" onclick="togglePaletteDrawer()">
             <div class="flex items-center space-x-3">
                 <span class="w-6 h-6 rounded-md bg-white text-[#0369a1] font-bold flex items-center justify-center text-xs shadow-sm">
-                    <i class="fa-solid fa-[#fa-palette] fa-palette"></i>
+                    <i class="fa-solid fa-palette"></i>
                 </span>
                 <span class="font-bold text-slate-900 text-sm flex items-center gap-2">
                     Global Comparison Palette
@@ -590,7 +739,7 @@
 
                 <!-- Copy All Button -->
                 <button onclick="copyPaletteToClipboard()" class="px-3 py-1 bg-white hover:bg-sky-50 text-[#0369a1] text-xs font-bold rounded-md border border-sky-300 shadow-sm transition-colors flex items-center gap-1.5">
-                    <i class="fa-solid fa-[#fa-copy] fa-copy"></i>
+                    <i class="fa-solid fa-copy"></i>
                     <span class="hidden sm:inline">Copy Palette</span>
                 </button>
 
@@ -602,7 +751,7 @@
 
                 <!-- Expand / Collapse Icon -->
                 <button class="w-7 h-7 rounded-md bg-white/60 hover:bg-white text-slate-700 flex items-center justify-center transition-transform" id="drawer-toggle-icon">
-                    <i class="fa-solid fa-[#fa-chevron-down] fa-chevron-down text-xs"></i>
+                    <i class="fa-solid fa-chevron-down text-xs"></i>
                 </button>
             </div>
         </div>
@@ -610,7 +759,7 @@
         <!-- DRAWER CONTENT AREA -->
         <div id="palette-body" class="bg-white border-t border-slate-200 p-4 max-h-48 overflow-y-auto">
             <div id="palette-empty-msg" class="text-center py-6 text-slate-400 text-xs">
-                <i class="fa-solid fa-[#fa-hand-pointer] fa-hand-pointer text-xl mb-1 text-slate-300 block"></i>
+                <i class="fa-solid fa-hand-pointer text-xl mb-1 text-slate-300 block"></i>
                 No swatches added yet. Click any color tile or slice across Tabs 1, 2, or 3 to add colors here for comparison!
             </div>
             <div id="palette-grid" class="flex flex-wrap gap-2 hidden">
@@ -622,7 +771,7 @@
     <!-- GLOBAL TOOLTIP -->
     <div id="global-tooltip" class="fixed opacity-0 bg-slate-900 text-white text-xs rounded-lg p-2.5 shadow-xl border border-slate-700 font-mono pointer-events-none transition-opacity duration-150">
         <div id="tooltip-color-bar" class="h-2 rounded mb-1.5 w-full border border-white/20"></div>
-        <div id="tooltip-[#text-hex]" class="font-bold text-sky-300 text-sm mb-0.5">#FFFFFF</div>
+        <div id="tooltip-text-hex" class="font-bold text-sky-300 text-sm mb-0.5">#FFFFFF</div>
         <div id="tooltip-text-rgb" class="text-slate-300">RGB: 255, 255, 255</div>
         <div id="tooltip-text-hsl" class="text-slate-300">HSL: 0°, 0%, 100%</div>
         <div id="tooltip-text-val" class="text-amber-300 font-medium mt-0.5">Perceived Value: 100%</div>
@@ -639,6 +788,20 @@
         let activeTab = 1;
         let globalPalette = [];
         let paletteDrawerExpanded = true;
+
+        // TOP NAVIGATION DROPDOWN TOGGLER
+        function toggleNavDropdown(event) {
+            event.stopPropagation();
+            const container = document.getElementById('nav-dropdown-container');
+            container.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('nav-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
 
         // TAB 1 STATE
         const state1 = {
@@ -856,44 +1019,30 @@
                 case 'Z':
                     r = u * 255; g = v * 255; b = d * 255;
                     break;
-                case 'DIAG_X': // Y=Z offset by depth
-                    r = u * 255;
-                    g = v * 255;
-                    b = (v + (d - 0.5) * 2) * 255;
+                case 'DIAG_X':
+                    r = u * 255; g = v * 255; b = (v + (d - 0.5) * 2) * 255;
                     break;
-                case 'ADIAG_X': // Y+Z=255 offset
-                    r = u * 255;
-                    g = v * 255;
-                    b = (2 * d - v) * 255;
+                case 'ADIAG_X':
+                    r = u * 255; g = v * 255; b = (2 * d - v) * 255;
                     break;
-                case 'DIAG_Y': // X=Z
-                    g = u * 255;
-                    r = v * 255;
-                    b = (v + (d - 0.5) * 2) * 255;
+                case 'DIAG_Y':
+                    g = u * 255; r = v * 255; b = (v + (d - 0.5) * 2) * 255;
                     break;
-                case 'ADIAG_Y': // X+Z
-                    g = u * 255;
-                    r = v * 255;
-                    b = (2 * d - v) * 255;
+                case 'ADIAG_Y':
+                    g = u * 255; r = v * 255; b = (2 * d - v) * 255;
                     break;
-                case 'DIAG_Z': // X=Y
-                    b = u * 255;
-                    r = v * 255;
-                    g = (v + (d - 0.5) * 2) * 255;
+                case 'DIAG_Z':
+                    b = u * 255; r = v * 255; g = (v + (d - 0.5) * 2) * 255;
                     break;
-                case 'ADIAG_Z': // X+Y
-                    b = u * 255;
-                    r = v * 255;
-                    g = (2 * d - v) * 255;
+                case 'ADIAG_Z':
+                    b = u * 255; r = v * 255; g = (2 * d - v) * 255;
                     break;
             }
 
-            // Clamp raw coordinates
             r = Math.min(255, Math.max(0, r));
             g = Math.min(255, Math.max(0, g));
             b = Math.min(255, Math.max(0, b));
 
-            // Apply modifiers
             return applyColorModifiers(r, g, b, state1.sat, state1.tint, state1.tone, state1.shade);
         }
 
@@ -936,7 +1085,7 @@
             // Draw Iso-Luminance contour lines/highlights
             if (state1.trackIso) {
                 const targetLum = state1.isoTarget / 100.0;
-                const tolerance = 0.04; // +/- 4%
+                const tolerance = 0.04;
 
                 for (let j = 0; j < res; j++) {
                     for (let i = 0; i < res; i++) {
@@ -1035,12 +1184,12 @@
         }
 
         function computeTab2CornerRGB(cornerCoords, i, j, res, plane, radius) {
-            const [cx, cy, cz] = cornerCoords; // 0 or 255
+            const [cx, cy, cz] = cornerCoords;
             const u = res === 1 ? 0.5 : i / (res - 1);
             const v = res === 1 ? 0.5 : j / (res - 1);
 
             let dx = 0, dy = 0, dz = 0;
-            const rNorm = radius; // 0.05 to 1.00
+            const rNorm = radius;
 
             if (plane === 'XY') {
                 const theta = u * (Math.PI / 2);
@@ -1068,7 +1217,6 @@
                 dz = rNorm * Math.cos(phi);
             }
 
-            // Direction out from corner vertex
             let finalR = cx === 0 ? dx * 255 : 255 - dx * 255;
             let finalG = cy === 0 ? dy * 255 : 255 - dy * 255;
             let finalB = cz === 0 ? dz * 255 : 255 - dz * 255;
@@ -1084,7 +1232,7 @@
             const container = document.getElementById('t2-corners-grid');
             container.innerHTML = '';
 
-            RGB_CORNERS.forEach((corner, cornerIdx) => {
+            RGB_CORNERS.forEach((corner) => {
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col items-center justify-between space-y-3';
 
@@ -1127,7 +1275,7 @@
                         }
 
                         if (state2.trackIso) {
-                            const targetLum = 0.5; // midpoint contour
+                            const targetLum = 0.5;
                             if (Math.abs(lum - targetLum) <= 0.05) {
                                 ctx.strokeStyle = '#0284c7';
                                 ctx.lineWidth = 1.5;
@@ -1137,7 +1285,7 @@
                     }
                 }
 
-                // Interaction listeners for panel canvas
+                // Interaction listeners
                 canvas.addEventListener('mousemove', (e) => {
                     const rect = canvas.getBoundingClientRect();
                     const x = e.clientX - rect.left;
@@ -1205,7 +1353,7 @@
 
         function computeTab3ArcRGB(cornerCoords, rRadius, angleIndex, plane) {
             const [cx, cy, cz] = cornerCoords;
-            const theta = (angleIndex / 7) * (Math.PI / 2); // 0 to 90 deg
+            const theta = (angleIndex / 7) * (Math.PI / 2);
             const rNorm = rRadius / 255.0;
 
             let dx = 0, dy = 0, dz = 0;
@@ -1285,7 +1433,6 @@
                         tile.className = 'grid-tile h-9 rounded-lg cursor-pointer flex flex-col items-center justify-center p-1 relative shadow-sm border border-black/10';
                         tile.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 
-                        // Formatted text snippet if hex/code fits
                         const textEl = document.createElement('span');
                         textEl.className = 'font-mono text-[9px] font-bold tracking-tighter truncate max-w-full select-none';
                         textEl.style.color = lum > 0.5 ? '#0f172a' : '#ffffff';
@@ -1333,12 +1480,10 @@
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 3D Matrix Rotation Helper
             const radX = (cam3D.rotX * Math.PI) / 180;
             const radY = (cam3D.rotY * Math.PI) / 180;
 
             function project(x, y, z) {
-                // Center normalized coordinates from [-1, 1]
                 let x1 = x * Math.cos(radY) - z * Math.sin(radY);
                 let z1 = x * Math.sin(radY) + z * Math.cos(radY);
 
@@ -1350,7 +1495,6 @@
                 return { px, py, depth: z2 };
             }
 
-            // Cube 8 vertices in normalized [-0.5, 0.5] space
             const cubeVertices = [
                 [-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5],
                 [-0.5, -0.5, 0.5],  [0.5, -0.5, 0.5],  [0.5, 0.5, 0.5],  [-0.5, 0.5, 0.5]
@@ -1362,7 +1506,7 @@
                 [0,4], [1,5], [2,6], [3,7]
             ];
 
-            // Draw Wireframe Cube
+            // Wireframe Cube
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 1.5;
             edges.forEach(([u, v]) => {
@@ -1374,34 +1518,33 @@
                 ctx.stroke();
             });
 
-            // Draw Axes lines from Black Corner (-0.5, -0.5, -0.5)
+            // Axes lines from Black Corner
             const origin = project(-0.5, -0.5, -0.5);
 
-            // X Axis (Red)
+            // X Axis
             const xAxis = project(0.7, -0.5, -0.5);
             ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(xAxis.px, xAxis.py); ctx.stroke();
             ctx.fillStyle = '#ef4444'; ctx.font = 'bold 12px Inter'; ctx.fillText('X (Red)', xAxis.px + 5, xAxis.py);
 
-            // Y Axis (Green)
+            // Y Axis
             const yAxis = project(-0.5, 0.7, -0.5);
             ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(yAxis.px, yAxis.py); ctx.stroke();
             ctx.fillStyle = '#22c55e'; ctx.font = 'bold 12px Inter'; ctx.fillText('Y (Green)', yAxis.px + 5, yAxis.py - 5);
 
-            // Z Axis (Blue)
+            // Z Axis
             const zAxis = project(-0.5, -0.5, 0.7);
             ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 3;
             ctx.beginPath(); ctx.moveTo(origin.px, origin.py); ctx.lineTo(zAxis.px, zAxis.py); ctx.stroke();
             ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 12px Inter'; ctx.fillText('Z (Blue)', zAxis.px + 5, zAxis.py + 10);
 
-            // Draw Arc Sweeps from All 8 Vertices
+            // Corner Arc Curves
             RGB_CORNERS.forEach(corner => {
                 const vx = (corner.coords[0] / 255.0) - 0.5;
                 const vy = (corner.coords[1] / 255.0) - 0.5;
                 const vz = (corner.coords[2] / 255.0) - 0.5;
 
-                // Vertex Point Sphere
                 const pVer = project(vx, vy, vz);
                 ctx.fillStyle = `rgb(${corner.coords[0]}, ${corner.coords[1]}, ${corner.coords[2]})`;
                 ctx.beginPath();
@@ -1411,7 +1554,6 @@
                 ctx.lineWidth = 1;
                 ctx.stroke();
 
-                // Draw 3 radius arc sweep curves
                 [0.3, 0.6, 0.9].forEach(rNorm => {
                     ctx.beginPath();
                     ctx.strokeStyle = '#B4E3F8';
@@ -1492,7 +1634,6 @@
             globalPalette.push({ r, g, b, hex, label: sourceLabel, id: Date.now() + Math.random() });
             renderPaletteSwatches();
 
-            // Auto expand drawer if hidden
             if (!paletteDrawerExpanded) {
                 togglePaletteDrawer();
             }
@@ -1532,7 +1673,6 @@
 
             globalPalette.forEach(swatch => {
                 const code = formatColor(swatch.r, swatch.g, swatch.b, formatStr);
-                const lum = getPerceivedLuminance(swatch.r, swatch.g, swatch.b);
 
                 const item = document.createElement('div');
                 item.className = 'swatch-card flex items-center gap-2 p-1.5 bg-slate-50 border border-slate-200 rounded-lg shadow-sm hover:border-sky-300';
@@ -1561,7 +1701,6 @@
             const formatStr = document.getElementById('palette-format').value;
             const textList = globalPalette.map(s => formatColor(s.r, s.g, s.b, formatStr)).join(', ');
 
-            // Use legacy execCommand for iFrame iframe safety
             const textArea = document.createElement("textarea");
             textArea.value = textList;
             document.body.appendChild(textArea);
