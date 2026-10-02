@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YAPYAPYAP</title>
+    <title>Palette Vault - Image Extractor & Palette Bank</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,7 +11,7 @@
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -26,6 +26,7 @@
                             light: '#E6F4FA',
                             DEFAULT: '#B4E3F8',
                             hover: '#9BD6F3',
+                            border: '#22ACEC',
                             dark: '#0284c7',
                             text: '#0369a1'
                         }
@@ -97,7 +98,8 @@
         .tab-btn.active {
             background-color: #B4E3F8;
             color: #0369a1;
-            font-weight: 600;
+            font-weight: 700;
+            border-color: #22ACEC;
         }
 
         /* Eyedropper Loupe Lens */
@@ -140,6 +142,117 @@
             background-color: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(4px);
         }
+
+        /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
+        .nav-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2000;
+        }
+        
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+        
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
+        }
+        
+        .nav-tools-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .nav-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-dropdown-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+        }
+        
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 6px;
+            min-width: 220px;
+            background-color: #ffffff;
+            border: 1.5px solid #22ACEC;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 2100;
+        }
+        
+        .nav-tools-dropdown.open .nav-dropdown-content,
+        .nav-tools-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+        
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.15s, color 0.15s;
+        }
+        
+        .nav-dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .nav-dropdown-item:hover {
+            background-color: #B4E3F8;
+            color: #0284c7;
+        }
+        
+        .nav-dropdown-item.active-tool {
+            background-color: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-800">
@@ -147,32 +260,74 @@
     <!-- TOP NAVIGATION HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] shadow-inner font-bold text-xl">
-                        <i class="fa-solid fa-swatchbook"></i>
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
+                
+                <!-- Left Section: Home Link & Dropdown + App Title -->
+                <div class="flex flex-wrap items-center gap-3">
+                    
+                    <div class="nav-header-left">
+                        <!-- Back to Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Back to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
+                        <!-- Navigation Dropdown Switcher -->
+                        <div id="nav-dropdown-container" class="nav-tools-dropdown">
+                            <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
+                                <span>Rockie Navigation</span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </button>
+
+                            <div class="nav-dropdown-content">
+                                <a href="index.html" class="nav-dropdown-item">
+                                    <span>🪨</span> rockie home
+                                </a>
+                                <a href="colours2.html" class="nav-dropdown-item">
+                                    <span>🍀</span> square rockies
+                                </a>
+                                <a href="colours3.html" class="nav-dropdown-item">
+                                    <span>🍁</span> circle rockies
+                                </a>
+                                <a href="colours4.html" class="nav-dropdown-item">
+                                    <span>🌼</span> cube rockies
+                                </a>
+                                <a href="colours5.html" class="nav-dropdown-item active-tool">
+                                    <span>🌸</span> collected rockies
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            Palette Vault
-                            <span class="text-xs px-2 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-medium border border-sky-300">Image Extractor</span>
-                        </h1>
-                        <p class="text-xs text-slate-500">Extract, Analyze & Organize Image Color Palettes</p>
+
+                    <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
+
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-lg">
+                            <i class="fa-solid fa-swatchbook"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                                Palette Vault
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Image Extractor</span>
+                            </h1>
+                            <p class="text-[11px] text-slate-500">Extract, Analyze & Organize Image Color Palettes</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- NAVIGATION TABS -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-sm font-medium">
-                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-medium self-start lg:self-auto">
+                    <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn active px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
                         <i class="fa-solid fa-eye-dropper text-xs"></i>
                         <span>Extractor & Eyedropper</span>
                     </button>
-                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                    <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
                         <i class="fa-solid fa-box-archive text-xs"></i>
                         <span>Palette Bank</span>
                         <span id="bank-count-badge" class="bg-white text-[#0369a1] text-[10px] font-bold px-1.5 py-0.2 rounded-full ml-1 border border-sky-200">0</span>
                     </button>
-                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
+                    <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-3.5 py-1.5 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900">
                         <i class="fa-solid fa-circle-half-stroke text-xs"></i>
                         <span>Color Harmonies</span>
                     </button>
@@ -192,8 +347,8 @@
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-[#B4E3F8]"></span>
-                        <h2 class="font-bold text-slate-900 text-lg">Upload or Drag Image Palette</h2>
+                        <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
+                        <h2 class="font-bold text-slate-900 text-base">Upload or Drag Image Palette</h2>
                     </div>
                     <!-- Sample Preset Images -->
                     <div class="flex items-center gap-2 flex-wrap">
@@ -202,13 +357,13 @@
                             <i class="fa-solid fa-tree text-emerald-600"></i> Nature
                         </button>
                         <button onclick="loadSamplePreset('cyberpunk')" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 hover:bg-[#B4E3F8]/50 text-slate-700 rounded-lg border border-slate-200 transition-colors flex items-center gap-1">
-                            <i class="fa-solid fa-[#fa-bolt] fa-bolt text-fuchsia-600"></i> Cyberpunk
+                            <i class="fa-solid fa-bolt text-fuchsia-600"></i> Cyberpunk
                         </button>
                         <button onclick="loadSamplePreset('sunset')" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 hover:bg-[#B4E3F8]/50 text-slate-700 rounded-lg border border-slate-200 transition-colors flex items-center gap-1">
                             <i class="fa-solid fa-sun text-amber-500"></i> Pastel Sunset
                         </button>
                         <button onclick="loadSamplePreset('art')" class="px-2.5 py-1 text-xs font-semibold bg-slate-100 hover:bg-[#B4E3F8]/50 text-slate-700 rounded-lg border border-slate-200 transition-colors flex items-center gap-1">
-                            <i class="fa-solid fa-[#fa-palette] fa-palette text-indigo-500"></i> Autumn Artwork
+                            <i class="fa-solid fa-palette text-indigo-500"></i> Autumn Artwork
                         </button>
                     </div>
                 </div>
@@ -217,7 +372,7 @@
                 <div id="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)" class="border-2 border-dashed border-slate-300 hover:border-sky-400 bg-slate-50 hover:bg-slate-50/80 rounded-2xl p-6 text-center transition-all cursor-pointer relative">
                     <input type="file" id="image-file-input" accept="image/*" onchange="handleFileSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     <div class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
-                        <div class="w-12 h-12 rounded-2xl bg-[#B4E3F8] text-[#0369a1] flex items-center justify-center text-xl shadow-sm">
+                        <div class="w-12 h-12 rounded-2xl bg-[#B4E3F8] text-[#0369a1] flex items-center justify-center text-xl shadow-sm border border-[#22ACEC]">
                             <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
                         <p class="text-sm font-bold text-slate-800">
@@ -231,7 +386,7 @@
             <!-- MAIN WORKSPACE: CANVAS EXTRACTOR & DRAFT PALETTE -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                <!-- IMAGE CANVAS & EYEDROPPER WORKSPACE (8 COLS) -->
+                <!-- IMAGE CANVAS & EYEDROPPER WORKSPACE (7 COLS) -->
                 <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 flex flex-col justify-between">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center space-x-2">
@@ -250,7 +405,6 @@
                         <!-- Floating Eyedropper Loupe -->
                         <div id="eyedropper-loupe">
                             <canvas id="loupe-canvas" width="110" height="110" class="pixelated w-full h-full block"></canvas>
-                            <!-- Target reticle dot -->
                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div class="w-3 h-3 border-2 border-white rounded-full bg-transparent shadow-sm"></div>
                             </div>
@@ -303,7 +457,6 @@
                                 <span id="draft-count-tag" class="bg-slate-100 text-slate-700 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
                             </h3>
                             <div class="flex items-center space-x-2">
-                                <!-- Add manual color button -->
                                 <label for="manual-color-picker" class="cursor-pointer text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg font-semibold flex items-center gap-1 transition-colors border border-slate-200">
                                     <i class="fa-solid fa-plus text-xs"></i> Add Custom
                                 </label>
@@ -332,12 +485,11 @@
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono flex-grow">
                                     <div><span class="text-slate-400">RGB:</span> <span id="inspector-rgb" class="font-semibold">0, 0, 0</span></div>
                                     <div><span class="text-slate-400">HSL:</span> <span id="inspector-hsl" class="font-semibold">0°, 0%, 0%</span></div>
-                                    <div><span class="text-slate-400">Value:</span> <span id="inspector-val" class="font-semibold">0%</span></div>
-                                    <div><span class="text-slate-400">WCAG Text:</span> <span id="inspector-wcag" class="font-semibold">AAA</span></div>
+                                    <div><span class="text-slate-400">Luminance:</span> <span id="inspector-val" class="font-semibold">0%</span></div>
+                                    <div><span class="text-slate-400">WCAG:</span> <span id="inspector-wcag" class="font-semibold">AAA</span></div>
                                 </div>
                             </div>
 
-                            <!-- WCAG Text contrast preview badge -->
                             <div id="wcag-preview-bar" class="p-2 rounded-lg text-xs font-bold text-center flex items-center justify-center gap-2 border">
                                 <span>Sample Contrast Text Preview</span>
                             </div>
@@ -368,10 +520,10 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">
                     <div>
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8]"></span>
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
                             Saved Palette Bank
                         </h2>
-                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage</p>
+                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage. Click any card to inspect in detail.</p>
                     </div>
 
                     <!-- Global Bank Actions -->
@@ -425,7 +577,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
                     <div>
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8]"></span>
+                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
                             Color Harmonies Generator
                         </h2>
                         <p class="text-xs text-slate-500">Generate mathematical color theory harmonies from any base color</p>
@@ -441,7 +593,7 @@
                 </div>
 
                 <div class="flex items-center space-x-2 text-xs text-slate-500">
-                    <i class="fa-solid fa-[#fa-circle-info] fa-circle-info text-sky-600"></i>
+                    <i class="fa-solid fa-circle-info text-sky-600"></i>
                     <span>Click any harmony color swatch below to instantly append it to your Tab 1 Draft Palette!</span>
                 </div>
             </div>
@@ -506,6 +658,60 @@
         </section>
     </main>
 
+    <!-- ========================================================= -->
+    <!-- INTERACTIVE SAVED PALETTE DETAIL VIEWER MODAL -->
+    <!-- ========================================================= -->
+    <div id="palette-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-3xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Modal Header -->
+            <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+                <div class="flex items-start space-x-3">
+                    <div id="detail-modal-thumb-container"></div>
+                    <div>
+                        <h2 id="detail-modal-title" class="font-extrabold text-slate-900 text-xl">Palette Detail</h2>
+                        <p id="detail-modal-date" class="text-xs text-slate-400 font-medium">Saved on ...</p>
+                        <div id="detail-modal-tags" class="flex flex-wrap gap-1 mt-2"></div>
+                    </div>
+                </div>
+
+                <button onclick="closePaletteDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Full Palette Swatches Detail Grid -->
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                    <i class="fa-solid fa-swatchbook text-sky-600"></i> Full Swatch Specifications (Click to Copy HEX)
+                </h3>
+                
+                <div id="detail-modal-swatches-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Swatch cards injected dynamically -->
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-4 gap-3">
+                <button onclick="loadDetailPaletteToDraft()" class="w-full sm:w-auto px-4 py-2.5 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] font-bold text-xs rounded-xl transition-colors border border-sky-300 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-import"></i> Load into Tab 1 Draft Palette
+                </button>
+
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <button onclick="copyDetailPaletteAllHex()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
+                        <i class="fa-solid fa-copy text-sky-600"></i> Copy All HEX
+                    </button>
+                    <button onclick="openExportModalFromDetail()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
+                        <i class="fa-solid fa-code text-indigo-600"></i> Export Code / PNG Card
+                    </button>
+                    <button onclick="deleteDetailPalette()" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200" title="Delete Palette">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- EXPORT PALETTE MODAL POPUP -->
     <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
         <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 space-y-5">
@@ -558,7 +764,7 @@
     <div id="toast-container" class="fixed top-16 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- ========================================================= -->
-    <!-- JAVASCRIPT APPLICATION CORE & COLOR EXTRACTOR ENGINE -->
+    <!-- JAVASCRIPT APPLICATION CORE ENGINE -->
     <!-- ========================================================= -->
     <script>
         /* APPLICATION STATE */
@@ -567,11 +773,26 @@
         let draftPalette = []; // Array of hex strings e.g. ['#FF0000', ...]
         let activeInspectorHex = "#0284c7";
         let activeExportPalette = null;
+        let activeDetailPalette = null;
         let activeExportFormat = "css";
 
         // Main Image Canvas & Offscreen Image references
         let mainCanvas, mainCtx, loupeCanvas, loupeCtx;
         let loadedImage = null;
+
+        /* TOP NAVIGATION DROPDOWN TOGGLER */
+        function toggleNavDropdown(event) {
+            event.stopPropagation();
+            const container = document.getElementById('nav-dropdown-container');
+            container.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('nav-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
 
         /* INITIALIZATION ON WINDOW LOAD */
         window.onload = function() {
@@ -646,7 +867,6 @@
                 grad.addColorStop(1, '#FEF08A');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, 600, 400);
-                // Draw decorative shapes
                 ctx.fillStyle = '#78350F'; ctx.fillRect(100, 200, 40, 200);
                 ctx.fillStyle = '#047857'; ctx.beginPath(); ctx.arc(120, 180, 80, 0, Math.PI*2); ctx.fill();
             } else if (type === 'cyberpunk') {
@@ -733,7 +953,6 @@
         function renderImageToCanvas() {
             if (!loadedImage) return;
 
-            // Constrain canvas dimensions while maintaining aspect ratio
             const maxW = 700;
             const maxH = 440;
             let w = loadedImage.width;
@@ -762,7 +981,6 @@
             const mode = document.getElementById('extract-mode').value;
             document.getElementById('extract-count-val').innerText = `${count} Colors`;
 
-            // Downsample image pixels into a small matrix for fast processing
             const sampleCanvas = document.createElement('canvas');
             const sampleSize = 100;
             sampleCanvas.width = sampleSize;
@@ -775,12 +993,11 @@
 
             for (let i = 0; i < imgData.length; i += 4) {
                 const a = imgData[i + 3];
-                if (a < 128) continue; // Skip transparent
+                if (a < 128) continue;
                 const r = imgData[i];
                 const g = imgData[i + 1];
                 const b = imgData[i + 2];
 
-                // Filter based on extraction mode
                 const [h, s, l] = rgbToHsl(r, g, b);
 
                 if (mode === 'vibrant' && (s < 0.25 || l < 0.2 || l > 0.85)) continue;
@@ -790,7 +1007,6 @@
                 pixels.push([r, g, b]);
             }
 
-            // Fallback if filter left too few pixels
             if (pixels.length < count * 5) {
                 pixels = [];
                 for (let i = 0; i < imgData.length; i += 16) {
@@ -800,7 +1016,6 @@
                 }
             }
 
-            // K-Means clustering logic
             const centroids = kMeansCluster(pixels, count, 10);
             draftPalette = centroids.map(c => rgbToHex(c[0], c[1], c[2]));
 
@@ -814,7 +1029,6 @@
             if (pixels.length === 0) return [];
             if (pixels.length <= k) return pixels;
 
-            // Pick initial centroids evenly spaced
             let centroids = [];
             let step = Math.floor(pixels.length / k);
             for (let i = 0; i < k; i++) {
@@ -878,19 +1092,17 @@
                     return;
                 }
 
-                // Render zoomed loupe lens
                 loupe.style.display = 'block';
                 loupe.style.left = `${e.clientX - rect.left - 55}px`;
                 loupe.style.top = `${e.clientY - rect.top - 55}px`;
 
-                const zoomSize = 11; // 11x11 zoomed grid
+                const zoomSize = 11;
                 const srcX = Math.max(0, Math.min(mainCanvas.width - zoomSize, mouseX - Math.floor(zoomSize / 2)));
                 const srcY = Math.max(0, Math.min(mainCanvas.height - zoomSize, mouseY - Math.floor(zoomSize / 2)));
 
                 loupeCtx.imageSmoothingEnabled = false;
                 loupeCtx.drawImage(mainCanvas, srcX, srcY, zoomSize, zoomSize, 0, 0, 110, 110);
 
-                // Sample target pixel color
                 const p = mainCtx.getImageData(mouseX, mouseY, 1, 1).data;
                 const hex = rgbToHex(p[0], p[1], p[2]);
 
@@ -920,9 +1132,7 @@
             });
         }
 
-        /* ========================================================= */
         /* DRAFT PALETTE MANAGEMENT */
-        /* ========================================================= */
         function addManualColor(hex) {
             hex = hex.toUpperCase();
             if (!draftPalette.includes(hex)) {
@@ -999,7 +1209,6 @@
             wcagBar.style.color = lumPct > 50 ? '#0f172a' : '#ffffff';
             wcagBar.style.borderColor = lumPct > 50 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)';
 
-            // Update Tab 3 base color as well
             document.getElementById('harmony-base-picker').value = activeInspectorHex;
             document.getElementById('harmony-base-text').value = activeInspectorHex;
             updateHarmonies(activeInspectorHex);
@@ -1018,7 +1227,6 @@
             const rawTags = tagsInput.value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
             const tags = rawTags.length > 0 ? rawTags : ['extracted', 'custom'];
 
-            // Thumbnail snapshot from main canvas
             let thumbnail = null;
             if (mainCanvas && mainCanvas.width > 0) {
                 const thumbCanvas = document.createElement('canvas');
@@ -1045,18 +1253,17 @@
             tagsInput.value = '';
 
             showToast(`Saved "${name}" to Palette Bank!`);
-            switchTab(2); // Auto switch to Bank tab
+            switchTab(2);
         }
 
         /* ========================================================= */
-        /* TAB 2: SAVED PALETTE BANK & SEARCH ENGINE */
+        /* TAB 2: SAVED PALETTE BANK & DETAIL MODAL ENGINE */
         /* ========================================================= */
         function renderPaletteBank() {
             const grid = document.getElementById('bank-grid');
             const searchVal = document.getElementById('bank-search-input').value.toLowerCase().trim();
             const sortBy = document.getElementById('bank-sort-select').value;
 
-            // Gather all tags for chip filters
             renderBankTagChips();
 
             let filtered = paletteBank.filter(p => {
@@ -1066,7 +1273,6 @@
                 return matchName || matchTags || matchColors;
             });
 
-            // Sort logic
             if (sortBy === 'oldest') {
                 filtered.reverse();
             } else if (sortBy === 'name') {
@@ -1088,15 +1294,16 @@
 
             filtered.forEach(palette => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 hover:border-sky-300 transition-all flex flex-col justify-between';
+                card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 hover:border-sky-300 transition-all cursor-pointer flex flex-col justify-between group';
+                card.onclick = () => openPaletteDetailModal(palette.id);
 
                 const tagsHtml = palette.tags.map(t => `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">#${t}</span>`).join(' ');
 
                 const swatchesHtml = palette.colors.map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
-                        <div onclick="copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-12 first:rounded-l-xl last:rounded-r-xl relative group cursor-pointer flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
-                            <span class="font-mono text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
+                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-12 first:rounded-l-xl last:rounded-r-xl relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
+                            <span class="font-mono text-[9px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
                         </div>
                     `;
                 }).join('');
@@ -1105,7 +1312,7 @@
                     <div class="space-y-3">
                         <div class="flex items-start justify-between gap-2">
                             <div>
-                                <h3 class="font-bold text-slate-900 text-base">${palette.name}</h3>
+                                <h3 class="font-bold text-slate-900 text-base group-hover:text-[#0369a1] transition-colors">${palette.name}</h3>
                                 <p class="text-[10px] text-slate-400 font-medium">Saved on ${palette.date} • ${palette.colors.length} colors</p>
                             </div>
                             ${palette.thumbnail ? `<img src="${palette.thumbnail}" class="w-12 h-9 rounded-lg object-cover border border-slate-200 shadow-sm" alt="Thumbnail">` : ''}
@@ -1124,12 +1331,12 @@
 
                     <!-- Actions Footer -->
                     <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-                        <button onclick="copyAllHexFromPalette('${palette.id}')" class="text-[#0369a1] hover:text-sky-900 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-copy"></i> Copy HEX
-                        </button>
-                        <div class="flex items-center space-x-2">
-                            <button onclick="openExportModalForPalette('${palette.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-[#B4E3F8]/50 text-slate-700 font-semibold rounded-lg border border-slate-200 transition-colors">
-                                Export
+                        <span class="text-[#0369a1] font-bold text-[11px] flex items-center gap-1">
+                            <i class="fa-solid fa-expand text-xs"></i> Click to inspect
+                        </span>
+                        <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+                            <button onclick="copyAllHexFromPalette('${palette.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 text-[10px]">
+                                Copy HEX
                             </button>
                             <button onclick="deletePaletteFromBank('${palette.id}')" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
                                 <i class="fa-solid fa-trash-can"></i>
@@ -1163,6 +1370,92 @@
         function filterBankByTag(tag) {
             document.getElementById('bank-search-input').value = tag;
             renderPaletteBank();
+        }
+
+        /* ========================================================= */
+        /* INTERACTIVE SAVED PALETTE DETAIL MODAL CONTROLLER */
+        /* ========================================================= */
+        function openPaletteDetailModal(id) {
+            activeDetailPalette = paletteBank.find(p => p.id === id);
+            if (!activeDetailPalette) return;
+
+            document.getElementById('detail-modal-title').innerText = activeDetailPalette.name;
+            document.getElementById('detail-modal-date').innerText = `Saved on ${activeDetailPalette.date} • ${activeDetailPalette.colors.length} total colors`;
+
+            const thumbContainer = document.getElementById('detail-modal-thumb-container');
+            if (activeDetailPalette.thumbnail) {
+                thumbContainer.innerHTML = `<img src="${activeDetailPalette.thumbnail}" class="w-14 h-12 rounded-xl object-cover border border-slate-200 shadow-sm" alt="Thumbnail">`;
+            } else {
+                thumbContainer.innerHTML = '';
+            }
+
+            const tagsContainer = document.getElementById('detail-modal-tags');
+            tagsContainer.innerHTML = activeDetailPalette.tags.map(t => `<span class="bg-[#B4E3F8]/50 text-[#0369a1] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-sky-200">#${t}</span>`).join(' ');
+
+            const grid = document.getElementById('detail-modal-swatches-grid');
+            grid.innerHTML = '';
+
+            activeDetailPalette.colors.forEach((hex) => {
+                const [r, g, b] = hexToRgb(hex);
+                const [h, s, l] = rgbToHsl(r, g, b);
+                const lumPct = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
+                const isLight = lumPct > 50;
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center space-x-3 cursor-pointer hover:border-sky-400 transition-all shadow-sm group';
+                card.onclick = () => copySingleHex(hex);
+
+                card.innerHTML = `
+                    <div class="w-12 h-12 rounded-xl shadow-inner border border-black/10 flex-shrink-0 flex items-center justify-center relative overflow-hidden" style="background-color: ${hex}">
+                        <i class="fa-solid fa-copy text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${isLight ? '#000' : '#fff'}"></i>
+                    </div>
+                    <div class="flex-grow font-mono text-xs space-y-0.5">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-900 text-sm">${hex}</span>
+                            <span class="text-[9px] px-1.5 py-0.5 rounded font-sans font-bold ${isLight ? 'bg-amber-100 text-amber-800' : 'bg-slate-800 text-slate-100'}">${isLight ? 'AAA Dark' : 'AAA White'}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500">RGB: ${r}, ${g}, ${b}</div>
+                        <div class="text-[10px] text-slate-400">HSL: ${h}°, ${s}%, ${l}% • Lum: ${lumPct}%</div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            document.getElementById('palette-detail-modal').classList.remove('hidden');
+        }
+
+        function closePaletteDetailModal() {
+            document.getElementById('palette-detail-modal').classList.add('hidden');
+        }
+
+        function loadDetailPaletteToDraft() {
+            if (!activeDetailPalette) return;
+            draftPalette = [...activeDetailPalette.colors];
+            renderDraftPaletteGrid();
+            if (draftPalette.length > 0) inspectColor(draftPalette[0]);
+            closePaletteDetailModal();
+            switchTab(1);
+            showToast(`Loaded "${activeDetailPalette.name}" into Tab 1 Draft!`);
+        }
+
+        function copyDetailPaletteAllHex() {
+            if (!activeDetailPalette) return;
+            copyToClipboard(activeDetailPalette.colors.join(', '));
+            showToast(`Copied all ${activeDetailPalette.colors.length} HEX codes!`);
+        }
+
+        function openExportModalFromDetail() {
+            if (!activeDetailPalette) return;
+            activeExportPalette = activeDetailPalette;
+            closePaletteDetailModal();
+            openExportModalForPalette(activeExportPalette.id);
+        }
+
+        function deleteDetailPalette() {
+            if (!activeDetailPalette) return;
+            deletePaletteFromBank(activeDetailPalette.id);
+            closePaletteDetailModal();
         }
 
         function copySingleHex(hex) {
@@ -1286,11 +1579,9 @@
             cardCanvas.height = 450;
             const ctx = cardCanvas.getContext('2d');
 
-            // Draw clean background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, 800, 450);
 
-            // Header banner
             ctx.fillStyle = '#B4E3F8';
             ctx.fillRect(0, 0, 800, 80);
 
@@ -1302,7 +1593,6 @@
             ctx.font = '14px Inter, sans-serif';
             ctx.fillText(`Palette Vault Card • Saved on ${activeExportPalette.date}`, 40, 115);
 
-            // Swatches
             const colors = activeExportPalette.colors;
             const swatchWidth = (800 - 80) / colors.length;
             const swatchHeight = 220;
@@ -1314,7 +1604,6 @@
                 ctx.fillStyle = c;
                 ctx.fillRect(x, y, swatchWidth, swatchHeight);
 
-                // Code text
                 const lum = getPerceivedLuminanceHex(c);
                 ctx.fillStyle = lum > 0.5 ? '#000000' : '#ffffff';
                 ctx.font = 'bold 13px JetBrains Mono, monospace';
@@ -1322,7 +1611,6 @@
                 ctx.fillText(c, x + swatchWidth / 2, y + swatchHeight - 20);
             });
 
-            // Footer
             ctx.fillStyle = '#94a3b8';
             ctx.font = '12px Inter, sans-serif';
             ctx.textAlign = 'left';
@@ -1356,28 +1644,23 @@
             const [r, g, b] = hexToRgb(baseHex);
             const [h, s, l] = rgbToHsl(r, g, b);
 
-            // 1. Complementary (180 deg)
             const compH = (h + 180) % 360;
             const compHex = hslToHex(compH, s, l);
             renderHarmonySection('harmony-grid-complementary', [baseHex, compHex]);
 
-            // 2. Analogous (+-30 deg)
             const ana1 = hslToHex((h + 330) % 360, s, l);
             const ana2 = hslToHex((h + 30) % 360, s, l);
             renderHarmonySection('harmony-grid-analogous', [ana1, baseHex, ana2]);
 
-            // 3. Triadic (+120, +240 deg)
             const tri1 = hslToHex((h + 120) % 360, s, l);
             const tri2 = hslToHex((h + 240) % 360, s, l);
             renderHarmonySection('harmony-grid-triadic', [baseHex, tri1, tri2]);
 
-            // 4. Tetradic (+90, +180, +270 deg)
             const tet1 = hslToHex((h + 90) % 360, s, l);
             const tet2 = hslToHex((h + 180) % 360, s, l);
             const tet3 = hslToHex((h + 270) % 360, s, l);
             renderHarmonySection('harmony-grid-tetradic', [baseHex, tet1, tet2, tet3]);
 
-            // 5. Monochromatic (Shades/Tints)
             const mono = [
                 hslToHex(h, s, Math.max(10, l - 30)),
                 hslToHex(h, s, Math.max(20, l - 15)),
