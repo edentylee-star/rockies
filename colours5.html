@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>collection</title>
-
+    <title>Palette Vault - Image Extractor & Palette Bank</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -151,7 +150,29 @@
             gap: 8px;
             position: relative;
             z-index: 2000;
-       
+        }
+        
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+        
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
         }
         
         .nav-tools-dropdown {
@@ -242,7 +263,15 @@
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
                 
                 <!-- Left Section: Home Link & Dropdown + App Title -->
+                <div class="flex flex-wrap items-center gap-3">
+                    
                     <div class="nav-header-left">
+                        <!-- Back to Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Back to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
                         <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
@@ -282,7 +311,7 @@
                                 Palette Vault
                                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Image Extractor</span>
                             </h1>
-                            <p class="text-[11px] text-slate-500">Extract, Analyze & Organize Pure Color Palettes</p>
+                            <p class="text-[11px] text-slate-500">Extract, Analyze & Organize Image Color Palettes</p>
                         </div>
                     </div>
                 </div>
@@ -494,7 +523,7 @@
                             <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
                             Saved Palette Bank
                         </h2>
-                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage without bloated image overhead. Click any card to inspect.</p>
+                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage. Click any card to inspect in detail.</p>
                     </div>
 
                     <!-- Global Bank Actions -->
@@ -637,13 +666,21 @@
             
             <!-- Modal Header -->
             <div class="flex items-start justify-between border-b border-slate-100 pb-4">
-                <div>
-                    <h2 id="detail-modal-title" class="font-extrabold text-slate-900 text-xl">Palette Detail</h2>
+                <div class="flex-grow space-y-2 mr-4">
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="detail-edit-name" class="font-extrabold text-slate-900 text-xl w-full bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500" placeholder="Palette Name">
+                    </div>
                     <p id="detail-modal-date" class="text-xs text-slate-400 font-medium">Saved on ...</p>
-                    <div id="detail-modal-tags" class="flex flex-wrap gap-1 mt-2"></div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs text-slate-500 font-bold uppercase tracking-wider flex-shrink-0">Tags:</label>
+                        <input type="text" id="detail-edit-tags" class="text-xs text-slate-700 bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1 w-full font-medium focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500" placeholder="tags, comma, separated">
+                        <button onclick="saveDetailPaletteChanges()" class="px-3 py-1 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-lg border border-sky-300 transition-colors flex-shrink-0 flex items-center gap-1">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Info
+                        </button>
+                    </div>
                 </div>
 
-                <button onclick="closePaletteDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+                <button onclick="closePaletteDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors flex-shrink-0">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
@@ -665,23 +702,14 @@
                     <i class="fa-solid fa-file-import"></i> Load into Tab 1 Draft Palette
                 </button>
 
-                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end flex-wrap gap-1">
-                    <button onclick="copyDetailPaletteAllHex()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                    <button onclick="copyDetailPaletteAllHex()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
                         <i class="fa-solid fa-copy text-sky-600"></i> Copy All HEX
                     </button>
-                    
-                    <!-- JPEG & PNG Download Buttons in Detail Modal -->
-                    <button onclick="downloadDetailPaletteCard('jpeg')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-xl transition-colors border border-amber-200 flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-image text-amber-600"></i> Download JPEG Card
+                    <button onclick="openExportModalFromDetail()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
+                        <i class="fa-solid fa-code text-indigo-600"></i> Export Code / PNG Card
                     </button>
-                    <button onclick="downloadDetailPaletteCard('png')" class="px-3 py-2 bg-sky-50 hover:bg-sky-100 text-[#0369a1] text-xs font-bold rounded-xl transition-colors border border-sky-200 flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-image text-sky-600"></i> Download PNG Card
-                    </button>
-
-                    <button onclick="openExportModalFromDetail()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
-                        <i class="fa-solid fa-code text-indigo-600"></i> Export Code
-                    </button>
-                    <button onclick="deleteDetailPalette()" class="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200" title="Delete Palette">
+                    <button onclick="deleteDetailPalette()" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-200" title="Delete Palette">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
@@ -699,7 +727,7 @@
                     </span>
                     <div>
                         <h3 id="export-modal-title" class="font-bold text-slate-900 text-base">Export Palette</h3>
-                        <p class="text-xs text-slate-400">Choose output code format or download high-res JPEG/PNG card</p>
+                        <p class="text-xs text-slate-400">Choose output code format or download PNG card</p>
                     </div>
                 </div>
                 <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 p-1 text-lg">
@@ -717,31 +745,22 @@
 
             <!-- Code Output Box -->
             <div class="relative">
-                <textarea id="export-code-area" readonly class="w-full h-36 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
+                <textarea id="export-code-area" readonly class="w-full h-40 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
             </div>
 
-            <!-- Modal Action Buttons for Download & Copy -->
-            <div class="space-y-3 pt-1">
-                <div class="flex items-center justify-between gap-2">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Image Palette Card Downloads:</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="downloadExportPaletteCard('jpeg')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-amber-200">
-                        <i class="fa-solid fa-file-image text-amber-600"></i> JPEG Card (.jpg)
-                    </button>
-                    <button onclick="downloadExportPaletteCard('png')" class="px-3 py-2 bg-sky-50 hover:bg-sky-100 text-[#0369a1] text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-sky-200">
-                        <i class="fa-solid fa-file-image text-sky-600"></i> PNG Card (.png)
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-colors">
-                    Close
+            <!-- Modal Action Buttons -->
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="downloadPNGPaletteCard()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5 border border-slate-200">
+                    <i class="fa-solid fa-file-image text-sky-600"></i> Download PNG Card
                 </button>
-                <button onclick="copyExportCode()" class="px-4 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl transition-colors border border-sky-300 flex items-center gap-1.5">
-                    <i class="fa-solid fa-copy"></i> Copy Code
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-colors">
+                        Close
+                    </button>
+                    <button onclick="copyExportCode()" class="px-4 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl transition-colors border border-sky-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-copy"></i> Copy Code
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -788,38 +807,38 @@
             loupeCtx = loupeCanvas.getContext('2d');
 
             loadBankFromStorage();
-            loadSamplePreset('sunset'); // Default sample preset
+            renderCanvasPlaceholder();
             setupEyedropperListeners();
             updateHarmonies('#0284c7');
         };
 
+        function renderCanvasPlaceholder() {
+            mainCanvas.width = 600;
+            mainCanvas.height = 360;
+            mainCtx.fillStyle = '#0f172a';
+            mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+
+            mainCtx.fillStyle = '#38bdf8';
+            mainCtx.font = 'bold 16px Inter, sans-serif';
+            mainCtx.textAlign = 'center';
+            mainCtx.fillText('Upload an image or select a sample preset above', mainCanvas.width / 2, mainCanvas.height / 2 - 10);
+
+            mainCtx.fillStyle = '#94a3b8';
+            mainCtx.font = '12px Inter, sans-serif';
+            mainCtx.fillText('Hover to inspect • Click to pick color', mainCanvas.width / 2, mainCanvas.height / 2 + 15);
+        }
+
         /* LOCAL STORAGE PERSISTENCE (PURE COLOR DATA ONLY - NO IMAGES) */
-        function loadBankFromStorage() {
-            const saved = localStorage.getItem('paletteVault_bank_v1');
-            if (saved) {
-                try {
-                    paletteBank = JSON.parse(saved);
-                    // Ensure legacy data with thumbnails is cleaned up
-                    paletteBank.forEach(p => delete p.thumbnail);
-                } catch(e) {
-                    paletteBank = [];
-                }
-            } else {
-                // Initialize with sample palettes in bank (pure color arrays)
-                paletteBank = [
-                    {
-                        id: 'sample-1',
-                        name: 'Pastel Horizon',
-                        tags: ['pastel', 'sky', 'soft'],
-                        date: new Date().toLocaleDateString(),
-                        colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD']
+                        colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD'],
+                        thumbnail: null
                     },
                     {
                         id: 'sample-2',
                         name: 'Deep Cyberpunk Neon',
                         tags: ['cyberpunk', 'dark', 'neon', 'ui'],
                         date: new Date().toLocaleDateString(),
-                        colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308']
+                        colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308'],
+                        thumbnail: null
                     }
                 ];
                 saveBankToStorage();
@@ -1200,7 +1219,6 @@
             updateHarmonies(activeInspectorHex);
         }
 
-        // SAVE CURRENT DRAFT TO BANK (NO IMAGE SAVED)
         function saveCurrentDraftToBank() {
             if (draftPalette.length === 0) {
                 showToast("Draft palette is empty!", "warning");
@@ -1214,13 +1232,23 @@
             const rawTags = tagsInput.value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
             const tags = rawTags.length > 0 ? rawTags : ['extracted', 'custom'];
 
-            // NOTE: Explicitly NOT storing any image data or thumbnail!
+            let thumbnail = null;
+            if (mainCanvas && mainCanvas.width > 0) {
+                const thumbCanvas = document.createElement('canvas');
+                thumbCanvas.width = 120;
+                thumbCanvas.height = 80;
+                const thumbCtx = thumbCanvas.getContext('2d');
+                thumbCtx.drawImage(mainCanvas, 0, 0, 120, 80);
+                thumbnail = thumbCanvas.toDataURL('image/jpeg', 0.7);
+            }
+
             const newEntry = {
                 id: 'pal_' + Date.now(),
                 name,
                 tags,
                 date: new Date().toLocaleDateString(),
-                colors: [...draftPalette]
+                colors: [...draftPalette],
+                thumbnail
             };
 
             paletteBank.unshift(newEntry);
@@ -1279,7 +1307,7 @@
                 const swatchesHtml = palette.colors.map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
-                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-14 first:rounded-l-xl last:rounded-r-xl relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
+                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-12 first:rounded-l-xl last:rounded-r-xl relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
                             <span class="font-mono text-[9px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
                         </div>
                     `;
@@ -1292,9 +1320,10 @@
                                 <h3 class="font-bold text-slate-900 text-base group-hover:text-[#0369a1] transition-colors">${palette.name}</h3>
                                 <p class="text-[10px] text-slate-400 font-medium">Saved on ${palette.date} • ${palette.colors.length} colors</p>
                             </div>
+                            ${palette.thumbnail ? `<img src="${palette.thumbnail}" class="w-12 h-9 rounded-lg object-cover border border-slate-200 shadow-sm" alt="Thumbnail">` : ''}
                         </div>
 
-                        <!-- Pure Color Swatch Bar -->
+                        <!-- Color Swatch Bar -->
                         <div class="flex items-center w-full rounded-xl overflow-hidden border border-black/10">
                             ${swatchesHtml}
                         </div>
@@ -1355,11 +1384,9 @@
             activeDetailPalette = paletteBank.find(p => p.id === id);
             if (!activeDetailPalette) return;
 
-            document.getElementById('detail-modal-title').innerText = activeDetailPalette.name;
+            document.getElementById('detail-edit-name').value = activeDetailPalette.name;
             document.getElementById('detail-modal-date').innerText = `Saved on ${activeDetailPalette.date} • ${activeDetailPalette.colors.length} total colors`;
-
-            const tagsContainer = document.getElementById('detail-modal-tags');
-            tagsContainer.innerHTML = activeDetailPalette.tags.map(t => `<span class="bg-[#B4E3F8]/50 text-[#0369a1] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-sky-200">#${t}</span>`).join(' ');
+            document.getElementById('detail-edit-tags').value = activeDetailPalette.tags ? activeDetailPalette.tags.join(', ') : '';
 
             const grid = document.getElementById('detail-modal-swatches-grid');
             grid.innerHTML = '';
@@ -1398,6 +1425,25 @@
             document.getElementById('palette-detail-modal').classList.add('hidden');
         }
 
+        function saveDetailPaletteChanges() {
+            if (!activeDetailPalette) return;
+
+            const newName = document.getElementById('detail-edit-name').value.trim();
+            const rawTags = document.getElementById('detail-edit-tags').value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
+
+            if (!newName) {
+                showToast("Palette name cannot be empty!", "warning");
+                return;
+            }
+
+            activeDetailPalette.name = newName;
+            activeDetailPalette.tags = rawTags.length > 0 ? rawTags : ['custom'];
+
+            saveBankToStorage();
+            renderPaletteBank();
+            showToast("Palette updated successfully!");
+        }
+
         function loadDetailPaletteToDraft() {
             if (!activeDetailPalette) return;
             draftPalette = [...activeDetailPalette.colors];
@@ -1412,16 +1458,6 @@
             if (!activeDetailPalette) return;
             copyToClipboard(activeDetailPalette.colors.join(', '));
             showToast(`Copied all ${activeDetailPalette.colors.length} HEX codes!`);
-        }
-
-        function downloadDetailPaletteCard(format) {
-            if (!activeDetailPalette) return;
-            downloadPaletteCard(activeDetailPalette, format);
-        }
-
-        function downloadExportPaletteCard(format) {
-            if (!activeExportPalette) return;
-            downloadPaletteCard(activeExportPalette, format);
         }
 
         function openExportModalFromDetail() {
@@ -1467,11 +1503,7 @@
 
         /* BANK JSON IMPORT / EXPORT */
         function exportBankJSON() {
-            const cleanBank = paletteBank.map(p => {
-                const { thumbnail, ...clean } = p;
-                return clean;
-            });
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cleanBank, null, 2));
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(paletteBank, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", `palette_vault_backup_${Date.now()}.json`);
@@ -1490,10 +1522,7 @@
                 try {
                     const imported = JSON.parse(evt.target.result);
                     if (Array.isArray(imported)) {
-                        paletteBank = imported.map(p => {
-                            delete p.thumbnail;
-                            return p;
-                        });
+                        paletteBank = imported;
                         saveBankToStorage();
                         renderPaletteBank();
                         showToast(`Successfully imported ${imported.length} palettes!`);
@@ -1508,7 +1537,7 @@
         }
 
         /* ========================================================= */
-        /* EXPORT MODAL & HIGH-QUALITY JPEG / PNG CARD GENERATION */
+        /* EXPORT MODAL & PNG CARD GENERATION */
         /* ========================================================= */
         function openExportModalForPalette(id) {
             activeExportPalette = paletteBank.find(p => p.id === id);
@@ -1545,8 +1574,7 @@
                     colors.map((c, i) => `        '${i + 1}': '${c}',`).join('\n') +
                     `\n      }\n    }\n  }\n}`;
             } else if (fmt === 'json') {
-                const { thumbnail, ...clean } = activeExportPalette;
-                area.value = JSON.stringify(clean, null, 2);
+                area.value = JSON.stringify(activeExportPalette, null, 2);
             } else if (fmt === 'hex') {
                 area.value = colors.join(', ');
             }
@@ -1558,127 +1586,58 @@
             showToast("Copied code to clipboard!");
         }
 
-        // UNIVERSAL HIGH-QUALITY JPEG & PNG PALETTE CARD GENERATOR
-        function downloadPaletteCard(palette, format = 'jpeg') {
-            if (!palette || !palette.colors || palette.colors.length === 0) {
-                showToast("Invalid palette data for card generation", "warning");
-                return;
-            }
+        function downloadPNGPaletteCard() {
+            if (!activeExportPalette) return;
 
-            const canvas = document.createElement('canvas');
-            canvas.width = 960;
-            canvas.height = 540;
-            const ctx = canvas.getContext('2d');
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = 800;
+            cardCanvas.height = 450;
+            const ctx = cardCanvas.getContext('2d');
 
-            // 1. Crisp Background Fill
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, 800, 450);
 
-            // 2. Header Accent Band (#B4E3F8)
             ctx.fillStyle = '#B4E3F8';
-            ctx.fillRect(0, 0, canvas.width, 90);
+            ctx.fillRect(0, 0, 800, 80);
 
-            // Header Bottom Border line
-            ctx.fillStyle = '#22ACEC';
-            ctx.fillRect(0, 88, canvas.width, 2);
-
-            // 3. Header Text (#0369a1)
             ctx.fillStyle = '#0369a1';
-            ctx.font = 'bold 30px Inter, sans-serif';
-            ctx.fillText(palette.name, 40, 56);
+            ctx.font = 'bold 28px Inter, sans-serif';
+            ctx.fillText(activeExportPalette.name, 40, 50);
 
-            // Header Subtitle info
-            ctx.fillStyle = '#475569';
-            ctx.font = '500 13px Inter, sans-serif';
-            ctx.fillText(`Palette Vault • Saved ${palette.date} • ${palette.colors.length} Swatches`, 40, 122);
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px Inter, sans-serif';
+            ctx.fillText(`Palette Vault Card • Saved on ${activeExportPalette.date}`, 40, 115);
 
-            // Render Tags
-            if (palette.tags && palette.tags.length > 0) {
-                ctx.fillStyle = '#0284c7';
-                ctx.font = '600 12px Inter, sans-serif';
-                ctx.fillText(`Tags: #${palette.tags.join('  #')}`, 40, 142);
-            }
-
-            // 4. Render Swatches Block
-            const colors = palette.colors;
-            const marginX = 40;
-            const startY = 165;
-            const totalW = canvas.width - (marginX * 2);
-            const swatchHeight = 280;
-            const gap = 8;
-            const swatchW = (totalW - (gap * (colors.length - 1))) / colors.length;
+            const colors = activeExportPalette.colors;
+            const swatchWidth = (800 - 80) / colors.length;
+            const swatchHeight = 220;
 
             colors.forEach((c, idx) => {
-                const x = marginX + idx * (swatchW + gap);
-                const y = startY;
+                const x = 40 + idx * swatchWidth;
+                const y = 140;
 
-                // Draw Swatch Block
                 ctx.fillStyle = c;
-                ctx.beginPath();
-                ctx.roundRect(x, y, swatchW, swatchHeight, 16);
-                ctx.fill();
+                ctx.fillRect(x, y, swatchWidth, swatchHeight);
 
-                // Swatch Border
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Luminance & Text Colors
-                const [r, g, b] = hexToRgb(c);
-                const lum = getPerceivedLuminance(r, g, b);
-                const isLight = lum > 0.5;
-
-                const textPrimary = isLight ? '#0f172a' : '#ffffff';
-                const textSecondary = isLight ? 'rgba(15, 23, 42, 0.7)' : 'rgba(255, 255, 255, 0.75)';
-
-                // HEX Text Label
-                ctx.fillStyle = textPrimary;
-                ctx.font = 'bold 15px JetBrains Mono, monospace';
+                const lum = getPerceivedLuminanceHex(c);
+                ctx.fillStyle = lum > 0.5 ? '#000000' : '#ffffff';
+                ctx.font = 'bold 13px JetBrains Mono, monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText(c.toUpperCase(), x + swatchW / 2, y + swatchHeight - 48);
-
-                // RGB Specification
-                ctx.fillStyle = textSecondary;
-                ctx.font = '500 11px JetBrains Mono, monospace';
-                ctx.fillText(`${r}, ${g}, ${b}`, x + swatchW / 2, y + swatchHeight - 28);
-
-                // WCAG Contrast Badge Tag
-                ctx.fillStyle = isLight ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.35)';
-                ctx.beginPath();
-                ctx.roundRect(x + swatchW / 2 - 32, y + 14, 64, 20, 10);
-                ctx.fill();
-
-                ctx.fillStyle = isLight ? '#0f172a' : '#ffffff';
-                ctx.font = 'bold 10px Inter, sans-serif';
-                ctx.fillText(isLight ? 'AAA DARK' : 'AAA WHITE', x + swatchW / 2, y + 27);
+                ctx.fillText(c, x + swatchWidth / 2, y + swatchHeight - 20);
             });
 
-            // 5. Card Footer Branding
             ctx.fillStyle = '#94a3b8';
-            ctx.font = '500 12px Inter, sans-serif';
+            ctx.font = '12px Inter, sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText('Generated with Palette Vault (Rockie Series)', 40, 498);
-
-            ctx.textAlign = 'right';
-            ctx.fillText('Pure Color Palette Card', canvas.width - 40, 498);
-
-            // 6. Download Trigger Execution
-            const isJpeg = format.toLowerCase() === 'jpeg' || format.toLowerCase() === 'jpg';
-            const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
-            const fileExt = isJpeg ? 'jpg' : 'png';
-            const quality = isJpeg ? 0.95 : undefined;
-
-            const dataUrl = canvas.toDataURL(mimeType, quality);
-            const fileName = `${palette.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_palette.${fileExt}`;
+            ctx.fillText('Generated with Palette Vault', 40, 415);
 
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataUrl);
-            downloadAnchor.setAttribute("download", fileName);
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL('image/png'));
+            downloadAnchor.setAttribute("download", `${activeExportPalette.name.toLowerCase().replace(/\s+/g, '_')}_palette.png`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-
-            showToast(`Downloaded ${fileExt.toUpperCase()} Palette Card!`);
+            showToast("Downloaded PNG Palette Card!");
         }
 
         /* ========================================================= */
