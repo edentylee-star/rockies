@@ -264,7 +264,6 @@
                 
                 <!-- Left Section: Home Link & Dropdown + App Title -->
                 <div class="flex flex-wrap items-center gap-3">
-                    
                     <div class="nav-header-left">
                         <!-- Back to Home Button -->
                         <a href="index.html" class="home-link-btn" title="Back to Main Dashboard">
@@ -523,7 +522,7 @@
                             <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
                             Saved Palette Bank
                         </h2>
-                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage. Click any card to inspect in detail.</p>
+                        <p class="text-xs text-slate-500">Persistent color library stored in LocalStorage. Click any card to inspect and edit.</p>
                     </div>
 
                     <!-- Global Bank Actions -->
@@ -810,6 +809,7 @@
             renderCanvasPlaceholder();
             setupEyedropperListeners();
             updateHarmonies('#0284c7');
+            renderPaletteBank();
         };
 
         function renderCanvasPlaceholder() {
@@ -821,14 +821,32 @@
             mainCtx.fillStyle = '#38bdf8';
             mainCtx.font = 'bold 16px Inter, sans-serif';
             mainCtx.textAlign = 'center';
-            mainCtx.fillText('Upload an image or select a sample preset above', mainCanvas.width / 2, mainCanvas.height / 2 - 10);
+            mainCtx.fillText('Drop image here or click "Try Samples" above', mainCanvas.width / 2, mainCanvas.height / 2 - 10);
 
             mainCtx.fillStyle = '#94a3b8';
             mainCtx.font = '12px Inter, sans-serif';
             mainCtx.fillText('Hover to inspect • Click to pick color', mainCanvas.width / 2, mainCanvas.height / 2 + 15);
         }
 
-        /* LOCAL STORAGE PERSISTENCE (PURE COLOR DATA ONLY - NO IMAGES) */
+        /* LOCAL STORAGE PERSISTENCE ENGINE */
+        function loadBankFromStorage() {
+            try {
+                const stored = localStorage.getItem('paletteVault_bank_v1');
+                if (stored) {
+                    paletteBank = JSON.parse(stored);
+                }
+            } catch(e) {
+                console.error("Error loading palette bank from storage", e);
+                paletteBank = [];
+            }
+
+            if (!Array.isArray(paletteBank) || paletteBank.length === 0) {
+                paletteBank = [
+                    {
+                        id: 'sample-1',
+                        name: 'Pastel Horizon',
+                        tags: ['pastel', 'soft', 'ui', 'gradient'],
+                        date: new Date().toLocaleDateString(),
                         colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD'],
                         thumbnail: null
                     },
@@ -838,6 +856,14 @@
                         tags: ['cyberpunk', 'dark', 'neon', 'ui'],
                         date: new Date().toLocaleDateString(),
                         colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308'],
+                        thumbnail: null
+                    },
+                    {
+                        id: 'sample-3',
+                        name: 'Earthy Forest',
+                        tags: ['nature', 'forest', 'warm', 'earthy'],
+                        date: new Date().toLocaleDateString(),
+                        colors: ['#064E3B', '#047857', '#10B981', '#A7F3D0', '#78350F'],
                         thumbnail: null
                     }
                 ];
@@ -852,7 +878,8 @@
         }
 
         function updateBankBadge() {
-            document.getElementById('bank-count-badge').innerText = paletteBank.length;
+            const badge = document.getElementById('bank-count-badge');
+            if (badge) badge.innerText = paletteBank.length;
         }
 
         /* ========================================================= */
@@ -1266,15 +1293,17 @@
         /* ========================================================= */
         function renderPaletteBank() {
             const grid = document.getElementById('bank-grid');
-            const searchVal = document.getElementById('bank-search-input').value.toLowerCase().trim();
-            const sortBy = document.getElementById('bank-sort-select').value;
+            if (!grid) return;
+
+            const searchVal = (document.getElementById('bank-search-input')?.value || '').toLowerCase().trim();
+            const sortBy = document.getElementById('bank-sort-select')?.value || 'newest';
 
             renderBankTagChips();
 
             let filtered = paletteBank.filter(p => {
                 const matchName = p.name.toLowerCase().includes(searchVal);
-                const matchTags = p.tags.some(t => t.toLowerCase().includes(searchVal));
-                const matchColors = p.colors.some(c => c.toLowerCase().includes(searchVal));
+                const matchTags = (p.tags || []).some(t => t.toLowerCase().includes(searchVal));
+                const matchColors = (p.colors || []).some(c => c.toLowerCase().includes(searchVal));
                 return matchName || matchTags || matchColors;
             });
 
@@ -1302,9 +1331,9 @@
                 card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 hover:border-sky-300 transition-all cursor-pointer flex flex-col justify-between group';
                 card.onclick = () => openPaletteDetailModal(palette.id);
 
-                const tagsHtml = palette.tags.map(t => `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">#${t}</span>`).join(' ');
+                const tagsHtml = (palette.tags || []).map(t => `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">#${t}</span>`).join(' ');
 
-                const swatchesHtml = palette.colors.map(c => {
+                const swatchesHtml = (palette.colors || []).map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
                         <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-12 first:rounded-l-xl last:rounded-r-xl relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
@@ -1337,7 +1366,7 @@
                     <!-- Actions Footer -->
                     <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
                         <span class="text-[#0369a1] font-bold text-[11px] flex items-center gap-1">
-                            <i class="fa-solid fa-expand text-xs"></i> Click to inspect
+                            <i class="fa-solid fa-pen-to-square text-xs"></i> Click to edit & inspect
                         </span>
                         <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
                             <button onclick="copyAllHexFromPalette('${palette.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 text-[10px]">
@@ -1356,8 +1385,10 @@
 
         function renderBankTagChips() {
             const container = document.getElementById('bank-tag-filter-container');
+            if (!container) return;
+
             const allTags = new Set();
-            paletteBank.forEach(p => p.tags.forEach(t => allTags.add(t)));
+            paletteBank.forEach(p => (p.tags || []).forEach(t => allTags.add(t)));
 
             if (allTags.size === 0) {
                 container.innerHTML = '';
@@ -1373,12 +1404,13 @@
         }
 
         function filterBankByTag(tag) {
-            document.getElementById('bank-search-input').value = tag;
+            const searchInput = document.getElementById('bank-search-input');
+            if (searchInput) searchInput.value = tag;
             renderPaletteBank();
         }
 
         /* ========================================================= */
-        /* INTERACTIVE SAVED PALETTE DETAIL MODAL CONTROLLER */
+        /* INTERACTIVE SAVED PALETTE DETAIL VIEWER MODAL */
         /* ========================================================= */
         function openPaletteDetailModal(id) {
             activeDetailPalette = paletteBank.find(p => p.id === id);
@@ -1688,6 +1720,7 @@
 
         function renderHarmonySection(elementId, colors) {
             const container = document.getElementById(elementId);
+            if (!container) return;
             container.innerHTML = '';
 
             colors.forEach(hex => {
@@ -1783,6 +1816,8 @@
         /* TOAST SYSTEM */
         function showToast(message, type = "success") {
             const container = document.getElementById('toast-container');
+            if (!container) return;
+
             const toast = document.createElement('div');
             toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 bg-white text-slate-800 ${type === 'warning' ? 'border-amber-300' : 'border-sky-300'}`;
 
@@ -1806,11 +1841,11 @@
                 const btn = document.getElementById(`tab-btn-${i}`);
                 const content = document.getElementById(`tab-content-${i}`);
                 if (i === tabNum) {
-                    btn.classList.add('active');
-                    content.classList.remove('hidden');
+                    if (btn) btn.classList.add('active');
+                    if (content) content.classList.remove('hidden');
                 } else {
-                    btn.classList.remove('active');
-                    content.classList.add('hidden');
+                    if (btn) btn.classList.remove('active');
+                    if (content) content.classList.add('hidden');
                 }
             }
 
