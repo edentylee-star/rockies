@@ -483,7 +483,7 @@
                                 <div id="inspector-preview-box" class="w-12 h-12 rounded-xl shadow-inner border border-black/10 flex-shrink-0"></div>
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono flex-grow">
                                     <div><span class="text-slate-400">RGB:</span> <span id="inspector-rgb" class="font-semibold">0, 0, 0</span></div>
-                                    <div><span class="text-slate-400">HSL:</span> <span id="inspector-hsl" class="font-semibold">0°, 0%, 0%</span></div>
+                                    <div><span class="text-slate-400">HSL:</span> <span id="inspector-hsl" class="font-semibold">0%, 0%, 0%</span></div>
                                     <div><span class="text-slate-400">Luminance:</span> <span id="inspector-val" class="font-semibold">0%</span></div>
                                     <div><span class="text-slate-400">WCAG:</span> <span id="inspector-wcag" class="font-semibold">AAA</span></div>
                                 </div>
@@ -1249,7 +1249,7 @@
             document.getElementById('inspector-hex').innerText = activeInspectorHex;
             document.getElementById('inspector-preview-box').style.backgroundColor = activeInspectorHex;
             document.getElementById('inspector-rgb').innerText = `${r}, ${g}, ${b}`;
-            document.getElementById('inspector-hsl').innerText = `${h}°, ${s}%, ${l}%`;
+            document.getElementById('inspector-hsl').innerText = `${h}%, ${s}%, ${l}%`;
             document.getElementById('inspector-val').innerText = `${lumPct}%`;
 
             const contrastVal = lumPct > 50 ? 'Dark Text Pass' : 'White Text Pass';
@@ -1451,7 +1451,7 @@
                             <span class="text-[9px] px-1.5 py-0.5 rounded font-sans font-bold ${isLight ? 'bg-amber-100 text-amber-800' : 'bg-slate-800 text-slate-100'}">${isLight ? 'AAA Dark' : 'AAA White'}</span>
                         </div>
                         <div class="text-[10px] text-slate-500">RGB: ${r}, ${g}, ${b}</div>
-                        <div class="text-[10px] text-slate-400">HSL: ${h}°, ${s}%, ${l}% • Lum: ${lumPct}%</div>
+                        <div class="text-[10px] text-slate-400">HSL: ${h}%, ${s}%, ${l}% • Lum: ${lumPct}%</div>
                     </div>
                 `;
 
