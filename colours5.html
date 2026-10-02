@@ -1677,13 +1677,10 @@
                 const lum = getPerceivedLuminance(r, g, b);
                 ctx.fillStyle = lum > 0.5 ? '#0f172a' : '#ffffff';
 
-                // Render ONLY clean small HEX and RGB text inside rectangle
+                // Render ONLY clean small HEX inside rectangle
                 ctx.textAlign = 'center';
-                ctx.font = 'bold 12px "JetBrains Mono", monospace';
+                ctx.font = 'bold 8px "JetBrains Mono", monospace';
                 ctx.fillText(hex.toUpperCase(), x + swatchWidth / 2, swatchHeight - 38);
-
-                ctx.font = '500 10px "JetBrains Mono", monospace';
-                ctx.fillText(`RGB: ${r}, ${g}, ${b}`, x + swatchWidth / 2, swatchHeight - 22);
             });
 
             const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
