@@ -144,30 +144,183 @@
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
+
+        /* Home Link Button Styling */
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
+        }
+
+        /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
+        .nav-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2000;
+        }
+
+        .nav-tools-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-dropdown-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 6px;
+            min-width: 220px;
+            background-color: #ffffff;
+            border: 1.5px solid #22ACEC;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 2100;
+        }
+
+        .nav-tools-dropdown.open .nav-dropdown-content,
+        .nav-tools-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .nav-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-dropdown-item:hover {
+            background-color: #B4E3F8;
+            color: #0284c7;
+        }
+
+        .nav-dropdown-item.active-tool {
+            background-color: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
                 
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
-                        <i class="fa-solid fa-[#0369a1] fa-chart-line"></i>
+                <!-- Left Container: Home Button, Dropdown Navigation & Logo + Title -->
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+                    <div class="nav-header-left">
+                        <!-- Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Return to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
+                        <!-- Navigation Dropdown Switcher -->
+                        <div id="nav-dropdown-container" class="nav-tools-dropdown">
+                            <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
+                                <span>Rockie Navigation</span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </button>
+
+                            <div class="nav-dropdown-content">
+                                <a href="index.html" class="nav-dropdown-item">
+                                    <span>🪨</span> rockie home
+                                </a>
+                                <a href="colours1.html" class="nav-dropdown-item active-tool">
+                                    <span>📊</span> matrix rockies
+                                </a>
+                                <a href="colours2.html" class="nav-dropdown-item">
+                                    <span>🍀</span> square rockies
+                                </a>
+                                <a href="colours3.html" class="nav-dropdown-item">
+                                    <span>🍁</span> circle rockies
+                                </a>
+                                <a href="colours4.html" class="nav-dropdown-item">
+                                    <span>🌼</span> cube rockies
+                                </a>
+                                <a href="colours5.html" class="nav-dropdown-item">
+                                    <span>🌸</span> collected rockies
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            Palette Vault
-                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Analytics & Matrices</span>
-                        </h1>
-                        <p class="text-xs text-slate-500">Colour Matrices, Custom Corner Blends, Hue Constants & Perceived Value Graphs</p>
+
+                    <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
+
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                                Palette Vault
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Analytics & Matrices</span>
+                            </h1>
+                            <p class="text-xs text-slate-500">Colour Matrices, Custom Corner Blends, Hue Constants & Perceived Value Graphs</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Navigation Tabs -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium overflow-x-auto">
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium overflow-x-auto self-start lg:self-auto">
                     <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-border-all text-xs"></i>
                         <span>1. Colour Matrices</span>
@@ -177,7 +330,7 @@
                         <span>2. Custom Corner Matrix</span>
                     </button>
                     <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
-                        <i class="fa-solid fa-[#0369a1] fa-palette text-xs"></i>
+                        <i class="fa-solid fa-palette text-xs"></i>
                         <span>3. Hue Constants</span>
                     </button>
                     <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
@@ -678,7 +831,7 @@
                     <i class="fa-solid fa-swatchbook text-[#0369a1] text-base"></i>
                     <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Comparison Palette (0/16)</span>
                 </div>
-                <button onclick="clearPalette()" class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors">
+                <button onclick="clearPalette()" class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm">
                     Clear
                 </button>
             </div>
@@ -711,6 +864,20 @@
         const MAX_PALETTE = 16;
         let paletteColors = [];
         let draggedIndex = null;
+
+        /* TOP NAVIGATION DROPDOWN TOGGLER */
+        function toggleNavDropdown(event) {
+            event.stopPropagation();
+            const container = document.getElementById('nav-dropdown-container');
+            if (container) container.classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('nav-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
 
         /* HELPERS */
         function updateVal(id, val) { 
