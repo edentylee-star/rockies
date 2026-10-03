@@ -3,33 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>line rockies</title>
+    <title>Palette Vault - Colour Matrices & Perceived Value Analytics</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-        
-    <!-- Navigation Switcher Dropdown -->
-   
-        <div class="nav-dropdown-content">
-              <a href="index.html" class="nav-dropdown-item">
-                   <span>🪨</span> rockie home
-              </a>
-             <a href="colours2.html" class="nav-dropdown-item">
-                <span>🍀</span> square rockies
-            </a>
-            <a href="colours3.html" class="nav-dropdown-item">
-                    <span>🍁</span> circle rockies
-             </a>
-            <a href="colours4.html" class="nav-dropdown-item">
-                    <span>🌼</span> cube rockies
-             </a>
-             <a href="colours5.html" class="nav-dropdown-item">
-                   <span>🌸</span> collected rockies
-             </a>
-            </div>
-        </div>
-    </div>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,7 +62,7 @@
             background: #94a3b8;
         }
 
-        /* Range Sliders */
+        /* Custom Range Sliders */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -99,22 +79,22 @@
             border-radius: 9999px;
         }
         input[type=range]::-webkit-slider-thumb {
-            height: 18px;
-            width: 18px;
+            height: 16px;
+            width: 16px;
             border-radius: 50%;
             background: #0284c7;
             cursor: pointer;
             -webkit-appearance: none;
-            margin-top: -6px;
+            margin-top: -5px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             transition: transform 0.15s ease, background-color 0.15s ease;
         }
         input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
+            transform: scale(1.2);
             background: #0369a1;
         }
 
-        /* Tab Active State */
+        /* Tab Buttons */
         .tab-btn {
             transition: all 0.2s ease;
         }
@@ -125,25 +105,37 @@
             border-color: #22ACEC;
         }
 
-        /* Swatch Hover Effects */
-        .swatch-interactive {
+        /* Interactive Swatches */
+        .swatch {
             transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
         }
-        .swatch-interactive:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2);
+        .swatch:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 12px -2px rgba(0,0,0,0.25);
             z-index: 20;
         }
 
-        /* Iso line highlight effect */
-        .iso-highlight {
+        /* Iso-line Highlighting */
+        .iso-matched {
             outline: 2px solid #00f0ff !important;
             box-shadow: 0 0 10px rgba(0, 240, 255, 0.8), inset 0 0 0 2px #00f0ff !important;
             z-index: 30 !important;
             opacity: 1 !important;
         }
-        .iso-dimmed {
-            opacity: 0.25;
+
+        /* Drag and Drop Palette Slots */
+        .palette-slot {
+            transition: all 0.15s ease;
+        }
+        .palette-slot.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .palette-slot.drag-over {
+            border-color: #0284c7;
+            background-color: #E6F4FA;
+            transform: scale(1.05);
         }
 
         /* Glassmorphic Cards */
@@ -151,277 +143,703 @@
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }    
+        }
+
+        /* Home Link Button Styling */
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #ffffff;
+            color: #0284c7;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
+        }
+        .home-link-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
+        }
+
+        /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
+        .nav-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 2000;
+        }
+
+        .nav-tools-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border: 1.5px solid #22ACEC;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-dropdown-btn:hover {
+            background-color: #22ACEC;
+            color: #ffffff;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 6px;
+            min-width: 220px;
+            background-color: #ffffff;
+            border: 1.5px solid #22ACEC;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 2100;
+        }
+
+        .nav-tools-dropdown.open .nav-dropdown-content,
+        .nav-tools-dropdown:hover .nav-dropdown-content {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .nav-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .nav-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-dropdown-item:hover {
+            background-color: #B4E3F8;
+            color: #0284c7;
+        }
+
+        .nav-dropdown-item.active-tool {
+            background-color: #f0f9ff;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
                 
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
-                        <i class="fa-solid fa-cubes-stacked"></i>
+                <!-- Left Container: Home Button, Dropdown Navigation & Logo + Title -->
+                <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+                    <div class="nav-header-left">
+                        <!-- Home Button -->
+                        <a href="index.html" class="home-link-btn" title="Return to Main Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Home</span>
+                        </a>
+
+                        <!-- Navigation Dropdown Switcher -->
+                        <div id="nav-dropdown-container" class="nav-tools-dropdown">
+                            <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
+                                <span>Rockie Navigation</span>
+                                <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                            </button>
+
+                            <div class="nav-dropdown-content">
+                                <a href="index.html" class="nav-dropdown-item">
+                                    <span>🪨</span> rockie home
+                                </a>
+                                <a href="colours1.html" class="nav-dropdown-item active-tool">
+                                    <span>🎨</span> matrix rockies
+                                </a>
+                                <a href="colours2.html" class="nav-dropdown-item">
+                                    <span>🍀</span> square rockies
+                                </a>
+                                <a href="colours3.html" class="nav-dropdown-item">
+                                    <span>🍁</span> circle rockies
+                                </a>
+                                <a href="colours4.html" class="nav-dropdown-item">
+                                    <span>🌼</span> cube rockies
+                                </a>
+                                <a href="colours5.html" class="nav-dropdown-item">
+                                    <span>🌸</span> collected rockies
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            Palette Vault
-                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Color Theory Studio</span>
-                        </h1>
-                        <p class="text-xs text-slate-500">RGB Matrices, Harmonies, Mutes, & Multi-Vertex Gradients</p>
+
+                    <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
+
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                                Palette Vault
+                                <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Analytics & Matrices</span>
+                            </h1>
+                            <p class="text-xs text-slate-500">Colour Matrices, Custom Corner Blends, Hue Constants & Perceived Value Graphs</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Navigation Tabs -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium">
-                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
-                        <i class="fa-solid fa-table-cells text-xs"></i>
-                        <span>1. RGB Edges Matrix</span>
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium overflow-x-auto self-start lg:self-auto">
+                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
+                        <i class="fa-solid fa-border-all text-xs"></i>
+                        <span>1. Colour Matrices</span>
                     </button>
-                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
+                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
+                        <i class="fa-solid fa-shapes text-xs"></i>
+                        <span>2. Custom Corner Matrix</span>
+                    </button>
+                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-palette text-xs"></i>
-                        <span>2. Charts, Mutes & Harmonies</span>
+                        <span>3. Hue Constants</span>
                     </button>
-                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
-                        <i class="fa-solid fa-sliders text-xs"></i>
-                        <span>3. Colour Gradients</span>
+                    <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
+                        <i class="fa-solid fa-chart-line text-xs"></i>
+                        <span>4. Perceived Value Graph</span>
                     </button>
                 </nav>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- MAIN CONTENT AREA -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
 
         <!-- ========================================================= -->
-        <!-- TAB 1: RGB EDGES MATRIX -->
+        <!-- TAB 1: COLOUR MATRICES -->
         <!-- ========================================================= -->
         <section id="tab1" class="tab-content space-y-6">
-            
             <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">
                     <div class="flex items-center gap-2">
                         <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
-                        <h2 class="font-bold text-slate-900 text-lg">RGB Edges Channel Matrix Controls</h2>
+                        <h2 class="font-bold text-slate-900 text-lg">Grouped Blend Matrix Controls</h2>
                     </div>
-                    <div class="text-xs text-slate-500 font-mono">
-                        6 Edge Vectors across 0-255 RGB cube boundary steps
+                    <span id="t1-badge" class="text-xs font-mono font-medium text-[#0369a1] bg-[#B4E3F8]/40 px-3 py-1 rounded-full border border-[#22ACEC]/30">
+                        20 Chromatic Trios • 60 Total Combinations
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+                    <!-- Matrix Mode Dropdown -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Matrix Mode</label>
+                        <select id="t1-mode" onchange="onModeChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="2">Groups of 2 (Opposite Corners)</option>
+                            <option value="3" selected>Groups of 3 (20 Chromatic Trios)</option>
+                            <option value="4">Groups of 4 (Corner Gradients)</option>
+                        </select>
+                    </div>
+
+                    <!-- Trio Filter (Visible when Mode 3 is active) -->
+                    <div id="trio-filter-wrapper" class="space-y-1">
+                        <label class="font-semibold text-slate-600 block flex items-center justify-between">
+                            <span>Trio Combination</span>
+                            <span class="text-[10px] text-[#0369a1] font-mono">(20 Trios)</span>
+                        </label>
+                        <select id="t1-trio-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <!-- Options injected dynamically by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Neutral Corner Filter (Visible when Mode 3 is active) -->
+                    <div id="neutral-filter-wrapper" class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Neutral Corner</label>
+                        <select id="t1-neutral-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="all" selected>All Neutrals (White, Grey, Black)</option>
+                            <option value="0">White Corner Only (#FFFFFF)</option>
+                            <option value="1">Grey Corner Only (#808080)</option>
+                            <option value="2">Black Corner Only (#000000)</option>
+                        </select>
+                    </div>
+
+                    <!-- Resolution Dropdown -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Matrix Resolution</label>
+                        <select id="t1-res" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="4">4 × 4 Grid</option>
+                            <option value="6">6 × 6 Grid</option>
+                            <option value="8" selected>8 × 8 Grid</option>
+                            <option value="10">10 × 10 Grid</option>
+                            <option value="12">12 × 12 Grid</option>
+                        </select>
+                    </div>
+
+                    <!-- Iso-Line Tracking -->
+                    <div class="space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="inline-flex items-center cursor-pointer space-x-1.5">
+                                <input type="checkbox" id="t1-isoline" onchange="renderTab1()" class="sr-only peer">
+                                <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                                <span class="text-xs font-semibold text-slate-700">Track Iso-Line</span>
+                            </label>
+                            <span id="val-t1-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
+                        </div>
+                        <input type="range" id="t1-isoval" value="50" min="0" max="100" oninput="updateVal('val-t1-iso', this.value); renderTab1()">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <!-- Step Size Dropdown -->
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Step Size Resolution</label>
-                        <select id="rgb-step" onchange="renderRGBEdgesTab()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="1">1 (Fine - 256 Rows)</option>
-                            <option value="5" selected>5 (Standard - 52 Rows)</option>
-                            <option value="10">10 (Medium - 26 Rows)</option>
-                            <option value="15">15 (Coarse - 18 Rows)</option>
-                            <option value="17">17 (Web Safe - 16 Rows)</option>
-                            <option value="51">51 (Fast - 6 Rows)</option>
-                        </select>
-                    </div>
-
-                    <!-- Display Format Dropdown -->
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Display Code Format</label>
-                        <select id="rgb-format" onchange="renderRGBEdgesTab()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="hex" selected>HEX (#RRGGBB)</option>
-                            <option value="rgb">RGB (r, g, b)</option>
-                            <option value="hsl">HSL (h%, s%, l%)</option>
-                            <option value="cmyk">CMYK (c, m, y, k)</option>
-                        </select>
-                    </div>
-
-                    <!-- Show Perceived Value Toggle -->
-                    <div class="space-y-1 flex flex-col justify-center">
-                        <label class="font-semibold text-slate-600 mb-1">Cell Value Display</label>
+                <!-- Display Format Toggles & Adjustments -->
+                <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 pt-2 border-t border-slate-100 text-xs items-center">
+                    <div class="space-y-1 col-span-2 sm:col-span-1 flex flex-col justify-center">
                         <label class="inline-flex items-center cursor-pointer space-x-2">
-                            <input type="checkbox" id="rgb-showval" onchange="renderRGBEdgesTab()" class="sr-only peer">
-                            <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
-                            <span class="text-xs font-semibold text-slate-700">Show Perceived Value (%)</span>
+                            <input type="checkbox" id="t1-showval" onchange="renderTab1()" class="sr-only peer">
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span class="text-xs font-semibold text-slate-700">Perceived Val (%)</span>
+                        </label>
+                        <label class="inline-flex items-center cursor-pointer space-x-2 pt-1">
+                            <input type="checkbox" id="t1-showformats" onchange="renderTab1()" class="sr-only peer">
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span class="text-xs font-semibold text-slate-700">RGB / HSL / HEX</span>
                         </label>
                     </div>
 
-                    <!-- Track Iso-Line Controls -->
-                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <div class="flex items-center justify-between">
-                            <label class="inline-flex items-center cursor-pointer space-x-1.5">
-                                <input type="checkbox" id="rgb-isoline" onchange="renderRGBEdgesTab()" class="sr-only peer">
-                                <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
-                                <span class="text-xs font-semibold text-slate-700">Track Iso-Line</span>
-                            </label>
-                            <span id="isoval-display" class="font-mono font-bold text-[#0369a1]">50%</span>
+                    <!-- Sliders: Tint, Tone, Shade, Saturation -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Tint (White):</span>
+                            <span id="val-tint" class="text-[#0369a1] font-mono font-bold">0%</span>
                         </div>
-                        <input type="range" id="rgb-isoval" value="50" min="0" max="100" oninput="document.getElementById('isoval-display').innerText = this.value + '%'; renderRGBEdgesTab()">
+                        <input type="range" id="t1-tint" value="0" min="0" max="100" oninput="updateVal('val-tint', this.value); renderTab1()">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Tone (Grey):</span>
+                            <span id="val-tone" class="text-[#0369a1] font-mono font-bold">0%</span>
+                        </div>
+                        <input type="range" id="t1-tone" value="0" min="0" max="100" oninput="updateVal('val-tone', this.value); renderTab1()">
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Shade (Black):</span>
+                            <span id="val-shade" class="text-[#0369a1] font-mono font-bold">0%</span>
+                        </div>
+                        <input type="range" id="t1-shade" value="0" min="0" max="100" oninput="updateVal('val-shade', this.value); renderTab1()">
+                    </div>
+                    <div class="space-y-1 col-span-2 lg:col-span-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Saturation:</span>
+                            <span id="val-sat" class="text-[#0369a1] font-mono font-bold">100%</span>
+                        </div>
+                        <input type="range" id="t1-sat" value="100" min="0" max="200" oninput="updateVal('val-sat', this.value); renderTab1()">
                     </div>
                 </div>
             </div>
 
-            <!-- RGB Matrix Table Box -->
-            <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-center border-collapse">
-                        <thead>
-                            <tr class="bg-[#B4E3F8] text-[#0369a1] text-xs font-bold uppercase tracking-wider border-b border-[#22ACEC]">
-                                <th class="py-3 px-3 border-r border-[#22ACEC]/40 w-20">Value</th>
-                                <th class="py-2 px-2 border-r border-[#22ACEC]/40">Red Edge<br><span class="text-[10px] opacity-80 font-mono">FFxx00</span></th>
-                                <th class="py-2 px-2 border-r border-[#22ACEC]/40">Yellow Edge<br><span class="text-[10px] opacity-80 font-mono">xxFF00</span></th>
-                                <th class="py-2 px-2 border-r border-[#22ACEC]/40">Green Edge<br><span class="text-[10px] opacity-80 font-mono">00FFxx</span></th>
-                                <th class="py-2 px-2 border-r border-[#22ACEC]/40">Cyan Edge<br><span class="text-[10px] opacity-80 font-mono">00xxFF</span></th>
-                                <th class="py-2 px-2 border-r border-[#22ACEC]/40">Blue Edge<br><span class="text-[10px] opacity-80 font-mono">xx00FF</span></th>
-                                <th class="py-2 px-2">Magenta Edge<br><span class="text-[10px] opacity-80 font-mono">FF00xx</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="rgb-table-body" class="divide-y divide-slate-100 font-mono text-xs">
-                            <!-- Injected dynamically -->
-                        </tbody>
-                    </table>
+            <!-- Matrices Grid Target -->
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 gap-2">
+                    <h3 id="t1-header" class="text-base font-bold text-slate-900">Generated Colour Matrices</h3>
+                    <span id="t1-matrix-count" class="text-xs font-mono text-slate-500 font-bold">Showing 60 matrices</span>
                 </div>
+                <div id="matrices-target" class="flex flex-wrap justify-center gap-6"></div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- TAB 2: COLOR CHARTS, MUTES & HARMONIES -->
+        <!-- TAB 2: CUSTOM CORNER MATRIX & PRE-SAVED PALETTES -->
         <!-- ========================================================= -->
         <section id="tab2" class="tab-content hidden space-y-6">
             
-            <!-- Base Color Selection Bar -->
+            <!-- Controls Bar: 4 Corner Inputs -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
-                    <div>
-                        <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
-                            Color Theory Analysis & Harmony Generator
-                        </h2>
-                        <p class="text-xs text-slate-500">Pick any base color to update charts, mute ladders, and harmony grids</p>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
+                        Custom 4-Corner Blend Matrix Controls
+                    </h2>
+                    <span class="text-xs text-slate-500 font-mono">Real-time HEX / RGB / HSL Sync</span>
+                </div>
+
+                <!-- 4 Corner Input Panels Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    
+                    <!-- Top-Left (TL) Corner -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-slate-700">
+                            <span>Top-Left (TL)</span>
+                            <input type="color" id="cc-tl-picker" value="#FF0000" oninput="syncPickerToText('tl')" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500 w-8">HEX:</span>
+                            <input type="text" id="cc-tl-hex" value="#FF0000" oninput="syncTextToPicker('tl', 'hex')" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 font-mono font-bold text-slate-800 text-center uppercase">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-tl-r" value="255" oninput="syncTextToPicker('tl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="R">
+                            <input type="text" id="cc-tl-g" value="0" oninput="syncTextToPicker('tl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="G">
+                            <input type="text" id="cc-tl-b" value="0" oninput="syncTextToPicker('tl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="B">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-tl-h" value="0" oninput="syncTextToPicker('tl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="H°">
+                            <input type="text" id="cc-tl-s" value="100" oninput="syncTextToPicker('tl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="S%">
+                            <input type="text" id="cc-tl-l" value="50" oninput="syncTextToPicker('tl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="L%">
+                        </div>
                     </div>
 
-                    <div class="flex items-center space-x-3 flex-wrap gap-2">
-                        <div class="flex items-center space-x-2 bg-slate-50 border border-slate-300 rounded-xl p-1.5">
-                            <span class="text-xs font-semibold text-slate-600 pl-1">Base:</span>
-                            <input type="color" id="base-color-picker" value="#B4E3F8" oninput="syncColorInput(this.value)" class="w-8 h-8 rounded-lg cursor-pointer border-0 p-0 bg-transparent">
-                            <input type="text" id="base-color-input" value="#B4E3F8" oninput="updateHarmonies()" class="w-20 font-mono text-xs font-bold text-slate-800 bg-transparent border-0 focus:outline-none uppercase">
+                    <!-- Top-Right (TR) Corner -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-slate-700">
+                            <span>Top-Right (TR)</span>
+                            <input type="color" id="cc-tr-picker" value="#FFFF00" oninput="syncPickerToText('tr')" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent">
                         </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500 w-8">HEX:</span>
+                            <input type="text" id="cc-tr-hex" value="#FFFF00" oninput="syncTextToPicker('tr', 'hex')" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 font-mono font-bold text-slate-800 text-center uppercase">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-tr-r" value="255" oninput="syncTextToPicker('tr', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="R">
+                            <input type="text" id="cc-tr-g" value="255" oninput="syncTextToPicker('tr', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="G">
+                            <input type="text" id="cc-tr-b" value="0" oninput="syncTextToPicker('tr', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="B">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-tr-h" value="60" oninput="syncTextToPicker('tr', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="H°">
+                            <input type="text" id="cc-tr-s" value="100" oninput="syncTextToPicker('tr', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="S%">
+                            <input type="text" id="cc-tr-l" value="50" oninput="syncTextToPicker('tr', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="L%">
+                        </div>
+                    </div>
 
-                        <select id="palette-picker" onchange="pickFromPalette(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="">-- Load Saved Swatch --</option>
+                    <!-- Bottom-Left (BL) Corner -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-slate-700">
+                            <span>Bottom-Left (BL)</span>
+                            <input type="color" id="cc-bl-picker" value="#0000FF" oninput="syncPickerToText('bl')" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500 w-8">HEX:</span>
+                            <input type="text" id="cc-bl-hex" value="#0000FF" oninput="syncTextToPicker('bl', 'hex')" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 font-mono font-bold text-slate-800 text-center uppercase">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-bl-r" value="0" oninput="syncTextToPicker('bl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="R">
+                            <input type="text" id="cc-bl-g" value="0" oninput="syncTextToPicker('bl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="G">
+                            <input type="text" id="cc-bl-b" value="255" oninput="syncTextToPicker('bl', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="B">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-bl-h" value="240" oninput="syncTextToPicker('bl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="H°">
+                            <input type="text" id="cc-bl-s" value="100" oninput="syncTextToPicker('bl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="S%">
+                            <input type="text" id="cc-bl-l" value="50" oninput="syncTextToPicker('bl', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="L%">
+                        </div>
+                    </div>
+
+                    <!-- Bottom-Right (BR) Corner -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                        <div class="flex items-center justify-between font-bold text-slate-700">
+                            <span>Bottom-Right (BR)</span>
+                            <input type="color" id="cc-br-picker" value="#00FF00" oninput="syncPickerToText('br')" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500 w-8">HEX:</span>
+                            <input type="text" id="cc-br-hex" value="#00FF00" oninput="syncTextToPicker('br', 'hex')" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 font-mono font-bold text-slate-800 text-center uppercase">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-br-r" value="0" oninput="syncTextToPicker('br', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="R">
+                            <input type="text" id="cc-br-g" value="255" oninput="syncTextToPicker('br', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="G">
+                            <input type="text" id="cc-br-b" value="0" oninput="syncTextToPicker('br', 'rgb')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="B">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                            <input type="text" id="cc-br-h" value="120" oninput="syncTextToPicker('br', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="H°">
+                            <input type="text" id="cc-br-s" value="100" oninput="syncTextToPicker('br', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="S%">
+                            <input type="text" id="cc-br-l" value="50" oninput="syncTextToPicker('br', 'hsl')" class="bg-white border border-slate-300 rounded px-1 py-0.5 font-mono text-center text-[11px]" placeholder="L%">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matrix Adjustments Toolbar -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-slate-100">
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Resolution</label>
+                        <select id="cc-res" onchange="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-medium">
+                            <option value="4">4 × 4 Grid</option>
+                            <option value="6">6 × 6 Grid</option>
+                            <option value="8" selected>8 × 8 Grid</option>
+                            <option value="10">10 × 10 Grid</option>
+                            <option value="12">12 × 12 Grid</option>
                         </select>
                     </div>
-                </div>
-            </div>
 
-            <!-- Secondary & Tertiary Charts Row -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Secondary Color Chart -->
-                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
-                        <span>Secondary Color Chart</span>
-                        <i class="fa-solid fa-circle-nodes text-sky-600"></i>
-                    </h3>
-                    <div id="secondary-chart" class="space-y-1.5"></div>
-                </div>
-
-                <!-- Tertiary Chart (Set 1) -->
-                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
-                        <span>Tertiary Chart (Set 1)</span>
-                        <i class="fa-solid fa-chart-pie text-sky-600"></i>
-                    </h3>
-                    <div id="tertiary-chart-1" class="space-y-1.5"></div>
-                </div>
-
-                <!-- Tertiary Chart (Set 2) -->
-                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
-                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
-                        <span>Tertiary Chart (Set 2)</span>
-                        <i class="fa-solid fa-chart-line text-sky-600"></i>
-                    </h3>
-                    <div id="tertiary-chart-2" class="space-y-1.5"></div>
-                </div>
-            </div>
-
-            <!-- Mute Charts Section -->
-            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="border-b pb-2 flex items-center justify-between">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base">Color Fundamentals / Mute Chart</h3>
-                        <p class="text-xs text-slate-500">Saturation levels & desaturation ladders between complementary hues</p>
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Tint:</span>
+                            <span id="val-cc-tint" class="text-[#0369a1] font-mono">0%</span>
+                        </div>
+                        <input type="range" id="cc-tint" value="0" min="0" max="100" oninput="updateVal('val-cc-tint', this.value); renderTab2Custom()">
                     </div>
-                    <span class="text-xs bg-[#B4E3F8] text-[#0369a1] font-semibold px-2.5 py-1 rounded-full border border-[#22ACEC]">9 Steps</span>
-                </div>
-                <div id="mute-grid-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto pb-2"></div>
-            </div>
 
-            <!-- Hue Wheel Saturation & Neutralization Intervals -->
-            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="border-b pb-2 flex items-center justify-between">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base">Hue Wheel Saturation & Neutralization Intervals (0° – 330°)</h3>
-                        <p class="text-xs text-slate-500">Full 12-column radial hue progression ramping down to central neutral grey (S=0, L=58)</p>
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Tone:</span>
+                            <span id="val-cc-tone" class="text-[#0369a1] font-mono">0%</span>
+                        </div>
+                        <input type="range" id="cc-tone" value="0" min="0" max="100" oninput="updateVal('val-cc-tone', this.value); renderTab2Custom()">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Shade:</span>
+                            <span id="val-cc-shade" class="text-[#0369a1] font-mono">0%</span>
+                        </div>
+                        <input type="range" id="cc-shade" value="0" min="0" max="100" oninput="updateVal('val-cc-shade', this.value); renderTab2Custom()">
+                    </div>
+
+                    <div class="space-y-1">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span>Sat:</span>
+                            <span id="val-cc-sat" class="text-[#0369a1] font-mono">100%</span>
+                        </div>
+                        <input type="range" id="cc-sat" value="100" min="0" max="200" oninput="updateVal('val-cc-sat', this.value); renderTab2Custom()">
+                    </div>
+
+                    <div class="space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-slate-700">Iso:</span>
+                            <span id="val-cc-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
+                        </div>
+                        <input type="range" id="cc-isoval" value="50" min="0" max="100" oninput="updateVal('val-cc-iso', this.value); renderTab2Custom()">
                     </div>
                 </div>
-                <div id="wheel-chart-container" class="grid grid-cols-6 sm:grid-cols-12 gap-1.5 overflow-x-auto pb-2"></div>
+
+                <!-- Checkboxes Row -->
+                <div class="flex items-center gap-6 text-xs font-semibold text-slate-700 pt-1">
+                    <label class="inline-flex items-center cursor-pointer space-x-2">
+                        <input type="checkbox" id="cc-showval" onchange="renderTab2Custom()" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                        <span>Show Perceived Value (%)</span>
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer space-x-2">
+                        <input type="checkbox" id="cc-showformats" onchange="renderTab2Custom()" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                        <span>Show RGB / HSL / HEX</span>
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer space-x-2">
+                        <input type="checkbox" id="cc-isoline" onchange="renderTab2Custom()" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                        <span>Track Iso-Line</span>
+                    </label>
+                </div>
             </div>
 
-            <!-- Color Harmonies Workspace (RBY vs CMY Models) -->
-            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+            <!-- Custom Matrix Display Target -->
+            <div class="space-y-4">
+                <h3 class="text-base font-bold text-slate-900 border-b pb-2">Custom Corner Color Matrix</h3>
+                <div id="matrices-target-custom" class="flex justify-center"></div>
+            </div>
+
+            <!-- Pre-Saved Palettes Section -->
+            <div class="space-y-4 pt-4">
                 <div class="border-b pb-2">
-                    <h3 class="font-bold text-slate-900 text-base">Color Harmonies Workspace</h3>
-                    <p class="text-xs text-slate-500">Side-by-side mathematical comparison of traditional RBY vs digital CMY/RGB color wheel models</p>
+                    <h3 class="text-base font-bold text-slate-900">Pre-Saved Corner Palettes</h3>
+                    <p class="text-xs text-slate-500">Click any card below to load its 4 corner colors into the blend matrix above.</p>
                 </div>
-                <div id="harmony-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+                <div id="presaved-target" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3"></div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- TAB 3: COLOUR GRADIENTS MATRIX -->
+        <!-- TAB 3: HUE CONSTANTS MATRIX -->
         <!-- ========================================================= -->
         <section id="tab3" class="tab-content hidden space-y-6">
             
             <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">
-                    <div>
-                        <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
-                            Multi-Vertex Colour Gradient Interpolation
-                        </h2>
-                        <p class="text-xs text-slate-500">Generate 1D Linear, 2D Barycentric Triangular, or 2D Bilinear Square color spaces</p>
+                    <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
+                        Hue Constants Matrix Engine
+                    </h2>
+                    <span class="text-xs font-mono font-bold text-[#0369a1] bg-[#B4E3F8]/40 px-3 py-1 rounded-full border border-[#22ACEC]/30">
+                        0° – 360° Hue Sweep
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <!-- Hue Resolution -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Hue Angle Step Resolution</label>
+                        <select id="t2-res" onchange="renderTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
+                            <option value="10">10° Intervals (36 Columns)</option>
+                            <option value="15" selected>15° Intervals (24 Columns)</option>
+                            <option value="30">30° Intervals (12 Columns)</option>
+                            <option value="45">45° Intervals (8 Columns)</option>
+                        </select>
                     </div>
 
-                    <div class="flex items-center space-x-4">
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold text-slate-600 block">Gradient Mode</label>
-                            <select id="grad-num-colors" onchange="updateGradientControls(); renderGradients();" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                                <option value="2" selected>2 Colors (Linear Gradient)</option>
-                                <option value="3">3 Colors (Triangular Barycentric)</option>
-                                <option value="4">4 Colors (Square Bilinear Matrix)</option>
-                            </select>
-                        </div>
+                    <!-- Display Format Mode -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Color Space Mode</label>
+                        <select id="t2-format" onchange="updateTab2Controls(); renderTab3();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
+                            <option value="1">1: Y=Sat, Slider=Lightness</option>
+                            <option value="2">2: Y=Lightness, Slider=Sat</option>
+                            <option value="3">3: Y=Brightness, Slider1=Tone, Slider2=Shade</option>
+                            <option value="4">4: Y=Brightness, Slider1=Shade, Slider2=Tone</option>
+                            <option value="5">5: Y=Tone, Slider1=Brightness, Slider2=Shade</option>
+                            <option value="6">6: Y=Shade, Slider1=Brightness, Slider2=Tone</option>
+                        </select>
+                    </div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold text-slate-600 block">Grid Steps</label>
-                            <input type="number" id="grad-steps" value="8" min="2" max="20" onchange="renderGradients()" class="w-20 bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl p-2 font-mono font-bold text-center">
+                    <!-- Dynamic Slider 1 -->
+                    <div id="slider1-container" class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span id="lbl-s1">Lightness:</span>
+                            <span id="val-s1" class="text-[#0369a1] font-mono font-bold">50%</span>
                         </div>
+                        <input type="range" id="t2-s1" value="50" min="0" max="100" oninput="updateVal('val-s1', this.value); renderTab3()">
+                    </div>
+
+                    <!-- Dynamic Slider 2 -->
+                    <div id="slider2-container" class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200 hidden">
+                        <div class="flex justify-between font-semibold text-slate-600">
+                            <span id="lbl-s2">Slider 2:</span>
+                            <span id="val-s2" class="text-[#0369a1] font-mono font-bold">0%</span>
+                        </div>
+                        <input type="range" id="t2-s2" value="0" min="0" max="100" oninput="updateVal('val-s2', this.value); renderTab3()">
                     </div>
                 </div>
 
-                <!-- Vertex Color Pickers Row -->
-                <div id="gradient-inputs-bar" class="flex flex-wrap items-center gap-4 pt-1">
-                    <!-- Injected dynamically -->
+                <!-- Toggles Row -->
+                <div class="flex items-center gap-6 text-xs font-semibold text-slate-700 pt-2 border-t border-slate-100">
+                    <label class="inline-flex items-center cursor-pointer space-x-2">
+                        <input type="checkbox" id="t2-showval" onchange="renderTab3()" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                        <span>Show Perceived Value (%)</span>
+                    </label>
+
+                    <div class="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <label class="inline-flex items-center cursor-pointer space-x-2">
+                            <input type="checkbox" id="t2-isoline" onchange="renderTab3()" class="sr-only peer">
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span>Track Iso-Line</span>
+                        </label>
+                        <input type="range" id="t2-isoval" value="50" min="0" max="100" oninput="updateVal('val-t2-iso', this.value); renderTab3()" class="w-20">
+                        <span id="val-t2-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Gradient Display Surface -->
-            <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col items-center justify-center min-h-[400px]">
-                <div id="gradient-output" class="w-full flex justify-center items-center overflow-x-auto p-2">
-                    <!-- Dynamic swatches / grid -->
+            <!-- Dynamic Surface Container -->
+            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
+                <div id="t2-container" class="min-w-full"></div>
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- TAB 4: PERCEIVED VALUE GRAPH -->
+        <!-- ========================================================= -->
+        <section id="tab4" class="tab-content hidden space-y-6">
+            
+            <!-- Controls Bar -->
+            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">
+                    <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-[#B4E3F8] border border-[#22ACEC]"></span>
+                        Perceived Value Analytical Scatter Plot
+                    </h2>
+                    <span class="text-xs font-mono font-bold text-[#0369a1] bg-[#B4E3F8]/40 px-3 py-1 rounded-full border border-[#22ACEC]/30">
+                        Photopic Luminance (0.2126R + 0.7152G + 0.0722B)
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <!-- Resolution -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Resolution</label>
+                        <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
+                            <option value="10">10° Intervals</option>
+                            <option value="15" selected>15° Intervals</option>
+                            <option value="30">30° Intervals</option>
+                            <option value="45">45° Intervals</option>
+                        </select>
+                    </div>
+
+                    <!-- Sorting -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Sorting Order</label>
+                        <select id="t3-sort" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
+                            <option value="hue">Chronological Hue (0° - 360°)</option>
+                            <option value="value">Perceived Value Luminance</option>
+                        </select>
+                    </div>
+
+                    <!-- Display Value Toggle -->
+                    <div class="space-y-1 flex items-center">
+                        <label class="inline-flex items-center cursor-pointer space-x-2">
+                            <input type="checkbox" id="t3-showval" onchange="renderTab4()" class="sr-only peer" checked>
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span class="text-xs font-semibold text-slate-700">Show Perceived Value (%)</span>
+                        </label>
+                    </div>
+
+                    <!-- Iso-Line Tracking -->
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="inline-flex items-center cursor-pointer space-x-1.5">
+                                <input type="checkbox" id="t3-isoline" onchange="renderTab4()" class="sr-only peer">
+                                <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                                <span class="text-xs font-semibold text-slate-700">Track Iso-Line</span>
+                            </label>
+                            <span id="val-t3-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
+                        </div>
+                        <input type="range" id="t3-isoval" value="50" min="0" max="100" oninput="updateVal('val-t3-iso', this.value); renderTab4()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Scatter Plot Container -->
+            <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative min-h-[520px]">
+                <div class="flex h-[520px] overflow-auto relative">
+                    <!-- Sticky Y-Axis -->
+                    <div class="sticky left-0 top-0 bottom-0 w-20 bg-slate-900 text-slate-200 font-mono text-xs font-bold flex flex-col justify-between py-6 px-3 border-r border-slate-800 z-30 flex-shrink-0 shadow-lg">
+                        <span class="text-[#B4E3F8]">Val 10</span>
+                        <span class="text-slate-400">Val 9</span>
+                        <span class="text-slate-400">Val 8</span>
+                        <span class="text-slate-400">Val 7</span>
+                        <span class="text-slate-400">Val 6</span>
+                        <span class="text-slate-400">Val 5</span>
+                        <span class="text-slate-400">Val 4</span>
+                        <span class="text-[#B4E3F8]">Val 3</span>
+                    </div>
+
+                    <!-- Plot Target Canvas Area -->
+                    <div id="pv-plot-target" class="relative bg-slate-950 flex-grow min-w-[1800px] h-full"></div>
                 </div>
             </div>
         </section>
@@ -430,16 +848,22 @@
     <!-- ========================================================= -->
     <!-- GLOBAL COMPARISON PALETTE DRAWER -->
     <!-- ========================================================= -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#B4E3F8]/95 backdrop-blur-md border-t-2 border-[#22ACEC] shadow-2xl px-4 py-3">
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
             
             <div class="flex items-center justify-between md:justify-start space-x-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-swatchbook text-[#0369a1] text-base"></i>
-                    <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Palette (0/16)</span>
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-sm">
+                        <i class="fa-solid fa-swatchbook text-sm"></i>
+                    </div>
+                    <div>
+                        <span id="palette-counter" class="font-bold text-slate-900 text-xs sm:text-sm block">Global Comparison Palette (0/16)</span>
+                        <span class="text-[10px] text-slate-500 font-medium hidden sm:inline-block">Click swatch in grid to add • Drag to reorder</span>
+                    </div>
                 </div>
-                <button onclick="clearPalette()" class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors">
-                    Clear
+                <button onclick="clearPalette()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-trash-can text-[11px]"></i>
+                    <span>Clear</span>
                 </button>
             </div>
 
@@ -450,8 +874,9 @@
 
             <!-- Action Controls -->
             <div class="flex items-center space-x-2">
-                <button onclick="copyAllPaletteHex()" class="px-3 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-sky-600">
-                    <i class="fa-solid fa-copy"></i> Copy All HEX
+                <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-[#22ACEC] text-[#0369a1] hover:text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5 border border-[#22ACEC]">
+                    <i class="fa-solid fa-copy text-xs"></i>
+                    <span>Copy All HEX</span>
                 </button>
             </div>
         </div>
@@ -467,87 +892,129 @@
     <!-- JAVASCRIPT APPLICATION CORE -->
     <!-- ========================================================= -->
     <script>
-        /* APPLICATION STATE */
         const MAX_PALETTE = 16;
         let paletteColors = [];
+        let draggedIndex = null;
 
-        /* COLOR MATH UTILITIES */
-        function getPerceivedValue(r, g, b) {
-            return Math.round((0.299 * r + 0.587 * g + 0.114 * b) / 255 * 100);
+        /* Core 6 Chromatic Colors */
+        const CHROMATIC_COLORS = [
+            { name: "Red", hex: "#FF0000" },
+            { name: "Yellow", hex: "#FFFF00" },
+            { name: "Green", hex: "#00FF00" },
+            { name: "Cyan", hex: "#00FFFF" },
+            { name: "Blue", hex: "#0000FF" },
+            { name: "Magenta", hex: "#FF00FF" }
+        ];
+
+        /* TOP NAVIGATION DROPDOWN TOGGLER */
+        function toggleNavDropdown(event) {
+            event.stopPropagation();
+            const container = document.getElementById('nav-dropdown-container');
+            if (container) container.classList.toggle('open');
         }
 
-        function getContrastTextColor(r, g, b) {
-            return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#0f172a' : '#ffffff';
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('nav-dropdown-container');
+            if (container && !container.contains(e.target)) {
+                container.classList.remove('open');
+            }
+        });
+
+        /* HELPERS */
+        function updateVal(id, val) { 
+            const el = document.getElementById(id);
+            if(el) el.innerText = val + '%'; 
         }
 
-        function rgbToHex(r, g, b) {
-            return "#" + [r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('').toUpperCase();
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(`btn-${tabId}`).classList.add('active');
+
+            if (tabId === 'tab1') renderTab1();
+            if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
+            if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
+            if (tabId === 'tab4') renderTab4();
         }
 
         function hexToRgb(hex) {
-            let c = hex.replace('#', '');
-            if (c.length === 3) c = c.split('').map(x => x + x).join('');
-            let num = parseInt(c, 16);
-            return [num >> 16, (num >> 8) & 255, num & 255];
+            let cleanHex = hex.replace('#','');
+            if(cleanHex.length === 3) cleanHex = cleanHex.split('').map(x => x+x).join('');
+            const match = cleanHex.match(/.{1,2}/g);
+            if(!match || match.length < 3) return { r: 0, g: 0, b: 0 };
+            return { r: parseInt(match[0], 16) || 0, g: parseInt(match[1], 16) || 0, b: parseInt(match[2], 16) || 0 };
+        }
+
+        function rgbToHex(r, g, b) {
+            const clamp = v => Math.max(0, Math.min(255, Math.round(v)));
+            return "#" + [r, g, b].map(x => clamp(x).toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function lerpColorObj(c1, c2, t) {
+            return { r: c1.r + t * (c2.r - c1.r), g: c1.g + t * (c2.g - c1.g), b: c1.b + t * (c2.b - c1.b) };
         }
 
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
             const max = Math.max(r, g, b), min = Math.min(r, g, b);
             let h, s, l = (max + min) / 2;
-            if (max === min) { h = s = 0; }
+            if(max === min) { h = s = 0; } 
             else {
                 const d = max - min;
                 s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
+                switch(max) {
                     case r: h = (g - b) / d + (g < b ? 6 : 0); break;
                     case g: h = (b - r) / d + 2; break;
                     case b: h = (r - g) / d + 4; break;
                 }
                 h /= 6;
             }
-            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
         }
 
-        function hslToRgb(h, s, l) {
+        function hslToRgbObj(h, s, l) {
             h = (h % 360 + 360) % 360;
             h /= 360; s /= 100; l /= 100;
             let r, g, b;
-            if (s === 0) { r = g = b = l; }
+            if(s === 0) { r = g = b = l; } 
             else {
                 const hue2rgb = (p, q, t) => {
-                    if (t < 0) t += 1; if (t > 1) t -= 1;
-                    if (t < 1/6) return p + (q - p) * 6 * t;
-                    if (t < 1/2) return q;
-                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    if(t < 0) t += 1; if(t > 1) t -= 1;
+                    if(t < 1/6) return p + (q - p) * 6 * t;
+                    if(t < 1/2) return q;
+                    if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
                     return p;
                 };
                 const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
                 const p = 2 * l - q;
                 r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
             }
-            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+            return { r: r * 255, g: g * 255, b: b * 255 };
         }
 
-        function rgbToCmyk(r, g, b) {
-            let c = 1 - (r / 255);
-            let m = 1 - (g / 255);
-            let y = 1 - (b / 255);
-            let k = Math.min(c, Math.min(m, y));
-            if (k === 1) return '0,0,0,100';
-            c = Math.round(((c - k) / (1 - k)) * 100);
-            m = Math.round(((m - k) / (1 - k)) * 100);
-            y = Math.round(((y - k) / (1 - k)) * 100);
-            k = Math.round(k * 100);
-            return `${c},${m},${y},${k}`;
+        function getPerceivedValue(r, g, b) {
+            return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
         }
 
-        function lerpColor(c1, c2, t) {
-            return [
-                c1[0] + t * (c2[0] - c1[0]),
-                c1[1] + t * (c2[1] - c1[1]),
-                c1[2] + t * (c2[2] - c1[2])
-            ];
+        function applyAdjustments(rgb, tint, tone, shade, satRatio) {
+            let hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            hsl.s = Math.min(100, hsl.s * (satRatio / 100));
+            let base = hslToRgbObj(hsl.h, hsl.s, hsl.l);
+            base.r += (255 - base.r) * (tint / 100);
+            base.g += (255 - base.g) * (tint / 100);
+            base.b += (255 - base.b) * (tint / 100);
+            base.r += (128 - base.r) * (tone / 100);
+            base.g += (128 - base.g) * (tone / 100);
+            base.b += (128 - base.b) * (tone / 100);
+            base.r *= (1 - shade / 100); base.g *= (1 - shade / 100); base.b *= (1 - shade / 100);
+            return rgbToHex(base.r, base.g, base.b);
+        }
+
+        function getContrastTextColor(hex) {
+            const rgb = hexToRgb(hex);
+            return (((rgb.r * 299) + (rgb.g * 587) + (rgb.b * 114)) / 1000 >= 128) ? '#0f172a' : '#ffffff';
         }
 
         function copyToClipboard(text) {
@@ -568,443 +1035,606 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2200);
         }
 
-        /* TAB NAVIGATION MANAGER */
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        /* GENERATE ALL 20 MATHEMATICAL TRIOS (6 COMBINATION 3) */
+        function getAll20Trios() {
+            const trios = [];
+            const n = CHROMATIC_COLORS.length;
+            let counter = 1;
 
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById(`btn-${tabId}`).classList.add('active');
+            for (let i = 0; i < n - 2; i++) {
+                for (let j = i + 1; j < n - 1; j++) {
+                    for (let k = j + 1; k < n; k++) {
+                        const c1 = CHROMATIC_COLORS[i];
+                        const c2 = CHROMATIC_COLORS[j];
+                        const c3 = CHROMATIC_COLORS[k];
+                        
+                        let customTag = "";
+                        if (c1.name === "Red" && c2.name === "Green" && c3.name === "Blue") customTag = " (RGB Primary)";
+                        if (c1.name === "Yellow" && c2.name === "Cyan" && c3.name === "Magenta") customTag = " (CMY Secondary)";
 
-            if (tabId === 'tab2') {
-                renderCharts();
-                renderMuteCharts();
-                renderWheelChart();
-                updateHarmonies();
-                updatePaletteDropdown();
+                        trios.push({
+                            id: counter - 1,
+                            c1: c1.hex,
+                            c2: c2.hex,
+                            c3: c3.hex,
+                            c1Name: c1.name,
+                            c2Name: c2.name,
+                            c3Name: c3.name,
+                            title: `Trio ${counter}: ${c1.name} + ${c2.name} + ${c3.name}${customTag}`,
+                            shortTitle: `${counter}. ${c1.name} / ${c2.name} / ${c3.name}`
+                        });
+                        counter++;
+                    }
+                }
             }
-            if (tabId === 'tab3') {
-                updateGradientControls();
-                renderGradients();
-            }
+            return trios;
         }
 
-        /* ========================================================= */
-        /* TAB 1: RGB EDGES MATRIX RENDERER */
-        /* ========================================================= */
-        function renderRGBEdgesTab() {
-            const step = parseInt(document.getElementById("rgb-step").value);
-            const format = document.getElementById("rgb-format").value;
-            const tbody = document.getElementById("rgb-table-body");
+        function populateTrioFilter() {
+            const filterSelect = document.getElementById('t1-trio-filter');
+            if (!filterSelect) return;
+            filterSelect.innerHTML = '';
 
-            const showPV = document.getElementById("rgb-showval").checked;
-            const trackIso = document.getElementById("rgb-isoline").checked;
-            const tIso = parseFloat(document.getElementById("rgb-isoval").value);
+            const allOption = document.createElement('option');
+            allOption.value = 'all';
+            allOption.innerText = 'All 20 Chromatic Trios (60 Matrices)';
+            filterSelect.appendChild(allOption);
 
-            tbody.innerHTML = "";
+            const trios = getAll20Trios();
+            trios.forEach(trio => {
+                const opt = document.createElement('option');
+                opt.value = trio.id;
+                opt.innerText = trio.title;
+                filterSelect.appendChild(opt);
+            });
+        }
 
-            for (let i = 0; i <= 255; i += step) {
-                if (i > 255) i = 255;
-                const tr = document.createElement("tr");
+        function onModeChange() {
+            const mode = document.getElementById('t1-mode').value;
+            const trioWrapper = document.getElementById('trio-filter-wrapper');
+            const neutralWrapper = document.getElementById('neutral-filter-wrapper');
+            const badge = document.getElementById('t1-badge');
 
-                const tdVal = document.createElement("td");
-                tdVal.className = "py-2 px-3 font-bold bg-slate-100 border-r border-slate-200 text-slate-700";
-                tdVal.innerText = i;
-                tr.appendChild(tdVal);
+            if (mode === '3') {
+                if (trioWrapper) trioWrapper.style.display = 'block';
+                if (neutralWrapper) neutralWrapper.style.display = 'block';
+                if (badge) badge.innerText = "20 Chromatic Trios • 60 Total Combinations";
+            } else if (mode === '2') {
+                if (trioWrapper) trioWrapper.style.display = 'none';
+                if (neutralWrapper) neutralWrapper.style.display = 'none';
+                if (badge) badge.innerText = "Opposites • 9 Matrices";
+            } else if (mode === '4') {
+                if (trioWrapper) trioWrapper.style.display = 'none';
+                if (neutralWrapper) neutralWrapper.style.display = 'none';
+                if (badge) badge.innerText = "Corner Gradients • 3 Matrices";
+            }
+            renderTab1();
+        }
 
-                const edges = [
-                    { r: 255, g: i, b: 0 },   // FFxx00
-                    { r: i, g: 255, b: 0 },   // xxFF00
-                    { r: 0, g: 255, b: i },   // 00FFxx
-                    { r: 0, g: i, b: 255 },   // 00xxFF
-                    { r: i, g: 0, b: 255 },   // xx00FF
-                    { r: 255, g: 0, b: i }    // FF00xx
+        /* TAB 1 MATRIX GENERATOR */
+        function renderTab1() {
+            const target = document.getElementById('matrices-target');
+            if (!target) return;
+            target.innerHTML = '';
+
+            const mode = document.getElementById('t1-mode').value;
+            const trioFilterVal = document.getElementById('t1-trio-filter').value;
+            const neutralFilterVal = document.getElementById('t1-neutral-filter').value;
+            const res = parseInt(document.getElementById('t1-res').value);
+            const tint = parseInt(document.getElementById('t1-tint').value);
+            const tone = parseInt(document.getElementById('t1-tone').value);
+            const shade = parseInt(document.getElementById('t1-shade').value);
+            const sat = parseInt(document.getElementById('t1-sat').value);
+            const showVal = document.getElementById('t1-showval').checked;
+            const showFormats = document.getElementById('t1-showformats').checked;
+            const trackIso = document.getElementById('t1-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t1-isoval').value);
+
+            let matricesData = [];
+            const neutralCorners = ["#FFFFFF", "#808080", "#000000"];
+            const neutralNames = ["White", "Grey", "Black"];
+
+            if (mode === '2') {
+                document.getElementById('t1-header').innerText = "Groups of 2 (Opposite Corners)";
+                const pairs = [
+                    { c1: "#FF0000", c2: "#0000FF", name: "Red ↔ Blue" },
+                    { c1: "#00FF00", c2: "#FF00FF", name: "Green ↔ Magenta" },
+                    { c1: "#FFFF00", c2: "#00FFFF", name: "Yellow ↔ Cyan" }
                 ];
-
-                edges.forEach(color => {
-                    const td = document.createElement("td");
-                    td.className = "py-2 px-2 cursor-pointer font-bold transition-all relative swatch-interactive border-r border-slate-100";
-                    const hexCode = rgbToHex(color.r, color.g, color.b);
-                    td.style.backgroundColor = hexCode;
-                    td.style.color = getContrastTextColor(color.r, color.g, color.b);
-
-                    let pVal = getPerceivedValue(color.r, color.g, color.b);
-
-                    // Format code selection
-                    let mainText = hexCode;
-                    if (format === 'rgb') mainText = `${color.r},${color.g},${color.b}`;
-                    else if (format === 'hsl') {
-                        const [h, s, l] = rgbToHsl(color.r, color.g, color.b);
-                        mainText = `${h}°,${s}%`;
-                    } else if (format === 'cmyk') {
-                        mainText = rgbToCmyk(color.r, color.g, color.b);
-                    }
-
-                    if (showPV) {
-                        td.innerHTML = `<div class="leading-tight text-[11px]">${mainText}</div><div class="text-[9px] opacity-80">${pVal}%</div>`;
-                    } else {
-                        td.innerText = mainText;
-                    }
-
-                    if (trackIso) {
-                        if (Math.abs(pVal - tIso) <= 3) td.classList.add("iso-highlight");
-                        else td.classList.add("iso-dimmed");
-                    }
-
-                    td.onclick = () => {
-                        addToPalette(hexCode);
-                        copyToClipboard(hexCode);
-                    };
-
-                    tr.appendChild(td);
-                });
-
-                tbody.appendChild(tr);
-                if (i === 255) break;
-                if (i + step > 255 && i !== 255) { i = 255 - step; }
-            }
-        }
-
-        /* ========================================================= */
-        /* TAB 2: COLOR CHARTS, MUTES & HARMONIES */
-        /* ========================================================= */
-        const secondaryChartHexes = ["#FFFF00", "#FF8B00", "#FF0000", "#A2005D", "#8B0074", "#0000FF", "#006F6F", "#009100"];
-        const tertiaryChart1Hexes = ["#FFFF00", "#F1DF0F", "#E2BF1D", "#D49F2C", "#C5803A", "#B76049", "#A84057", "#9A2066", "#800080"];
-        const tertiaryChart2Hexes = ["#FF8B00", "#DF7A20", "#BF6840", "#9F5760", "#804680", "#60349F", "#4023BF", "#2011DF", "#0000FF"];
-
-        function renderCharts() {
-            renderChartStack("secondary-chart", secondaryChartHexes);
-            renderChartStack("tertiary-chart-1", tertiaryChart1Hexes);
-            renderChartStack("tertiary-chart-2", tertiaryChart2Hexes);
-        }
-
-        function renderChartStack(containerId, hexList) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = "";
-            hexList.forEach(hex => {
-                const [r, g, b] = hexToRgb(hex);
-                const div = document.createElement("div");
-                div.className = "h-7 rounded-lg flex items-center justify-between px-3 text-xs font-mono font-bold cursor-pointer swatch-interactive border border-black/10 shadow-sm";
-                div.style.backgroundColor = hex;
-                div.style.color = getContrastTextColor(r, g, b);
-                div.innerHTML = `<span>Swatch</span><span>${hex}</span>`;
-                div.onclick = () => {
-                    document.getElementById("base-color-input").value = hex;
-                    document.getElementById("base-color-picker").value = hex;
-                    updateHarmonies();
-                    addToPalette(hex);
-                };
-                container.appendChild(div);
-            });
-        }
-
-        function renderMuteCharts() {
-            const container = document.getElementById("mute-grid-container");
-            container.innerHTML = "";
-
-            const columnsData = [
-                { name: "Red ↔ Green", hexes: ["#E83838", "#D25442", "#BA6B46", "#9E7246", "#7D6D47", "#69724C", "#688B4C", "#579E3C", "#36A238"] },
-                { name: "Red-Org ↔ Bl-Grn", hexes: ["#EC6023", "#D47039", "#BA7D4A", "#9D804F", "#7A7C54", "#63805B", "#549463", "#3CA163", "#14A470"] },
-                { name: "Orange ↔ Blue", hexes: ["#F18512", "#DE882D", "#C48A45", "#A68653", "#82835C", "#608064", "#4A9473", "#2C9C7B", "#199797"] },
-                { name: "Ylw-Org ↔ Bl-Vlt", hexes: ["#F4AA09", "#E4A826", "#CD9F45", "#B09556", "#8B8D62", "#6D876E", "#5B8D76", "#448A7B", "#327A8A"] },
-                { name: "Yellow ↔ Purple", hexes: ["#F8CD0E", "#EAC829", "#D2BD4E", "#B8AD6B", "#969B7B", "#768686", "#62738E", "#565F93", "#4E3E8C"] },
-                { name: "Ylw-Grn ↔ Red-Vlt", hexes: ["#A8D238", "#A7C455", "#A2AF6E", "#989C82", "#8E888A", "#7E718B", "#795B8C", "#7C3E8A", "#731C7F"] }
-            ];
-
-            columnsData.forEach(col => {
-                const colDiv = document.createElement("div");
-                colDiv.className = "flex flex-col gap-1 min-w-[95px]";
-
-                const titleDiv = document.createElement("div");
-                titleDiv.className = "text-[10px] font-bold text-center text-[#0369a1] bg-[#B4E3F8]/40 py-1 rounded border border-[#22ACEC]/30 mb-1 truncate";
-                titleDiv.innerText = col.name;
-                colDiv.appendChild(titleDiv);
-
-                col.hexes.forEach(hex => {
-                    const [r, g, b] = hexToRgb(hex);
-                    let swatch = document.createElement("div");
-                    swatch.className = "h-8 rounded flex items-center justify-center text-[10px] font-mono font-bold cursor-pointer swatch-interactive border border-black/10";
-                    swatch.style.backgroundColor = hex;
-                    swatch.style.color = getContrastTextColor(r, g, b);
-                    swatch.innerText = hex;
-                    swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-                    colDiv.appendChild(swatch);
-                });
-
-                container.appendChild(colDiv);
-            });
-        }
-
-        function renderWheelChart() {
-            const container = document.getElementById("wheel-chart-container");
-            container.innerHTML = "";
-
-            const topAngles = [0, 30, 60, 90, 120, 150];
-            const botAngles = [180, 210, 240, 270, 300, 330];
-            const allAngles = [...topAngles, ...botAngles];
-
-            allAngles.forEach((hue) => {
-                const colDiv = document.createElement("div");
-                colDiv.className = "flex flex-col gap-1 min-w-[65px] items-center";
-
-                const topTitle = document.createElement("div");
-                topTitle.className = "text-xs font-bold text-slate-700 text-center h-4";
-                topTitle.innerText = hue < 180 ? `${hue}°` : "";
-                colDiv.appendChild(topTitle);
-
-                let compHue = (hue + 180) % 360;
-                for (let i = 0; i < 11; i++) {
-                    let currentHue, sat, light;
-                    if (i <= 5) {
-                        let t = i / 5;
-                        currentHue = hue;
-                        sat = 100 * (1 - t);
-                        light = 50 + (t * 8);
-                    } else {
-                        let t = (i - 5) / 5;
-                        currentHue = compHue;
-                        sat = 100 * t;
-                        light = 58 - (t * 8);
-                    }
-                    if (i === 5) { sat = 0; light = 58; currentHue = 0; }
-
-                    let [r, g, b] = hslToRgb(currentHue, sat, light);
-                    let hex = rgbToHex(r, g, b);
-
-                    let swatch = document.createElement("div");
-                    swatch.className = "w-full h-7 rounded text-[9px] font-mono font-bold flex items-center justify-center cursor-pointer swatch-interactive border border-black/10";
-                    swatch.style.backgroundColor = hex;
-                    swatch.style.color = getContrastTextColor(r, g, b);
-                    swatch.innerText = hex;
-                    swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-                    colDiv.appendChild(swatch);
-                }
-
-                const botTitle = document.createElement("div");
-                botTitle.className = "text-xs font-bold text-slate-700 text-center h-4 mt-0.5";
-                botTitle.innerText = hue >= 180 ? `${hue}°` : "";
-                colDiv.appendChild(botTitle);
-
-                container.appendChild(colDiv);
-            });
-        }
-
-        function syncColorInput(val) {
-            document.getElementById("base-color-input").value = val.toUpperCase();
-            updateHarmonies();
-        }
-
-        function pickFromPalette(val) {
-            if (!val) return;
-            document.getElementById("base-color-input").value = val;
-            document.getElementById("base-color-picker").value = val;
-            updateHarmonies();
-        }
-
-        function updatePaletteDropdown() {
-            const select = document.getElementById("palette-picker");
-            select.innerHTML = '<option value="">-- Load Saved Swatch --</option>';
-            paletteColors.forEach(hex => {
-                let opt = document.createElement("option");
-                opt.value = hex; opt.innerText = hex;
-                select.appendChild(opt);
-            });
-        }
-
-        function updateHarmonies() {
-            const inputHex = document.getElementById("base-color-input").value;
-            if (!inputHex.startsWith("#") || inputHex.length !== 7) return;
-
-            let [r, g, b] = hexToRgb(inputHex);
-            let [h, s, l] = rgbToHsl(r, g, b);
-
-            const grid = document.getElementById("harmony-grid");
-            grid.innerHTML = "";
-
-            const harmonyTypes = [
-                { name: "Monochromatic", angles: [0, -20, -40, 20, 40], satMods: [1, 0.8, 0.6, 0.9, 0.7], litMods: [1, 1.2, 1.4, 0.8, 0.6] },
-                { name: "Complementary", angles: [0, 180], satMods: [1, 1], litMods: [1, 1] },
-                { name: "Analogous", angles: [-30, -15, 0, 15, 30], satMods: [0.9, 0.95, 1, 0.95, 0.9], litMods: [1, 1, 1, 1, 1] },
-                { name: "Triadic", angles: [0, 120, 240], satMods: [1, 1, 1], litMods: [1, 1, 1] },
-                { name: "Split Complementary", angles: [0, 150, 210], satMods: [1, 1, 1], litMods: [1, 1, 1] },
-                { name: "Tetradic", angles: [0, 90, 180, 270], satMods: [1, 1, 1, 1], litMods: [1, 1, 1, 1] }
-            ];
-
-            ["RBY Traditional Wheel", "CMY / RGB Digital Wheel"].forEach((modelName, modelIdx) => {
-                let modelCard = document.createElement("div");
-                modelCard.className = "bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-4";
-                modelCard.innerHTML = `<h4 class="font-bold text-[#0369a1] text-sm border-b border-slate-200 pb-2">${modelName} Harmonies</h4>`;
-
-                harmonyTypes.forEach(harm => {
-                    let card = document.createElement("div");
-                    card.className = "bg-white border border-slate-200 rounded-xl p-3 space-y-2 shadow-sm";
-                    card.innerHTML = `<h5 class="text-xs font-bold text-slate-700">${harm.name}</h5>`;
-
-                    let row = document.createElement("div");
-                    row.className = "flex gap-2 h-10";
-
-                    harm.angles.forEach((angOffset, idx) => {
-                        let targetH = (h + angOffset + (modelIdx === 1 ? 15 : 0)) % 360;
-                        let targetS = Math.min(100, Math.max(10, s * harm.satMods[idx]));
-                        let targetL = Math.min(90, Math.max(15, l * harm.litMods[idx]));
-                        let [tr, tg, tb] = hslToRgb(targetH, targetS, targetL);
-                        let tHex = rgbToHex(tr, tg, tb);
-
-                        let swatch = document.createElement("div");
-                        swatch.className = "flex-1 rounded-lg flex items-end justify-center pb-1 text-[10px] font-mono font-bold cursor-pointer swatch-interactive border border-black/10";
-                        swatch.style.backgroundColor = tHex;
-                        swatch.style.color = getContrastTextColor(tr, tg, tb);
-                        swatch.innerText = tHex;
-                        swatch.onclick = () => { addToPalette(tHex); copyToClipboard(tHex); };
-                        row.appendChild(swatch);
+                pairs.forEach(pair => {
+                    const mix = rgbToHex(...Object.values(lerpColorObj(hexToRgb(pair.c1), hexToRgb(pair.c2), 0.5)));
+                    neutralCorners.forEach((neutral, idx) => {
+                        matricesData.push({ title: `${pair.name} (${neutralNames[idx]} Top-Right)`, tl: pair.c1, br: pair.c2, tr: neutral, bl: mix });
                     });
-
-                    card.appendChild(row);
-                    modelCard.appendChild(card);
                 });
+            } else if (mode === '3') {
+                document.getElementById('t1-header').innerText = "Groups of 3 (20 Chromatic Trios + Neutral Corner Variations)";
+                const allTrios = getAll20Trios();
 
-                grid.appendChild(modelCard);
-            });
-        }
+                let selectedTrios = allTrios;
+                if (trioFilterVal !== 'all') {
+                    const selectedIdx = parseInt(trioFilterVal);
+                    selectedTrios = allTrios.filter(t => t.id === selectedIdx);
+                }
 
-        /* ========================================================= */
-        /* TAB 3: COLOUR GRADIENTS MATRIX */
-        /* ========================================================= */
-        const defaultGradColors = ["#FF0000", "#0088FF", "#00FF00", "#FFFF00"];
-
-        function updateGradientControls() {
-            const num = parseInt(document.getElementById("grad-num-colors").value);
-            const bar = document.getElementById("gradient-inputs-bar");
-            bar.innerHTML = '<span class="text-xs font-bold text-slate-600">Corner Colors:</span>';
-
-            for (let i = 0; i < num; i++) {
-                let group = document.createElement("div");
-                group.className = "flex items-center space-x-1 bg-slate-50 border border-slate-200 rounded-xl p-1.5 text-xs font-semibold";
-                group.innerHTML = `
-                    <span class="text-slate-500">C${i + 1}:</span>
-                    <input type="color" id="grad-picker-${i}" value="${defaultGradColors[i]}" oninput="syncGradInput(${i}, this.value)" class="w-6 h-6 rounded cursor-pointer border-0 p-0 bg-transparent">
-                    <input type="text" id="grad-hex-${i}" value="${defaultGradColors[i]}" oninput="renderGradients()" class="w-16 font-mono font-bold uppercase bg-transparent border-0 focus:outline-none">
-                `;
-                bar.appendChild(group);
-            }
-        }
-
-        function syncGradInput(idx, val) {
-            document.getElementById(`grad-hex-${idx}`).value = val.toUpperCase();
-            renderGradients();
-        }
-
-        function renderGradients() {
-            const num = parseInt(document.getElementById("grad-num-colors").value);
-            const steps = parseInt(document.getElementById("grad-steps").value) || 8;
-            const output = document.getElementById("gradient-output");
-            output.innerHTML = "";
-
-            let colors = [];
-            for (let i = 0; i < num; i++) {
-                let val = document.getElementById(`grad-hex-${i}`).value;
-                colors.push(hexToRgb(val));
+                selectedTrios.forEach(trio => {
+                    neutralCorners.forEach((neutralHex, idx) => {
+                        if (neutralFilterVal === 'all' || neutralFilterVal === idx.toString()) {
+                            matricesData.push({
+                                title: `${trio.title} w/ ${neutralNames[idx]} Corner`,
+                                tl: trio.c1,
+                                tr: trio.c2,
+                                bl: trio.c3,
+                                br: neutralHex
+                            });
+                        }
+                    });
+                });
+            } else if (mode === '4') {
+                document.getElementById('t1-header').innerText = "Groups of 4 (Corner Gradients)";
+                matricesData.push({ title: "Warm to Cool Flow", tl: "#FF0000", tr: "#FFFF00", bl: "#FF00FF", br: "#0000FF" });
+                matricesData.push({ title: "Nature Flow", tl: "#FFFF00", tr: "#00FF00", bl: "#FF0000", br: "#00FFFF" });
+                matricesData.push({ title: "CMYK Box", tl: "#00FFFF", tr: "#FF00FF", bl: "#FFFF00", br: "#000000" });
             }
 
-            if (num === 2) {
-                let row = document.createElement("div");
-                row.className = "flex gap-1.5 w-full max-w-3xl h-16";
-                for (let i = 0; i < steps; i++) {
-                    let t = i / (steps - 1);
-                    let rgb = lerpColor(colors[0], colors[1], t);
-                    let hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+            const countEl = document.getElementById('t1-matrix-count');
+            if (countEl) countEl.innerText = `Showing ${matricesData.length} matrices`;
 
-                    let swatch = document.createElement("div");
-                    swatch.className = "flex-1 rounded-xl flex items-end justify-center pb-2 text-xs font-mono font-bold cursor-pointer swatch-interactive border border-black/10";
-                    swatch.style.backgroundColor = hex;
-                    swatch.style.color = getContrastTextColor(rgb[0], rgb[1], rgb[2]);
-                    swatch.innerText = hex;
-                    swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-                    row.appendChild(swatch);
-                }
-                output.appendChild(row);
-            } else if (num === 3) {
-                let container = document.createElement("div");
-                container.className = "relative w-[420px] h-[360px]";
+            matricesData.forEach(data => {
+                const panel = document.createElement('div');
+                panel.className = 'glass-card rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center space-y-3';
+                panel.innerHTML = `<div class="font-bold text-xs text-[#0369a1] text-center font-mono">${data.title}</div>`;
 
-                for (let r = 0; r <= steps; r++) {
-                    for (let c = 0; c <= steps - r; c++) {
-                        let w1 = (steps - r - c) / steps;
-                        let w2 = r / steps;
-                        let w3 = c / steps;
+                const grid = document.createElement('div');
+                const cellSize = Math.max(26, Math.floor(220 / res));
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+                grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
+                grid.className = 'rounded-xl overflow-hidden border border-black/10';
 
-                        let red = colors[0][0] * w1 + colors[1][0] * w2 + colors[2][0] * w3;
-                        let green = colors[0][1] * w1 + colors[1][1] * w2 + colors[2][1] * w3;
-                        let blue = colors[0][2] * w1 + colors[1][2] * w2 + colors[2][2] * w3;
-                        let hex = rgbToHex(red, green, blue);
+                const tl = hexToRgb(data.tl), tr = hexToRgb(data.tr), bl = hexToRgb(data.bl), br = hexToRgb(data.br);
 
-                        let node = document.createElement("div");
-                        node.className = "absolute w-9 h-9 rounded-lg flex items-center justify-center text-[8px] font-mono font-bold cursor-pointer swatch-interactive border border-black/10";
-                        node.style.backgroundColor = hex;
-                        node.style.color = getContrastTextColor(red, green, blue);
-                        node.innerText = hex;
-                        node.style.left = (c * (340 / steps) + (r * (170 / steps))) + 'px';
-                        node.style.top = (r * (300 / steps)) + 'px';
-                        node.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-                        container.appendChild(node);
-                    }
-                }
-                output.appendChild(container);
-            } else if (num === 4) {
-                let grid = document.createElement("div");
-                grid.className = "grid gap-1 bg-slate-900 p-2 rounded-2xl border border-slate-800";
-                grid.style.gridTemplateColumns = `repeat(${steps}, 36px)`;
+                for(let y = 0; y < res; y++) {
+                    const yT = y / (res - 1 || 1);
+                    for(let x = 0; x < res; x++) {
+                        const xT = x / (res - 1 || 1);
+                        const top = lerpColorObj(tl, tr, xT);
+                        const bot = lerpColorObj(bl, br, xT);
+                        const baseRGB = lerpColorObj(top, bot, yT);
+                        const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                        const rgbObj = hexToRgb(finalColor);
+                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                        const textColor = getContrastTextColor(finalColor);
+                        
+                        const cell = document.createElement('div');
+                        cell.className = 'swatch flex flex-col items-center justify-center font-mono text-[9px] font-bold p-0.5 leading-none select-none';
+                        cell.style.backgroundColor = finalColor;
+                        cell.onclick = () => { addToPalette(finalColor); copyToClipboard(finalColor); };
 
-                for (let y = 0; y < steps; y++) {
-                    let yT = y / (steps - 1);
-                    for (let x = 0; x < steps; x++) {
-                        let xT = x / (steps - 1);
+                        let innerHtml = '';
+                        if (showVal) {
+                            innerHtml += `<div style="color:${textColor};">${pv}%</div>`;
+                        }
+                        if (showFormats) {
+                            innerHtml += `<div style="font-size:7px; opacity:0.85; color:${textColor}; text-align:center;">` +
+                                         `${finalColor}<br>${rgbObj.r},${rgbObj.g},${rgbObj.b}` +
+                                         `</div>`;
+                        }
+                        cell.innerHTML = innerHtml;
 
-                        let topRgb = lerpColor(colors[0], colors[1], xT);
-                        let botRgb = lerpColor(colors[3], colors[2], xT);
-                        let rgb = lerpColor(topRgb, botRgb, yT);
-                        let hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
-
-                        let cell = document.createElement("div");
-                        cell.className = "w-9 h-9 rounded-md cursor-pointer swatch-interactive border border-black/10";
-                        cell.style.backgroundColor = hex;
-                        cell.title = hex;
-                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+                        if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
                         grid.appendChild(cell);
                     }
                 }
-                output.appendChild(grid);
+                panel.appendChild(grid);
+                target.appendChild(panel);
+            });
+        }
+
+        /* TAB 2 INPUT SYNCHRONIZATION */
+        function updateAllFieldsForCorner(pos, rgb, hex, hsl) {
+            document.getElementById(`cc-${pos}-picker`).value = hex;
+            document.getElementById(`cc-${pos}-hex`).value = hex;
+            document.getElementById(`cc-${pos}-r`).value = Math.round(rgb.r);
+            document.getElementById(`cc-${pos}-g`).value = Math.round(rgb.g);
+            document.getElementById(`cc-${pos}-b`).value = Math.round(rgb.b);
+            document.getElementById(`cc-${pos}-h`).value = hsl.h;
+            document.getElementById(`cc-${pos}-s`).value = hsl.s;
+            document.getElementById(`cc-${pos}-l`).value = hsl.l;
+        }
+
+        function syncPickerToText(pos) {
+            const hex = document.getElementById(`cc-${pos}-picker`).value.toUpperCase();
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            updateAllFieldsForCorner(pos, rgb, hex, hsl);
+            renderTab2Custom();
+        }
+
+        function syncTextToPicker(pos, source) {
+            let rgb, hex, hsl;
+            if (source === 'hex') {
+                let val = document.getElementById(`cc-${pos}-hex`).value;
+                if(!val.startsWith('#')) val = '#' + val;
+                if(val.length !== 7) return;
+                hex = val.toUpperCase();
+                rgb = hexToRgb(hex);
+                hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            } else if (source === 'rgb') {
+                let r = parseFloat(document.getElementById(`cc-${pos}-r`).value) || 0;
+                let g = parseFloat(document.getElementById(`cc-${pos}-g`).value) || 0;
+                let b = parseFloat(document.getElementById(`cc-${pos}-b`).value) || 0;
+                rgb = { r, g, b };
+                hex = rgbToHex(r, g, b);
+                hsl = rgbToHsl(r, g, b);
+            } else if (source === 'hsl') {
+                let h = parseFloat(document.getElementById(`cc-${pos}-h`).value) || 0;
+                let s = parseFloat(document.getElementById(`cc-${pos}-s`).value) || 0;
+                let l = parseFloat(document.getElementById(`cc-${pos}-l`).value) || 0;
+                hsl = { h, s, l };
+                let rgbObj = hslToRgbObj(h, s, l);
+                rgb = { r: rgbObj.r, g: rgbObj.g, b: rgbObj.b };
+                hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+            }
+            updateAllFieldsForCorner(pos, rgb, hex, hsl);
+            renderTab2Custom();
+        }
+
+        /* 28 PRE-SAVED PALETTES */
+        const preSavedPalettes = [
+            ["#FFFFFF", "#00A0E9", "#1D2099", "#E4007F"],
+            ["#FFFFFF", "#E4007F", "#E60012", "#FFF100"],
+            ["#FFFFFF", "#1D2088", "#1D2088", "#E4007F"],
+            ["#FFFFFF", "#E60012", "#1F3134", "#00A0E9"],
+            ["#FFFFFF", "#009944", "#009944", "#00A0E9"],
+            ["#FFFFFF", "#1D2088", "#1D2088", "#00A0E9"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#009944"],
+            ["#FFFFFF", "#E60012", "#1F3134", "#009944"],
+            ["#FFFFFF", "#00A0E9", "#009944", "#FFF100"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#E60012"],
+            ["#FFFFFF", "#E60012", "#E60012", "#FFF100"],
+            ["#FFFFFF", "#009944", "#1F3134", "#E4007F"],
+            ["#FFFFFF", "#009944", "#009944", "#FFF100"],
+            ["#FFF799", "#009E96", "#1E2C5C", "#E5004F"],
+            ["#FFF100", "#009944", "#1F3134", "#E60012"],
+            ["#FFFFFF", "#E60012", "#E60012", "#E4007F"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#FFF100"],
+            ["#FFFFFF", "#E4007F", "#1E0001", "#231815"],
+            ["#FFFFFF", "#920783", "#000000", "#231815"],
+            ["#FFFFFF", "#1D2088", "#000005", "#231815"],
+            ["#FFFFFF", "#955629", "#000000", "#231815"],
+            ["#FFFFFF", "#E5004F", "#200001", "#231815"],
+            ["#FFFFFF", "#00A0E9", "#000122", "#231815"],
+            ["#FFFFFF", "#0068B7", "#000114", "#231815"],
+            ["#FFFFFF", "#009944", "#000300", "#231815"],
+            ["#FFFFFF", "#009E96", "#000006", "#231815"],
+            ["#FFFFFF", "#FFF100", "#221B00", "#231815"],
+            ["#FFFFFF", "#F39800", "#230000", "#231815"]
+        ];
+
+        function applyPreSavedToCorners(palette) {
+            const positions = [
+                { pos: 'tl', hex: palette[0] },
+                { pos: 'tr', hex: palette[1] },
+                { pos: 'br', hex: palette[2] },
+                { pos: 'bl', hex: palette[3] }
+            ];
+
+            positions.forEach(item => {
+                const rgb = hexToRgb(item.hex);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                updateAllFieldsForCorner(item.pos, rgb, item.hex.toUpperCase(), hsl);
+            });
+
+            renderTab2Custom();
+            showToast("Loaded Corner Palette");
+        }
+
+        function renderPreSavedPalettes() {
+            const target = document.getElementById('presaved-target');
+            if (!target) return;
+            target.innerHTML = '';
+
+            preSavedPalettes.forEach((pal, idx) => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-2 cursor-pointer hover:border-[#0284c7] transition-all hover:-translate-y-0.5 space-y-1.5 shadow-sm';
+                card.onclick = () => applyPreSavedToCorners(pal);
+
+                const title = document.createElement('div');
+                title.className = 'text-[10px] font-bold text-slate-700 text-center font-mono';
+                title.innerText = `Option ${idx + 1}`;
+
+                const preview = document.createElement('div');
+                preview.className = 'grid grid-cols-2 grid-rows-2 gap-0.5 w-full h-12 rounded-lg overflow-hidden border border-black/10';
+
+                const cells = [
+                    { hex: pal[0], title: `TL: ${pal[0]}` },
+                    { hex: pal[1], title: `TR: ${pal[1]}` },
+                    { hex: pal[3], title: `BL: ${pal[3]}` },
+                    { hex: pal[2], title: `BR: ${pal[2]}` }
+                ];
+
+                cells.forEach(c => {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-full h-full';
+                    cell.style.backgroundColor = c.hex;
+                    cell.title = c.title;
+                    preview.appendChild(cell);
+                });
+
+                card.appendChild(title);
+                card.appendChild(preview);
+                target.appendChild(card);
+            });
+        }
+
+        /* TAB 2 CUSTOM MATRIX GENERATOR */
+        function renderTab2Custom() {
+            const target = document.getElementById('matrices-target-custom');
+            if (!target) return;
+            target.innerHTML = '';
+            const res = parseInt(document.getElementById('cc-res').value);
+            
+            const tlHex = document.getElementById('cc-tl-hex').value;
+            const trHex = document.getElementById('cc-tr-hex').value;
+            const blHex = document.getElementById('cc-bl-hex').value;
+            const brHex = document.getElementById('cc-br-hex').value;
+
+            const tint = parseInt(document.getElementById('cc-tint').value);
+            const tone = parseInt(document.getElementById('cc-tone').value);
+            const shade = parseInt(document.getElementById('cc-shade').value);
+            const sat = parseInt(document.getElementById('cc-sat').value);
+            const showVal = document.getElementById('cc-showval').checked;
+            const showFormats = document.getElementById('cc-showformats').checked;
+            const trackIso = document.getElementById('cc-isoline').checked;
+            const isoVal = parseInt(document.getElementById('cc-isoval').value);
+
+            const panel = document.createElement('div');
+            panel.className = 'glass-card rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col items-center space-y-3';
+            panel.innerHTML = `<div class="font-bold text-sm text-[#0369a1] font-mono">Custom Blend Grid (${res} × ${res})</div>`;
+            
+            const grid = document.createElement('div');
+            const cellSize = Math.max(30, Math.floor(320 / res));
+            grid.style.display = 'grid';
+            grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+            grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
+            grid.className = 'rounded-xl overflow-hidden border border-black/10';
+
+            const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+            for(let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for(let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
+                    const top = lerpColorObj(tl, tr, xT);
+                    const bot = lerpColorObj(bl, br, xT);
+                    const baseRGB = lerpColorObj(top, bot, yT);
+                    const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                    const rgbObj = hexToRgb(finalColor);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                    const textColor = getContrastTextColor(finalColor);
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'swatch flex flex-col items-center justify-center font-mono text-[9px] font-bold p-0.5 leading-none select-none';
+                    cell.style.backgroundColor = finalColor;
+                    cell.onclick = () => { addToPalette(finalColor); copyToClipboard(finalColor); };
+
+                    let innerHtml = '';
+                    if (showVal) {
+                        innerHtml += `<div style="color:${textColor};">${pv}%</div>`;
+                    }
+                    if (showFormats) {
+                        innerHtml += `<div style="font-size:7px; opacity:0.85; color:${textColor}; text-align:center;">` +
+                                     `${finalColor}<br>${rgbObj.r},${rgbObj.g},${rgbObj.b}` +
+                                     `</div>`;
+                    }
+                    cell.innerHTML = innerHtml;
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                    grid.appendChild(cell);
+                }
+            }
+            panel.appendChild(grid);
+            target.appendChild(panel);
+        }
+
+        /* TAB 3 HUE CONSTANTS ENGINE */
+        function updateTab2Controls() {
+            const format = document.getElementById('t2-format').value;
+            const s2Container = document.getElementById('slider2-container');
+            const lblS1 = document.getElementById('lbl-s1');
+            const lblS2 = document.getElementById('lbl-s2');
+
+            if(format === "1" || format === "2") {
+                s2Container.classList.add("hidden");
+                lblS1.innerText = format === "1" ? "Lightness:" : "Saturation:";
+            } else {
+                s2Container.classList.remove("hidden");
+                if(format === "3") { lblS1.innerText = "Tone:"; lblS2.innerText = "Shade:"; }
+                else if(format === "4") { lblS1.innerText = "Shade:"; lblS2.innerText = "Tone:"; }
+                else if(format === "5") { lblS1.innerText = "Brightness:"; lblS2.innerText = "Shade:"; }
+                else if(format === "6") { lblS1.innerText = "Brightness:"; lblS2.innerText = "Tone:"; }
             }
         }
 
-        /* ========================================================= */
-        /* GLOBAL COMPARISON PALETTE DRAWER */
-        /* ========================================================= */
+        function renderTab3() {
+            const container = document.getElementById('t2-container');
+            if (!container) return;
+            container.innerHTML = '';
+            const res = parseInt(document.getElementById('t2-res').value);
+            const format = document.getElementById('t2-format').value;
+            const s1Val = parseInt(document.getElementById('t2-s1').value);
+            const s2Val = parseInt(document.getElementById('t2-s2').value);
+            const showVal = document.getElementById('t2-showval').checked;
+            const trackIso = document.getElementById('t2-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t2-isoval').value);
+
+            const hues = [];
+            for(let h = 0; h < 360; h += res) hues.push(h);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-1 bg-slate-900 p-2 rounded-xl border border-slate-800';
+            grid.style.gridTemplateColumns = `50px repeat(${hues.length}, minmax(32px, 1fr))`;
+
+            grid.appendChild(createAxisLabel(""));
+            hues.forEach(h => grid.appendChild(createAxisLabel(h + "°")));
+
+            for(let row = 10; row >= 0; row--) {
+                const rowPct = row * 10;
+                grid.appendChild(createAxisLabel(rowPct + "%", true));
+
+                hues.forEach(h => {
+                    let color = "#000";
+                    let rgb = hslToRgbObj(h, 100, 50);
+
+                    if(format === "1") {
+                        rgb = hslToRgbObj(h, rowPct, s1Val);
+                        color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    } else if(format === "2") {
+                        rgb = hslToRgbObj(h, s1Val, rowPct);
+                        color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    } else if(format === "3") {
+                        rgb = hslToRgbObj(h, 100, rowPct);
+                        color = applyAdjustments(rgb, 0, s1Val, s2Val, 100);
+                    } else if(format === "4") {
+                        rgb = hslToRgbObj(h, 100, rowPct);
+                        color = applyAdjustments(rgb, 0, s2Val, s1Val, 100);
+                    } else if(format === "5") {
+                        rgb = hslToRgbObj(h, 100, s1Val);
+                        color = applyAdjustments(rgb, 0, rowPct, s2Val, 100);
+                    } else if(format === "6") {
+                        rgb = hslToRgbObj(h, 100, s1Val);
+                        color = applyAdjustments(rgb, 0, s2Val, rowPct, 100);
+                    }
+
+                    const rgbObj = hexToRgb(color);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'h-8 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/10';
+                    cell.style.backgroundColor = color;
+                    cell.onclick = () => { addToPalette(color); copyToClipboard(color); };
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                    if (showVal) {
+                        cell.innerText = pv + '%';
+                        cell.style.color = getContrastTextColor(color);
+                    }
+                    grid.appendChild(cell);
+                });
+            }
+            container.appendChild(grid);
+        }
+
+        function createAxisLabel(text, isY = false) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-center font-mono text-[10px] font-bold text-slate-400 py-1';
+            div.innerText = text;
+            if(isY) div.style.color = "#B4E3F8";
+            return div;
+        }
+
+        /* TAB 4 PERCEIVED VALUE GRAPH RENDERER */
+        function renderTab4() {
+            const target = document.getElementById('pv-plot-target');
+            if (!target) return;
+            target.innerHTML = '';
+            const res = parseInt(document.getElementById('t3-res').value);
+            const sortMode = document.getElementById('t3-sort').value;
+            const showVal = document.getElementById('t3-showval').checked;
+            const trackIso = document.getElementById('t3-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t3-isoval').value);
+
+            let hues = [];
+            for(let h = 0; h < 360; h += res) hues.push(h);
+
+            if(sortMode === 'value') {
+                hues.sort((a,b) => {
+                    let lumA = 0.2126 * hslToRgbObj(a,100,50).r + 0.7152 * hslToRgbObj(a,100,50).g + 0.0722 * hslToRgbObj(a,100,50).b;
+                    let lumB = 0.2126 * hslToRgbObj(b,100,50).r + 0.7152 * hslToRgbObj(b,100,50).g + 0.0722 * hslToRgbObj(b,100,50).b;
+                    return lumA - lumB;
+                });
+            }
+
+            const colWidth = 70;
+
+            hues.forEach((hue, i) => {
+                const colLine = document.createElement('div');
+                colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60';
+                colLine.style.left = (i * colWidth + 45) + 'px';
+                target.appendChild(colLine);
+
+                const label = document.createElement('div');
+                label.className = 'absolute top-2 font-mono text-[10px] font-bold text-slate-500 -translate-x-1/2';
+                label.style.left = (i * colWidth + 45) + 'px';
+                label.innerText = hue + '°';
+                target.appendChild(label);
+
+                for(let val = 3; val <= 10; val++) {
+                    const node = document.createElement('div');
+                    node.className = 'absolute w-7 h-5 rounded swatch flex items-center justify-center font-mono text-[7px] font-bold select-none border border-black/20 shadow-sm';
+                    
+                    const left = (i * colWidth) + 22 + ((val - 3) * 5);
+                    const top = 470 - (val * 48);
+
+                    const rgb = hslToRgbObj(hue, Math.min(100, 35 + (val * 7)), 92 - (val * 7.5));
+                    const color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    const pv = getPerceivedValue(rgb.r, rgb.g, rgb.b);
+
+                    node.style.left = left + 'px';
+                    node.style.top = top + 'px';
+                    node.style.backgroundColor = color;
+                    node.onclick = () => { addToPalette(color); copyToClipboard(color); };
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                    if (showVal) {
+                        node.innerText = pv + '%';
+                        node.style.color = getContrastTextColor(color);
+                    }
+                    target.appendChild(node);
+                }
+            });
+        }
+
+        /* GLOBAL PALETTE DRAWER & DRAG & DROP */
         function initPalette() {
             const container = document.getElementById('palette-slots-container');
+            if (!container) return;
             container.innerHTML = '';
             for (let i = 0; i < MAX_PALETTE; i++) {
                 let slot = document.createElement('div');
-                slot.className = 'w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all relative group overflow-hidden';
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all relative overflow-hidden';
                 slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+
                 container.appendChild(slot);
             }
             updatePaletteUI();
         }
 
         function addToPalette(hex) {
-            if (!paletteColors.includes(hex) && paletteColors.length < MAX_PALETTE) {
+            if (paletteColors.length < MAX_PALETTE) {
                 paletteColors.push(hex);
                 updatePaletteUI();
-                updatePaletteDropdown();
             }
+        }
+
+        function removeFromPalette(index, event) {
+            event.stopPropagation();
+            paletteColors.splice(index, 1);
+            updatePaletteUI();
         }
 
         function clearPalette() {
             paletteColors = [];
             updatePaletteUI();
-            updatePaletteDropdown();
-            showToast("Global Palette Cleared");
+            showToast("Palette Cleared");
         }
 
         function copyAllPaletteHex() {
@@ -1015,34 +1645,89 @@
             copyToClipboard(paletteColors.join(', '));
         }
 
+        function handleDragStart(e) {
+            const index = parseInt(this.dataset.index);
+            if (isNaN(index) || index >= paletteColors.length) {
+                e.preventDefault();
+                return;
+            }
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, movedColor);
+                updatePaletteUI();
+            }
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.palette-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            draggedIndex = null;
+        }
+
         function updatePaletteUI() {
-            document.getElementById('palette-counter').innerText = `Global Palette (${paletteColors.length}/16)`;
+            const counter = document.getElementById('palette-counter');
+            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
+
             for (let i = 0; i < MAX_PALETTE; i++) {
                 const slot = document.getElementById('p-slot-' + i);
+                if (!slot) continue;
+                slot.innerHTML = '';
+
                 if (i < paletteColors.length) {
                     const hex = paletteColors[i];
-                    const [r, g, b] = hexToRgb(hex);
                     slot.style.backgroundColor = hex;
-                    slot.className = 'w-11 h-8 rounded-lg border border-black/20 flex items-center justify-center cursor-pointer transition-all shadow-sm hover:scale-105';
-                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(r, g, b)}">${hex.substring(1)}</span>`;
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
+                    slot.setAttribute('draggable', 'true');
+
+                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.title = 'Remove color';
+                    removeBtn.onclick = (e) => removeFromPalette(i, e);
+                    slot.appendChild(removeBtn);
+
                     slot.onclick = () => copyToClipboard(hex);
                 } else {
                     slot.style.backgroundColor = 'transparent';
-                    slot.className = 'w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all';
-                    slot.innerHTML = '';
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all';
+                    slot.removeAttribute('draggable');
                     slot.onclick = null;
                 }
             }
         }
 
-        /* INITIALIZATION ON WINDOW LOAD */
+        /* INITIALIZATION */
         window.onload = () => {
             initPalette();
-            renderRGBEdgesTab();
-            renderCharts();
-            renderMuteCharts();
-            renderWheelChart();
-            updateHarmonies();
+            populateTrioFilter();
+            onModeChange();
+            renderTab2Custom();
+            renderPreSavedPalettes();
+            updateTab2Controls();
+            renderTab3();
+            setTimeout(renderTab4, 50);
         };
     </script>
 </body>
