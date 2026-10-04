@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rockies in a square</title>
+    <title>rockies in a square - Palette Vault Suite</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts: Inter & JetBrains Mono -->
@@ -42,7 +42,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
+            background-color: #f8fafc;
             color: #0f172a;
         }
 
@@ -94,7 +94,7 @@
             background: #0369a1;
         }
 
-        /* Tab Buttons */
+        /* Tab Navigation Buttons */
         .tab-btn {
             transition: all 0.2s ease;
         }
@@ -105,26 +105,26 @@
             border-color: #22ACEC;
         }
 
-        /* Interactive Swatches */
+        /* Swatches and Interactive Elements */
         .swatch {
             transition: transform 0.15s ease, box-shadow 0.15s ease;
             cursor: pointer;
         }
         .swatch:hover {
-            transform: scale(1.08);
-            box-shadow: 0 6px 12px -2px rgba(0,0,0,0.25);
-            z-index: 20;
+            transform: scale(1.15);
+            box-shadow: 0 6px 12px -2px rgba(0,0,0,0.3);
+            z-index: 40 !important;
         }
 
-        /* Iso-line Highlighting */
+        /* Iso-line Highlighting with Cyan Glow */
         .iso-matched {
             outline: 2px solid #00f0ff !important;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.8), inset 0 0 0 2px #00f0ff !important;
-            z-index: 30 !important;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.9), inset 0 0 0 2px #00f0ff !important;
+            z-index: 35 !important;
             opacity: 1 !important;
         }
 
-        /* Drag and Drop Palette Slots */
+        /* Palette Slot Drag and Drop Styling */
         .palette-slot {
             transition: all 0.15s ease;
         }
@@ -138,14 +138,14 @@
             transform: scale(1.05);
         }
 
-        /* Glassmorphic Cards */
+        /* Glassmorphic Container Cards */
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* TOP-LEFT NAVIGATION PANEL */
+        /* TOP-LEFT ROCKIE NAVIGATION PANEL */
         .nav-header-left {
             display: flex;
             align-items: center;
@@ -232,9 +232,26 @@
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* TAB 4 GRAPH TOOLTIP */
+        .chart-tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.92);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            border: 1px solid #334155;
+            display: none;
+            transform: translate(-50%, -120%);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800 pb-36">
 
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -254,11 +271,11 @@
                                 <a href="index.html" class="nav-dropdown-item">
                                     <span>🪨</span> rockie home
                                 </a>
-                                <a href="colours1.html" class="nav-dropdown-item active-tool">
+                                <a href="colours1.html" class="nav-dropdown-item">
                                     <span>🌙</span> line rockies
                                 </a>
-                                <a href="colours2.html" class="nav-dropdown-item">
-                                    <span>🍀</span> square rockies
+                                <a href="colours2.html" class="nav-dropdown-item active-tool">
+                                    <span>🍀</span> square rockies (Active)
                                 </a>
                                 <a href="colours3.html" class="nav-dropdown-item">
                                     <span>🍁</span> circle rockies
@@ -278,12 +295,13 @@
                     <!-- Logo & Title -->
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
-                            <i class="fa-solid fa-chart-line"></i>
+                            <i class="fa-solid fa-border-all"></i>
                         </div>
                         <div>
                             <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 rockies in a square
                             </h1>
+                            <p class="text-xs text-slate-500 hidden sm:block">Perceptual Corner Blends & True Value Luminance Graphs</p>
                         </div>
                     </div>
                 </div>
@@ -339,11 +357,11 @@
                             <span class="text-[10px] text-[#0369a1] font-mono">(20 Trios)</span>
                         </label>
                         <select id="t1-trio-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <!-- Options injected dynamically by JS -->
+                            <!-- Options injected dynamically -->
                         </select>
                     </div>
 
-                    <!-- Neutral Corner Filter (Visible when Mode 3 is active) -->
+                    <!-- Neutral Corner Filter -->
                     <div id="neutral-filter-wrapper" class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Neutral Corner</label>
                         <select id="t1-neutral-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -706,40 +724,50 @@
         </section>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: PERCEIVED VALUE GRAPH -->
+        <!-- TAB 4: PERCEIVED VALUE GRAPH (FIXED Y-AXIS LUMINANCE CHART) -->
         <!-- ========================================================= -->
         <section id="tab4" class="tab-content hidden space-y-6">
             
             <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
                     <!-- Resolution -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Resolution</label>
-                        <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
-                            <option value="10">10° Intervals</option>
-                            <option value="15" selected>15° Intervals</option>
-                            <option value="30">30° Intervals</option>
-                            <option value="45">45° Intervals</option>
+                        <label class="font-semibold text-slate-600 block">Hue Resolution</label>
+                        <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="10">10° Intervals (36 Hue Columns)</option>
+                            <option value="15" selected>15° Intervals (24 Hue Columns)</option>
+                            <option value="30">30° Intervals (12 Hue Columns)</option>
+                            <option value="45">45° Intervals (8 Hue Columns)</option>
                         </select>
                     </div>
 
-                    <!-- Sorting -->
+                    <!-- Spectrum Density Mode -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Sorting Order</label>
-                        <select id="t3-sort" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
+                        <label class="font-semibold text-slate-600 block">Spectrum Density</label>
+                        <select id="t3-density" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="max_chroma">Max Chroma Spectrum (9 Lightness Steps)</option>
+                            <option value="standard" selected>Standard Spectrum Grid (15 Swatches / Hue)</option>
+                            <option value="high_density">High-Density Spectrum (45 Swatches / Hue)</option>
+                        </select>
+                    </div>
+
+                    <!-- Sorting Order -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Hue Order</label>
+                        <select id="t3-sort" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                             <option value="hue">Chronological Hue (0° - 360°)</option>
-                            <option value="value">Perceived Value Luminance</option>
+                            <option value="value">Sorted by Peak Luminance</option>
                         </select>
                     </div>
 
                     <!-- Display Value Toggle -->
-                    <div class="space-y-1 flex items-center">
+                    <div class="space-y-1 flex flex-col justify-center">
                         <label class="inline-flex items-center cursor-pointer space-x-2">
                             <input type="checkbox" id="t3-showval" onchange="renderTab4()" class="sr-only peer" checked>
                             <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
-                            <span class="text-xs font-semibold text-slate-700">Show Perceived Value (%)</span>
+                            <span class="text-xs font-semibold text-slate-700">Show Perceived Val (%)</span>
                         </label>
                     </div>
 
@@ -756,26 +784,26 @@
                         <input type="range" id="t3-isoval" value="50" min="0" max="100" oninput="updateVal('val-t3-iso', this.value); renderTab4()">
                     </div>
                 </div>
+
+                <div class="text-[11px] text-slate-500 font-medium flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <i class="fa-solid fa-circle-info text-sky-500"></i>
+                    <span><b>Perceived Value Y-Axis Alignment:</b> Swatches are mapped exactly by perceived luminance percentage <code>Y = (100 - PerceivedVal)%</code>. Swatches on the same horizontal line share the exact same perceived brightness.</span>
+                </div>
             </div>
 
             <!-- Canvas Scatter Plot Container -->
-            <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative min-h-[800px]">
-                <div class="flex h-[520px] overflow-auto relative">
-                    <!-- Sticky Y-Axis -->
-                    <div class="sticky left-0 top-0 bottom-0 w-20 bg-slate-900 text-slate-200 font-mono text-xs font-bold flex flex-col justify-between py-6 px-3 border-r border-slate-800 z-30 flex-shrink-0 shadow-lg">
-                        <span class="text-[#B4E3F8]">Val 11</span>
-                        <span class="text-slate-400">Val 10</span>
-                        <span class="text-slate-400">Val 9</span>
-                        <span class="text-slate-400">Val 8</span>
-                        <span class="text-slate-400">Val 7</span>
-                        <span class="text-slate-400">Val 6</span>
-                        <span class="text-slate-400">Val 5</span>
-                        <span class="text-slate-400">Val 4</span>
-                        <span class="text-[#B4E3F8]">Val 3</span>
+            <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
+                <div class="flex h-[620px] overflow-x-auto relative">
+                    
+                    <!-- Sticky Y-Axis Sidebar -->
+                    <div id="pv-y-axis-sidebar" class="sticky left-0 top-0 bottom-0 w-28 bg-slate-900 text-slate-200 font-mono text-xs font-bold flex flex-col justify-between py-6 px-3 border-r border-slate-800 z-30 flex-shrink-0 shadow-xl select-none">
+                        <!-- Y-Axis step labels injected dynamically -->
                     </div>
 
                     <!-- Plot Target Canvas Area -->
-                    <div id="pv-plot-target" class="relative bg-slate-950 flex-grow min-w-[1800px] h-full"></div>
+                    <div id="pv-plot-target" class="relative bg-slate-950 flex-grow min-w-[1800px] h-full select-none overflow-hidden">
+                        <!-- Guide lines and color nodes injected dynamically -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -820,6 +848,9 @@
         <span class="w-2 h-2 rounded-full bg-[#00f0ff]"></span>
         <span id="toast-text">Copied to clipboard!</span>
     </div>
+
+    <!-- GRAPH HOVER TOOLTIP -->
+    <div id="chart-tooltip" class="chart-tooltip"></div>
 
     <!-- ========================================================= -->
     <!-- JAVASCRIPT APPLICATION CORE -->
@@ -927,6 +958,7 @@
             return { r: r * 255, g: g * 255, b: b * 255 };
         }
 
+        /* PERCEIVED VALUE LUMINANCE (0 - 100%) */
         function getPerceivedValue(r, g, b) {
             return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
         }
@@ -1026,25 +1058,17 @@
             const mode = document.getElementById('t1-mode').value;
             const trioWrapper = document.getElementById('trio-filter-wrapper');
             const neutralWrapper = document.getElementById('neutral-filter-wrapper');
-            const badge = document.getElementById('t1-badge');
 
             if (mode === '3') {
                 if (trioWrapper) trioWrapper.style.display = 'block';
                 if (neutralWrapper) neutralWrapper.style.display = 'block';
-                if (badge) badge.innerText = "20 Chromatic Trios • 60 Total Combinations";
-            } else if (mode === '2') {
+            } else {
                 if (trioWrapper) trioWrapper.style.display = 'none';
                 if (neutralWrapper) neutralWrapper.style.display = 'none';
-                if (badge) badge.innerText = "Opposites • 9 Matrices";
-            } else if (mode === '4') {
-                if (trioWrapper) trioWrapper.style.display = 'none';
-                if (neutralWrapper) neutralWrapper.style.display = 'none';
-                if (badge) badge.innerText = "Corner Gradients • 3 Matrices";
             }
             renderTab1();
         }
 
-        /* TAB 1 MATRIX GENERATOR */
         function renderTab1() {
             const target = document.getElementById('matrices-target');
             if (!target) return;
@@ -1164,7 +1188,6 @@
             });
         }
 
-        /* TAB 2 INPUT SYNCHRONIZATION */
         function updateAllFieldsForCorner(pos, rgb, hex, hsl) {
             document.getElementById(`cc-${pos}-picker`).value = hex;
             document.getElementById(`cc-${pos}-hex`).value = hex;
@@ -1301,7 +1324,6 @@
             });
         }
 
-        /* TAB 2 CUSTOM MATRIX GENERATOR */
         function renderTab2Custom() {
             const target = document.getElementById('matrices-target-custom');
             if (!target) return;
@@ -1371,7 +1393,6 @@
             target.appendChild(panel);
         }
 
-        /* TAB 3 HUE CONSTANTS ENGINE */
         function updateTab2Controls() {
             const format = document.getElementById('t2-format').value;
             const s2Container = document.getElementById('slider2-container');
@@ -1467,69 +1488,190 @@
             return div;
         }
 
-        /* TAB 4 PERCEIVED VALUE GRAPH RENDERER */
+        /* ========================================================= */
+        /* TAB 4: PERCEIVED VALUE GRAPH ENGINE (FIXED MAP TO TRUE Y-AXIS LUMINANCE) */
+        /* ========================================================= */
         function renderTab4() {
             const target = document.getElementById('pv-plot-target');
-            if (!target) return;
+            const sidebar = document.getElementById('pv-y-axis-sidebar');
+            if (!target || !sidebar) return;
+
             target.innerHTML = '';
+            sidebar.innerHTML = '';
+
             const res = parseInt(document.getElementById('t3-res').value);
+            const densityMode = document.getElementById('t3-density').value;
             const sortMode = document.getElementById('t3-sort').value;
             const showVal = document.getElementById('t3-showval').checked;
             const trackIso = document.getElementById('t3-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3-isoval').value);
 
+            // Set fixed dimensions for exact mathematical alignment
+            const paddingTop = 40;
+            const paddingBottom = 40;
+            const chartHeight = 540; // Usable plot height in pixels
+            const totalContainerHeight = chartHeight + paddingTop + paddingBottom; // 620px total
+
+            // Render Y-Axis Sidebar Labels & Step Marks (Val 10 = 100% down to Val 0 = 0%)
+            const ySteps = [
+                { name: "Val 10 (100%)", pv: 100, class: "text-sky-300 font-extrabold" },
+                { name: "Val 9 (90%)",  pv: 90,  class: "text-slate-300" },
+                { name: "Val 8 (80%)",  pv: 80,  class: "text-slate-300" },
+                { name: "Val 7 (70%)",  pv: 70,  class: "text-slate-300" },
+                { name: "Val 6 (60%)",  pv: 60,  class: "text-slate-300" },
+                { name: "Val 5 (50%)",  pv: 50,  class: "text-sky-300 font-extrabold" },
+                { name: "Val 4 (40%)",  pv: 40,  class: "text-slate-300" },
+                { name: "Val 3 (30%)",  pv: 30,  class: "text-slate-300" },
+                { name: "Val 2 (20%)",  pv: 20,  class: "text-slate-300" },
+                { name: "Val 1 (10%)",  pv: 10,  class: "text-slate-300" },
+                { name: "Val 0 (0%)",   pv: 0,   class: "text-sky-300 font-extrabold" }
+            ];
+
+            ySteps.forEach(step => {
+                const yPos = paddingTop + ((100 - step.pv) / 100) * chartHeight;
+
+                // Sidebar text label positioned exactly at yPos
+                const lbl = document.createElement('div');
+                lbl.className = `absolute left-2.5 -translate-y-1/2 text-[11px] ${step.class}`;
+                lbl.style.top = yPos + 'px';
+                lbl.innerText = step.name;
+                sidebar.appendChild(lbl);
+
+                // Horizontal Guide Line across the entire chart width
+                const guideLine = document.createElement('div');
+                guideLine.className = step.pv % 50 === 0 
+                    ? 'absolute left-0 right-0 h-[1.5px] bg-sky-500/30 z-10' 
+                    : 'absolute left-0 right-0 h-[1px] bg-slate-800/80 z-10';
+                guideLine.style.top = yPos + 'px';
+                target.appendChild(guideLine);
+            });
+
+            // Calculate Hue Columns (0° to 360°)
             let hues = [];
             for(let h = 0; h < 360; h += res) hues.push(h);
 
             if(sortMode === 'value') {
                 hues.sort((a,b) => {
-                    let lumA = 0.2126 * hslToRgbObj(a,100,50).r + 0.7152 * hslToRgbObj(a,100,50).g + 0.0722 * hslToRgbObj(a,100,50).b;
-                    let lumB = 0.2126 * hslToRgbObj(b,100,50).r + 0.7152 * hslToRgbObj(b,100,50).g + 0.0722 * hslToRgbObj(b,100,50).b;
+                    let lumA = getPerceivedValue(...Object.values(hslToRgbObj(a,100,50)));
+                    let lumB = getPerceivedValue(...Object.values(hslToRgbObj(b,100,50)));
                     return lumA - lumB;
                 });
             }
 
-            const colWidth = 70;
+            const colWidth = Math.max(55, Math.floor(1700 / hues.length));
 
-            hues.forEach((hue, i) => {
+            // Generate Swatches based on selected density
+            hues.forEach((hue, colIdx) => {
+                const colX = colIdx * colWidth + 50;
+
+                // Vertical Hue Axis Line
                 const colLine = document.createElement('div');
-                colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60';
-                colLine.style.left = (i * colWidth + 45) + 'px';
+                colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60 z-0';
+                colLine.style.left = colX + 'px';
                 target.appendChild(colLine);
 
+                // Column Top Label (Hue Angle)
                 const label = document.createElement('div');
-                label.className = 'absolute top-2 font-mono text-[10px] font-bold text-slate-500 -translate-x-1/2';
-                label.style.left = (i * colWidth + 45) + 'px';
+                label.className = 'absolute top-2 font-mono text-[10px] font-bold text-sky-400 -translate-x-1/2 z-20';
+                label.style.left = colX + 'px';
                 label.innerText = hue + '°';
                 target.appendChild(label);
 
-                for(let val = 3; val <= 10; val++) {
+                // Determine Lightness & Saturation Sampling Strategy
+                let samples = [];
+                if (densityMode === 'max_chroma') {
+                    for (let l = 10; l <= 90; l += 10) {
+                        samples.push({ s: 100, l: l });
+                    }
+                } else if (densityMode === 'standard') {
+                    const lVals = [15, 30, 45, 60, 75, 88];
+                    const sVals = [40, 75, 100];
+                    lVals.forEach(l => {
+                        sVals.forEach(s => {
+                            samples.push({ s: s, l: l });
+                        });
+                    });
+                } else if (densityMode === 'high_density') {
+                    for (let l = 10; l <= 90; l += 8) {
+                        for (let s = 20; s <= 100; s += 20) {
+                            samples.push({ s: s, l: l });
+                        }
+                    }
+                }
+
+                // Render each color swatch at its EXACT perceived value Y position
+                samples.forEach((sample, sampleIdx) => {
+                    const rgbObj = hslToRgbObj(hue, sample.s, sample.l);
+                    const colorHex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                    // MATHEMATICAL Y-POSITION: y = paddingTop + (100 - pv) / 100 * chartHeight
+                    const yPos = paddingTop + ((100 - pv) / 100) * chartHeight;
+
+                    // Slight horizontal jitter within column width to prevent overlap clutter
+                    const jitterX = (sampleIdx % 3 - 1) * 7;
+                    const xPos = colX + jitterX;
+
                     const node = document.createElement('div');
-                    node.className = 'absolute w-7 h-5 rounded swatch flex items-center justify-center font-mono text-[7px] font-bold select-none border border-black/20 shadow-sm';
-                    
-                    const left = (i * colWidth) + 22 + ((val - 3) * 5);
-                    const top = 470 - (val * 48);
+                    node.className = 'absolute w-8 h-5 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/30 shadow-md cursor-pointer -translate-x-1/2 -translate-y-1/2 transition-transform duration-150';
+                    node.style.left = xPos + 'px';
+                    node.style.top = yPos + 'px';
+                    node.style.backgroundColor = colorHex;
 
-                    const rgb = hslToRgbObj(hue, Math.min(100, 35 + (val * 7)), 92 - (val * 7.5));
-                    const color = rgbToHex(rgb.r, rgb.g, rgb.b);
-                    const pv = getPerceivedValue(rgb.r, rgb.g, rgb.b);
-
-                    node.style.left = left + 'px';
-                    node.style.top = top + 'px';
-                    node.style.backgroundColor = color;
-                    node.onclick = () => { addToPalette(color); copyToClipboard(color); };
-
-                    if (trackIso && Math.abs(pv - isoVal) <= 3) node.classList.add("iso-matched");
+                    const textColor = getContrastTextColor(colorHex);
                     if (showVal) {
                         node.innerText = pv + '%';
-                        node.style.color = getContrastTextColor(color);
+                        node.style.color = textColor;
                     }
+
+                    // Iso-line Highlight Check
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                        node.classList.add("iso-matched");
+                    }
+
+                    // Tooltip listeners
+                    node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj);
+                    node.onmousemove = (e) => updateChartTooltipPos(e);
+                    node.onmouseleave = () => hideChartTooltip();
+
+                    // Click to copy and add to palette
+                    node.onclick = () => {
+                        addToPalette(colorHex);
+                        copyToClipboard(colorHex);
+                    };
+
                     target.appendChild(node);
-                }
+                });
             });
         }
 
-        /* GLOBAL PALETTE DRAWER & DRAG & DROP */
+        /* TAB 4 TOOLTIP CONTROLS */
+        function showChartTooltip(e, hue, s, l, hex, pv, rgb) {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (!tooltip) return;
+            tooltip.style.display = 'block';
+            tooltip.innerHTML = `
+                <div class="font-bold text-sky-300">Hue: ${hue}° | HSL(${hue}, ${s}%, ${l}%)</div>
+                <div>HEX: <span class="font-bold text-white">${hex}</span></div>
+                <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
+                <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
+            `;
+            updateChartTooltipPos(e);
+        }
+
+        function updateChartTooltipPos(e) {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (tooltip && tooltip.style.display === 'block') {
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+            }
+        }
+
+        function hideChartTooltip() {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (tooltip) tooltip.style.display = 'none';
+        }
+
         function initPalette() {
             const container = document.getElementById('palette-slots-container');
             if (!container) return;
@@ -1555,6 +1697,8 @@
             if (paletteColors.length < MAX_PALETTE) {
                 paletteColors.push(hex);
                 updatePaletteUI();
+            } else {
+                showToast("Palette Drawer is Full (16/16)");
             }
         }
 
@@ -1651,7 +1795,6 @@
             }
         }
 
-        /* INITIALIZATION */
         window.onload = () => {
             initPalette();
             populateTrioFilter();
