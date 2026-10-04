@@ -386,7 +386,45 @@
                     </h3>
                     <div id="tertiary-chart-2" class="space-y-1.5"></div>
                 </div>
+
+                <!-- Tertiary Chart (Set 3) -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
+                        <span>Tertiary Chart (Set 3)</span>
+                        <i class="fa-solid fa-chart-line text-sky-600"></i>
+                    </h3>
+                    <div id="tertiary-chart-3" class="space-y-1.5"></div>
+                </div>
+
+                <!-- Tertiary Chart (Set 4) -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
+                        <span>Tertiary Chart (Set 4)</span>
+                        <i class="fa-solid fa-chart-pie text-sky-600"></i>
+                    </h3>
+                    <div id="tertiary-chart-4" class="space-y-1.5"></div>
+                </div>
+
+                <!-- Tertiary Chart (Set 5) -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
+                        <span>Tertiary Chart (Set 5)</span>
+                        <i class="fa-solid fa-chart-line text-sky-600"></i>
+                    </h3>
+                    <div id="tertiary-chart-5" class="space-y-1.5"></div>
+                </div>
+
+                <!-- Tertiary Chart (Set 6) -->
+                <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between border-b pb-2">
+                        <span>Tertiary Chart (Set 6)</span>
+                        <i class="fa-solid fa-chart-line text-sky-600"></i>
+                    </h3>
+                    <div id="tertiary-chart-6" class="space-y-1.5"></div>
+                </div>
             </div>
+
+            
 
             <!-- Mute Charts Section -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
@@ -732,11 +770,19 @@
         const secondaryChartHexes = ["#FFFF00", "#FF8B00", "#FF0000", "#A2005D", "#8B0074", "#0000FF", "#006F6F", "#009100"];
         const tertiaryChart1Hexes = ["#FFFF00", "#F1DF0F", "#E2BF1D", "#D49F2C", "#C5803A", "#B76049", "#A84057", "#9A2066", "#800080"];
         const tertiaryChart2Hexes = ["#FF8B00", "#DF7A20", "#BF6840", "#9F5760", "#804680", "#60349F", "#4023BF", "#2011DF", "#0000FF"];
+        const tertiaryChart3Hexes = ["#FF0000", "#DF1200", "#BF2400", "#9F3600", "#804680", "#605B00", "#406D00", "#207F00", "#009000"];
+        const tertiaryChart4Hexes = ["#FF8B00", "#FFE800", "#DF6520", "#D5582A", "#CA4C35", "#B5334A", "#AB2654", "#A0195F", "#8B0074"];
+        const tertiaryChart5Hexes = ["#8B0074", "#721A5F", "#652864", "#58354A", "#4C423F", "#3F4F35", "#335C2A", "#197715", "#009100"];
+        const tertiaryChart6Hexes = ["#009100", "#2E9000", "#5D8F00", "#748E00", "#8B8E00", "#A28D00", "#B98D00", "#D18C00", "#FF8B00"];
 
         function renderCharts() {
             renderChartStack("secondary-chart", secondaryChartHexes);
             renderChartStack("tertiary-chart-1", tertiaryChart1Hexes);
             renderChartStack("tertiary-chart-2", tertiaryChart2Hexes);
+            renderChartStack("tertiary-chart-3", tertiaryChart3Hexes);
+            renderChartStack("tertiary-chart-4", tertiaryChart4Hexes);
+            renderChartStack("tertiary-chart-5", tertiaryChart5Hexes);
+            renderChartStack("tertiary-chart-6", tertiaryChart6Hexes);
         }
 
         function renderChartStack(containerId, hexList) {
