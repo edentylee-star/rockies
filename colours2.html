@@ -145,29 +145,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* Home Link Button Styling */
-        .home-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background-color: #ffffff;
-            color: #0284c7;
-            border: 1.5px solid #22ACEC;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 6px rgba(34, 172, 236, 0.15);
-        }
-        .home-link-btn:hover {
-            background-color: #22ACEC;
-            color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 10px rgba(34, 172, 236, 0.3);
-        }
-
         /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
         .nav-header-left {
             display: flex;
@@ -266,12 +243,6 @@
                 <!-- Left Container: Home Button, Dropdown Navigation & Logo + Title -->
                 <div class="flex flex-wrap items-center gap-3 sm:gap-4">
                     <div class="nav-header-left">
-                        <!-- Home Button -->
-                        <a href="index.html" class="home-link-btn" title="Return to Main Dashboard">
-                            <i class="fa-solid fa-house"></i>
-                            <span>Home</span>
-                        </a>
-
                         <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
