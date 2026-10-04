@@ -3,33 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>line rockies</title>
+    <title>line rockies - Palette Vault</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-        
-    <!-- Navigation Switcher Dropdown -->
-   
-        <div class="nav-dropdown-content">
-              <a href="index.html" class="nav-dropdown-item">
-                   <span>🪨</span> rockie home
-              </a>
-             <a href="colours2.html" class="nav-dropdown-item">
-                <span>🍀</span> square rockies
-            </a>
-            <a href="colours3.html" class="nav-dropdown-item">
-                    <span>🍁</span> circle rockies
-             </a>
-            <a href="colours4.html" class="nav-dropdown-item">
-                    <span>🌼</span> cube rockies
-             </a>
-             <a href="colours5.html" class="nav-dropdown-item">
-                   <span>🌸</span> collected rockies
-             </a>
-            </div>
-        </div>
-    </div>
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,6 +44,26 @@
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
             color: #0f172a;
+        }
+
+        /* Home link button matching Rockies suite */
+        .home-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.15s ease;
+        }
+        .home-link-btn:hover {
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border-color: #22ACEC;
         }
 
         /* Custom Scrollbars */
@@ -156,35 +156,77 @@
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-800 pb-36">
 
+    <!-- NAVIGATION HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-3 gap-3">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
                 
-                <!-- Logo & Title -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
-                        <i class="fa-solid fa-cubes-stacked"></i>
+                <!-- Left Nav & Title Group -->
+                <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+                    <!-- Home Link Button -->
+                    <a href="index.html" class="home-link-btn" title="Back to Rockie Home">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Home</span>
+                    </a>
+
+                    <!-- Rockie Navigation Switcher Dropdown -->
+                    <div class="relative nav-dropdown-container">
+                        <button id="nav-dropdown-btn" onclick="toggleNavDropdown(event)" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors">
+                            <span>📈</span>
+                            <span>Rockie Navigation</span>
+                            <i class="fa-solid fa-chevron-down text-[10px] ml-1 opacity-60"></i>
+                        </button>
+
+                        <div id="nav-dropdown-menu" class="hidden absolute left-0 mt-1 w-52 bg-white/95 backdrop-blur-md border border-slate-200 rounded-xl shadow-xl py-1.5 z-50 text-xs">
+                            <a href="index.html" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-[#B4E3F8]/30 hover:text-[#0369a1] font-medium transition-colors">
+                                <span>🪨</span> rockie home
+                            </a>
+                            <a href="colours1.html" class="flex items-center gap-2 px-3 py-2 text-[#0369a1] bg-[#B4E3F8]/40 font-bold transition-colors">
+                                <span>📈</span> line rockies
+                            </a>
+                            <a href="colours2.html" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-[#B4E3F8]/30 hover:text-[#0369a1] font-medium transition-colors">
+                                <span>🍀</span> square rockies
+                            </a>
+                            <a href="colours3.html" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-[#B4E3F8]/30 hover:text-[#0369a1] font-medium transition-colors">
+                                <span>🍁</span> circle rockies
+                            </a>
+                            <a href="colours4.html" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-[#B4E3F8]/30 hover:text-[#0369a1] font-medium transition-colors">
+                                <span>🌼</span> cube rockies
+                            </a>
+                            <a href="colours5.html" class="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-[#B4E3F8]/30 hover:text-[#0369a1] font-medium transition-colors">
+                                <span>🌸</span> collected rockies
+                            </a>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                            Palette Vault
-                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">Color Theory Studio</span>
-                        </h1>
-                        <p class="text-xs text-slate-500">RGB Matrices, Harmonies, Mutes, & Multi-Vertex Gradients</p>
+
+                    <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+
+                    <!-- Logo & Title -->
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-lg">
+                            <i class="fa-solid fa-[#0369a1] fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                                Palette Vault
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#B4E3F8] text-[#0369a1] font-semibold border border-[#22ACEC]">line rockies</span>
+                            </h1>
+                            <p class="text-[11px] text-slate-500">RGB Matrices, Harmonies, Mutes & Multi-Vertex Gradients</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Navigation Tabs -->
-                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium">
-                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
+                <nav class="flex p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium overflow-x-auto">
+                    <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn active px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-table-cells text-xs"></i>
                         <span>1. RGB Edges Matrix</span>
                     </button>
-                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
+                    <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-palette text-xs"></i>
                         <span>2. Charts, Mutes & Harmonies</span>
                     </button>
-                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent">
+                    <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-sliders text-xs"></i>
                         <span>3. Colour Gradients</span>
                     </button>
@@ -428,18 +470,20 @@
     </main>
 
     <!-- ========================================================= -->
-    <!-- GLOBAL COMPARISON PALETTE DRAWER -->
+    <!-- GLOBAL COMPARISON PALETTE DRAWER (MATCHING COLOURS4.HTML) -->
     <!-- ========================================================= -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-[#B4E3F8]/95 backdrop-blur-md border-t-2 border-[#22ACEC] shadow-2xl px-4 py-3">
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
             
             <div class="flex items-center justify-between md:justify-start space-x-3">
                 <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-swatchbook text-[#0369a1] text-base"></i>
+                    <div class="w-7 h-7 rounded-lg bg-[#B4E3F8] text-[#0369a1] border border-[#22ACEC] flex items-center justify-center text-xs font-bold shadow-sm">
+                        <i class="fa-solid fa-swatchbook"></i>
+                    </div>
                     <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Palette (0/16)</span>
                 </div>
-                <button onclick="clearPalette()" class="px-2.5 py-1 bg-white hover:bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors">
-                    Clear
+                <button onclick="clearPalette()" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 transition-colors" title="Clear All Swatches">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
                 </button>
             </div>
 
@@ -450,7 +494,7 @@
 
             <!-- Action Controls -->
             <div class="flex items-center space-x-2">
-                <button onclick="copyAllPaletteHex()" class="px-3 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-sky-600">
+                <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-[#9BD6F3] text-[#0369a1] border border-[#22ACEC] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                     <i class="fa-solid fa-copy"></i> Copy All HEX
                 </button>
             </div>
@@ -470,6 +514,24 @@
         /* APPLICATION STATE */
         const MAX_PALETTE = 16;
         let paletteColors = [];
+        let draggedIndex = null;
+
+        /* NAVIGATION SWITCHER DROPDOWN */
+        function toggleNavDropdown(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('nav-dropdown-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('nav-dropdown-menu');
+            const btn = document.getElementById('nav-dropdown-btn');
+            if (menu && !menu.classList.contains('hidden')) {
+                if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                    menu.classList.add('hidden');
+                }
+            }
+        });
 
         /* COLOR MATH UTILITIES */
         function getPerceivedValue(r, g, b) {
@@ -630,7 +692,6 @@
 
                     let pVal = getPerceivedValue(color.r, color.g, color.b);
 
-                    // Format code selection
                     let mainText = hexCode;
                     if (format === 'rgb') mainText = `${color.r},${color.g},${color.b}`;
                     else if (format === 'hsl') {
@@ -803,6 +864,7 @@
 
         function updatePaletteDropdown() {
             const select = document.getElementById("palette-picker");
+            if (!select) return;
             select.innerHTML = '<option value="">-- Load Saved Swatch --</option>';
             paletteColors.forEach(hex => {
                 let opt = document.createElement("option");
@@ -978,17 +1040,9 @@
         }
 
         /* ========================================================= */
-        /* GLOBAL COMPARISON PALETTE DRAWER */
+        /* GLOBAL COMPARISON PALETTE DRAWER (EXACT COLOURS4 STYLING) */
         /* ========================================================= */
         function initPalette() {
-            const container = document.getElementById('palette-slots-container');
-            container.innerHTML = '';
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                let slot = document.createElement('div');
-                slot.className = 'w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all relative group overflow-hidden';
-                slot.id = 'p-slot-' + i;
-                container.appendChild(slot);
-            }
             updatePaletteUI();
         }
 
@@ -998,6 +1052,12 @@
                 updatePaletteUI();
                 updatePaletteDropdown();
             }
+        }
+
+        function removePaletteIndex(index) {
+            paletteColors.splice(index, 1);
+            updatePaletteUI();
+            updatePaletteDropdown();
         }
 
         function clearPalette() {
@@ -1015,22 +1075,71 @@
             copyToClipboard(paletteColors.join(', '));
         }
 
+        function handleDragStart(e, index) {
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e, targetIndex) {
+            if (e.stopPropagation) e.stopPropagation();
+            if (draggedIndex !== null && draggedIndex !== targetIndex && targetIndex < paletteColors.length) {
+                const item = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, item);
+                updatePaletteUI();
+                updatePaletteDropdown();
+            }
+            draggedIndex = null;
+            return false;
+        }
+
         function updatePaletteUI() {
-            document.getElementById('palette-counter').innerText = `Global Palette (${paletteColors.length}/16)`;
+            const counter = document.getElementById('palette-counter');
+            if (counter) counter.innerText = `Global Palette (${paletteColors.length}/16)`;
+
+            const container = document.getElementById('palette-slots-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+
             for (let i = 0; i < MAX_PALETTE; i++) {
-                const slot = document.getElementById('p-slot-' + i);
                 if (i < paletteColors.length) {
                     const hex = paletteColors[i];
                     const [r, g, b] = hexToRgb(hex);
+                    const contrastColor = getContrastTextColor(r, g, b);
+
+                    const slot = document.createElement('div');
+                    slot.className = 'relative w-11 h-9 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center cursor-pointer group overflow-hidden transition-transform duration-200 hover:scale-105';
                     slot.style.backgroundColor = hex;
-                    slot.className = 'w-11 h-8 rounded-lg border border-black/20 flex items-center justify-center cursor-pointer transition-all shadow-sm hover:scale-105';
-                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(r, g, b)}">${hex.substring(1)}</span>`;
+                    slot.draggable = true;
+
+                    slot.ondragstart = (e) => handleDragStart(e, i);
+                    slot.ondragover = (e) => handleDragOver(e);
+                    slot.ondrop = (e) => handleDrop(e, i);
+
                     slot.onclick = () => copyToClipboard(hex);
+
+                    slot.innerHTML = `
+                        <span class="text-[9px] font-mono font-bold" style="color:${contrastColor}">${hex}</span>
+                        <button onclick="event.stopPropagation(); removePaletteIndex(${i});" class="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-xs" title="Remove Swatch">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    container.appendChild(slot);
                 } else {
-                    slot.style.backgroundColor = 'transparent';
-                    slot.className = 'w-11 h-8 rounded-lg border-2 border-dashed border-sky-400/50 bg-white/40 flex items-center justify-center cursor-pointer transition-all';
-                    slot.innerHTML = '';
-                    slot.onclick = null;
+                    const emptySlot = document.createElement('div');
+                    emptySlot.className = 'w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300 text-xs font-mono font-medium';
+                    emptySlot.innerText = i + 1;
+
+                    emptySlot.ondragover = (e) => handleDragOver(e);
+                    emptySlot.ondrop = (e) => handleDrop(e, i);
+
+                    container.appendChild(emptySlot);
                 }
             }
         }
