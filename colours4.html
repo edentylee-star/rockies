@@ -670,7 +670,7 @@
                         <select id="t3-format" onchange="updateTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2 focus:ring-2 focus:ring-[#B4E3F8] font-medium">
                             <option value="HEX" selected>HEX (#RRGGBB)</option>
                             <option value="RGB">RGB (R, G, B)</option>
-                            <option value="HSL">HSL (H°, S%, L%)</option>
+                            <option value="HSL">HSL (H%, S%, L%)</option>
                             <option value="VALUE">Perceived Value (%)</option>
                         </select>
                     </div>
@@ -734,7 +734,7 @@
                     <select id="palette-format" onchange="renderPaletteSwatches()" class="bg-white text-slate-800 text-xs rounded-md border border-sky-300 px-2 py-1 font-semibold focus:outline-none">
                         <option value="HEX" selected>Hex (#RRGGBB)</option>
                         <option value="RGB">RGB (R, G, B)</option>
-                        <option value="HSL">HSL (H°, S%, L%)</option>
+                        <option value="HSL">HSL (H%, S%, L%)</option>
                         <option value="VALUE">Perceived Value (%)</option>
                     </select>
                 </div>
@@ -775,7 +775,7 @@
         <div id="tooltip-color-bar" class="h-2 rounded mb-1.5 w-full border border-white/20"></div>
         <div id="tooltip-text-hex" class="font-bold text-sky-300 text-sm mb-0.5">#FFFFFF</div>
         <div id="tooltip-text-rgb" class="text-slate-300">RGB: 255, 255, 255</div>
-        <div id="tooltip-text-hsl" class="text-slate-300">HSL: 0°, 0%, 100%</div>
+        <div id="tooltip-text-hsl" class="text-slate-300">HSL: 0%, 0%, 100%</div>
         <div id="tooltip-text-val" class="text-amber-300 font-medium mt-0.5">Perceived Value: 100%</div>
     </div>
 
@@ -951,7 +951,7 @@
                     return `rgb(${r}, ${g}, ${b})`;
                 case 'HSL':
                     const [h, s, l] = rgbToHsl(r, g, b);
-                    return `hsl(${h}°, ${s}%, ${l}%)`;
+                    return `hsl(${h}%, ${s}%, ${l}%)`;
                 case 'VALUE':
                     const val = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
                     return `${val}%`;
@@ -1123,7 +1123,7 @@
 
             document.getElementById('t1-info-rgb').innerText = `r: ${r}, g: ${g}, b: ${b}`;
             document.getElementById('t1-info-hex').innerText = hex;
-            document.getElementById('t1-info-hsl').innerText = `${h}°, ${s}%, ${l}%`;
+            document.getElementById('t1-info-hsl').innerText = `${h}%, ${s}%, ${l}%`;
             document.getElementById('t1-info-value').innerText = `${valPct}%`;
 
             showGlobalTooltip(e.clientX, e.clientY, r, g, b);
@@ -1743,7 +1743,7 @@
             colorBar.style.backgroundColor = `rgb(${r},${g},${b})`;
             textHex.innerText = hex;
             textRgb.innerText = `RGB: ${r}, ${g}, ${b}`;
-            textHsl.innerText = `HSL: ${h}°, ${s}%, ${l}%`;
+            textHsl.innerText = `HSL: ${h}%, ${s}%, ${l}%`;
             textVal.innerText = `Perceived Value: ${valPct}%`;
 
             tooltip.style.left = `${Math.min(window.innerWidth - 180, x + 15)}px`;
