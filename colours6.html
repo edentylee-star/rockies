@@ -66,7 +66,7 @@
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
-        /* Swatch Hover States for Matrices */
+        /* Grid Square Hover States */
         .matrix-swatch {
             cursor: pointer;
             transition: all 0.15s ease;
@@ -76,6 +76,18 @@
             z-index: 20;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 2px solid #fff;
+        }
+
+        /* Hexagon Hover States */
+        .hex-swatch {
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .hex-swatch:hover {
+            transform: scale(1.25);
+            z-index: 20;
+            /* clip-path cuts off borders and box-shadows, so we use drop-shadow filter instead */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
         }
 
         /* Palette Slot Drag and Drop */
@@ -179,8 +191,8 @@
         <!-- MATRIX CONTAINERS -->
         <div class="w-full max-w-5xl glass-card rounded-3xl p-6 shadow-md overflow-x-auto min-h-[500px] flex items-center justify-center">
             
-            <!-- Hexagon Matrix (Columns) -->
-            <div id="tab-hex" class="tab-content active flex-row gap-1 justify-center items-center"></div>
+            <!-- Hexagon Matrix (Columns) - Center alignment removed so JS grid math works perfectly -->
+            <div id="tab-hex" class="tab-content active flex-row justify-center py-6"></div>
 
             <!-- Grid Matrices (Rows) -->
             <div id="tab-arr2" class="tab-content flex-col gap-1 justify-center items-center"></div>
@@ -302,270 +314,72 @@
         function renderSwatchGrid(containerId, dataArray, isColumnBased, isCMYK = false) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
+            const isHexTab = (containerId === 'tab-hex');
             
-            dataArray.forEach(group => {
+            // Hexagon specific Math
+            const HEX_W = 32;
+            const HEX_H = 28;
+            const HEX_GAP = 2;
+            const STEP_H = HEX_H + HEX_GAP; // 30px per vertical step
+            
+            // Calculate height of tallest column so we can perfectly center all other columns relative to it
+            const maxItems = Math.max(...dataArray.map(col => col.length));
+            
+            dataArray.forEach((group, colIndex) => {
                 const groupDiv = document.createElement('div');
-                groupDiv.className = isColumnBased ? 'flex flex-col gap-1' : 'flex flex-row gap-1';
+                
+                if (isHexTab) {
+                    groupDiv.className = 'flex flex-col';
+                    // Pull odd/even columns left to interlock their zig-zag edges
+                    groupDiv.style.marginLeft = colIndex === 0 ? '0' : '-6px'; 
+                    
+                    // Smart Grid-Snap Centering algorithm
+                    // Calculates how far down the column needs to be pushed to center it
+                    const idealTopItems = (maxItems - group.length) / 2;
+                    let topOffsetPx = 0;
+                    
+                    if (colIndex % 2 === 0) {
+                        // Even columns lock strictly to the exact 30px grid steps
+                        topOffsetPx = Math.round(idealTopItems) * STEP_H;
+                    } else {
+                        // Odd columns lock strictly to the +15px half-step grid to interlock perfectly
+                        topOffsetPx = (Math.round(idealTopItems - 0.5) + 0.5) * STEP_H;
+                    }
+                    groupDiv.style.marginTop = `${topOffsetPx}px`;
+                    
+                } else {
+                    groupDiv.className = isColumnBased ? 'flex flex-col gap-1' : 'flex flex-row gap-1';
+                }
                 
                 group.forEach(val => {
                     const box = document.createElement('div');
-                    box.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-sm relative';
-                    
                     const hexCode = isCMYK ? cmykToHex(val) : cleanHex(val);
 
-                    if (hexCode) {
-                        box.style.backgroundColor = hexCode;
-                        box.classList.add('matrix-swatch');
-                        box.title = hexCode + (isCMYK ? ` (${val})` : '');
-                        box.onclick = () => openModal(hexCode);
+                    if (isHexTab) {
+                        // Render as tessellating flat-topped hexagon
+                        box.style.width = `${HEX_W}px`;
+                        box.style.height = `${HEX_H}px`;
+                        box.style.clipPath = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
+                        box.style.marginBottom = `${HEX_GAP}px`;
+                        
+                        if (hexCode) {
+                            box.className = 'hex-swatch relative transition-all duration-150';
+                            box.style.backgroundColor = hexCode;
+                        } else {
+                            box.style.backgroundColor = 'transparent';
+                            box.style.cursor = 'default';
+                        }
                     } else {
-                        box.style.backgroundColor = 'transparent';
+                        // Render as standard grid square
+                        box.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-sm relative transition-all duration-150';
+                        if (hexCode) {
+                            box.classList.add('matrix-swatch', 'border-white', 'hover:border-2');
+                            box.style.backgroundColor = hexCode;
+                        } else {
+                            box.style.backgroundColor = 'transparent';
+                            box.style.cursor = 'default';
+                        }
                     }
-                    groupDiv.appendChild(box);
-                });
-                container.appendChild(groupDiv);
-            });
-        }
 
-        // --- RAW DATA ---
-        
-        // 1. Hexagon Matrix (Columns)
-        const hexCols = [
-            ["99FF00","66FF00","33FF00","66FF33","33CC00","00CC33","33FF66","00FF33","00FF66","00FF99","00FFCC"],
-            ["CCFF00", "99FF33", "99FF66", "66CC33", "339900", "009933", "33CC66", "66FF99", "33FF99", "00FF99"],
-            ["CCFF33", "CCFF66", "66CC00", "00FF00", "00CC00", "009900", "006600", "003300", "00CC66", "66FFCC", "00FFCC"],
-            ["99CC00","669900","666600","666633","669933","66FF66","66CC66","669966","[Blank]","66FFFF","33FFFF","00FFFF","00CCCC","33CC99","00CC99","0099CC","3399CC"],
-            ["CC9900","996600","999900","999933","999966","99CC66","99FF99","99FFCC","99FFFF","66CCCC","33CCCC","009999","006666","003333","006699","003366","0099CC"],
-            ["FFCC00","FFCC33","CC9933","CCCC00","CCCC33","CCCC66","CCCC99","CCFFCC","CCFFFF","99CCCC","339999","336666","003333","336699","3399CC","33CCFF","00CCFF"],
-            ["FF9900","FFCC66","FFFF00","FFFF33","FFFF66","FFFF99","FFFFCC","999999","666666","333333","CCFFFF","99CCFF","66CCCC","339999","336666","003366","6699FF","3399FF","33CCFF"],
-            ["FF9933","FF9966","CC6600","663300","996633","996666","CC9999","FFCCCC","CCCCCC","000000","CCCCFF","99CCFF","99CCCC","6699CC","669999","336699","336666","003366","003333","0066CC","3399CC","0099CC","33CCFF","00CCFF"],
-            ["FF6600","FF9933","CC6600","330000","663300","663333","996633","996666","CC9999","FFCC99","FFCCCC","CCCCCC","999999","666666","333333","000000","CCCCFF","99CCFF","99CCCC","6699CC","669999","336699","336666","003366","003333","0066CC","3399CC","0099CC","33CCFF","00CCFF","0099FF"],
-            ["FF3300","FF9966","CC6633","330000","663333","996666","CC9999","FFCCCC","FFFFFF","FFCCFF","FF99FF","CC99FF","9999CC","6666CC","3333CC","0000CC","0033FF","0066FF"],
-            ["FF6633","CC3300","CC6633","660000","993333","CC6666","FF9999","FFCCCC","FF99CC","FF66FF","CC66FF","9966CC","6666FF","3333FF","0000FF","3366FF"],
-            ["CC3300","993300","990000","CC3333","FF6666","FF9999","FF99CC","CC6699","CC66CC","9966CC","663399","666699","333399","000099","3300FF","0033FF"],
-            ["CC0033","CC3333","CC0000","FF3333","FF6666","FF9999","CC6699","996699","993399","663366","660066","330066","000066","330099","3300CC"],
-            ["FF3366","990033","CC0000","FF0000","FF3333","FF6666","CC3366","993366","663366","990099","660099","330066","000033","330099"],
-            ["FF0033","CC3366","FF0000","FF3333","CC0066","660033","993366","663366","990066","660066","CC00CC","9900CC","6600CC","330066"],
-            ["FF0066","FF0099","FF00CC","FF3399","FF33CC","CC0066","CC0099","990066","9900CC","CC3399","CC33FF","CC00FF","9900FF","6600FF","9933CC","CC66FF"]
-        ];
-
-        // 2. Grid Alpha (Rows)
-        const arr2Rows = [
-            ["003333", "336699", "3366CC", "003399", "009999", "0000CC", "000066"],
-            ["006666", "006699", "0099CC", "0066CC", "0033CC", "00FFFF", "3333FF", "333399"],
-            ["669999", "009999", "33CCCC", "00CCFF", "0099FF", "0066FF", "3366FF", "3333CC", "666699"],
-            ["339966", "00CC99", "00FFCC", "00FFFF", "33CCFF", "3399FF", "6699FF", "6666FF", "6600FF", "6600CC"],
-            ["339933", "00CC66", "00FF99", "66FFCC", "66FFFF", "66CCFF", "99FFCC", "9999FF", "9966FF", "9933FF", "9900FF"],
-            ["006600", "00CC00", "00FF00", "66FF99", "99FFCC", "CCFFFF", "CCCCFF", "CC99FF", "CC66FF", "CC33FF", "CC00FF", "9900CC"],
-            ["003300", "009933", "33CC33", "66FF66", "99FF99", "CCFFCC", "FFFFFF", "FFCCFF", "FF99FF", "FF66FF", "FF00FF", "CC00CC", "660066"],
-            ["336600", "009900", "66FF33", "99FF66", "CCFF99", "FFFFCC", "FFCCCC", "FF99CC", "FF66CC", "FF33CC", "CC0099", "993399"],
-            ["333300", "669900", "99FF33", "CCFF66", "FFFF99", "FFCC99", "FF9999", "FF6699", "FF3399", "CC3399", "990099"],
-            ["666633", "99CC00", "CCFF33", "FFFF66", "FFCC66", "FF9966", "FF6666", "FF0066", "CC6699", "993366"],
-            ["999966", "CCCC00", "FFFF00", "FFCC00", "FF9933", "FF6600", "FF5050", "CC0066", "660033"],
-            ["996633", "CC9900", "FF9900", "CC6600", "FF3300", "FF0000", "CC0000", "990033"],
-            ["663300", "996600", "CC3300", "993300", "990000", "800000", "993333"],
-            ["FFFFFF", "CCCCCC", "999999", "666666", "C0C0C0", "808080", "333333", "000000"]
-        ];
-
-        // 3. Grid Beta (Rows with Blanks)
-        const arr3Rows = [
-            ["FFF", "EEEEEE", "999", "888", "777", "666", "555", "444", "333", "222", "111", "000", "FFCC00", "FF9900", "FF6600"],
-            ["99CC00", "[Blank]", "BBBBBB", "CCCCCC", "DDDDDD", "CC9900", "FFCC33", "FFCC66", "FF9966", "FF6633", "AA3300", "BB3300", "CC3300", "DD3300", "EE3300"],
-            ["CCFF00", "CCFF33", "333300", "666600", "999900", "CCCC00", "FFFF00", "CC9933", "CC6633", "330000", "660000", "990000", "CC0000", "FF0000", "FF3366"],
-            ["99FF00", "CCFF66", "99CC33", "666633", "999933", "CCCC33", "FFFF33", "996600", "993300", "663333", "993333", "CC3333", "FF3333", "CC3366", "FF6699"],
-            ["66FF00", "99FF66", "66CC33", "669900", "999966", "CCCC66", "FFFF66", "996633", "663300", "996666", "CC6666", "FF6666", "990033", "CC3399", "FF66CC"],
-            ["33FF00", "66FF33", "339900", "66CC00", "99FF33", "CCCC99", "FFFF99", "CC9966", "CC6600", "CC9999", "FF9999", "FF3399", "CC0066", "990066", "FF33CC"],
-            ["00CC00", "33CC00", "336600", "669933", "99CC66", "CCFF99", "FFFFCC", "FFCC99", "FF9933", "FFCCCC", "FF99CC", "CC6699", "993366", "660033", "CC0099"],
-            ["33CC33", "66CC66", "00FF00", "33FF33", "66FF66", "99FF99", "CCFFCC", "[Blank]", "[Blank]", "[Blank]", "CC99CC", "996699", "993399", "990099", "663366"],
-            ["006600", "336633", "009900", "339933", "669966", "99CC99", "[Blank]", "[Blank]", "[Blank]", "FFCCFF", "FF99FF", "FF66FF", "FF33FF", "FF00FF", "CC66CC"],
-            ["003300", "00CC33", "006633", "339966", "66CC99", "99FFCC", "CCFFFF", "3399FF", "99CCFF", "CCCCFF", "CC99FF", "9966CC", "663399", "330066", "9900CC"],
-            ["00FF33", "33FF66", "009933", "00CC66", "33FF99", "99FFFF", "99CCCC", "0066CC", "6699CC", "9999FF", "9999CC", "9933FF", "6600CC", "660099", "CC33FF"],
-            ["00FF66", "66FF99", "33CC66", "009966", "66FFFF", "66CCCC", "669999", "003366", "336699", "6666FF", "6666CC", "666699", "330099", "9933CC", "CC66FF"],
-            ["00FF99", "66FFCC", "33CC99", "33FFFF", "33CCCC", "339999", "336666", "006699", "003399", "3333FF", "3333CC", "333399", "333366", "6633CC", "9966FF"],
-            ["00FFCC", "33FFCC", "00FFFF", "00CCCC", "009999", "006666", "003333", "3399CC", "3366CC", "0000FF", "0000CC", "000099", "000066", "000033", "6633FF"],
-            ["00AA99", "00BB99", "00CC99", "00CCFF", "0099FF", "0099CC", "33CCFF", "66CCFF", "6699FF", "3366FF", "0033CC", "0033FF", "0066FF", "3300AA", "3300BB"]
-        ];
-
-        // 4. Grid Gamma (Rows)
-        const arr4Rows = [
-            ["FFFFFF", "CCCCCC", "999999", "666666", "333333", "000000", "FFCC00", "FF9900", "FF6600", "FF3300", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]"],
-            ["99CC00", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "CC9900", "FFCC33", "FFCC66", "FF9966", "FF6633", "CC3300", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "CC0033"],
-            ["CCFF00", "CCFF33", "333300", "666600", "999900", "CCCC00", "FFFF00", "CC9933", "CC6633", "330000", "660000", "990000", "CC0000", "FF0000", "FF3366", "FF0033"],
-            ["99FF00", "CCFF66", "99CC33", "666633", "999933", "CCCC33", "FFFF33", "996600", "993300", "663333", "993333", "CC3333", "FF3333", "CC3366", "FF6699", "FF0066"],
-            ["66FF00", "99FF66", "66CC33", "669900", "999966", "CCCC66", "FFFF66", "996633", "663300", "996666", "CC6666", "FF6666", "990033", "CC3399", "FF66CC", "FF0099"],
-            ["33FF00", "66FF33", "339900", "66CC00", "99FF33", "CCCC99", "FFFF99", "CC9966", "CC6600", "CC9999", "FF9999", "FF3399", "CC0066", "990066", "FF33CC", "FF00CC"],
-            ["00CC00", "33CC00", "336600", "669933", "99CC66", "CCFF99", "FFFFCC", "FFCC99", "FF9933", "FFCCCC", "FF99CC", "CC6699", "993366", "660033", "CC0099", "330033"],
-            ["33CC33", "66CC66", "00FF00", "33FF33", "66FF66", "99FF99", "CCFFCC", "[Blank]", "[Blank]",  "[Blank]", "CC99CC", "996699", "993399", "990099", "663366", "660066"],
-            ["006600", "336633", "009900", "339933", "669966", "99CC99", "[Blank]", "[Blank]", "[Blank]", "FFCCFF", "FF99FF", "FF66FF", "FF33FF", "FF00FF", "CC66CC", "CC33CC"],
-            ["003300", "00CC33", "006633", "339966", "66CC99", "99FFCC", "CCFFFF", "3399FF", "99CCFF", "CCCCFF", "CC99FF", "9966CC", "663399", "330066", "9900CC", "CC00CC"],
-            ["00FF33", "33FF66", "009933", "00CC66", "33FF99", "99FFFF", "99CCCC", "0066CC", "6699CC", "9999FF", "9999CC", "9933FF", "6600CC", "660099", "CC33FF", "CC00FF"],
-            ["00FF66", "66FF99", "33CC66", "009966", "66FFFF", "66CCCC", "669999", "003366", "336699", "6666FF", "6666CC", "666699", "330099", "9933CC", "CC66FF", "9900FF"],
-            ["00FF99", "66FFCC", "33CC99", "33FFFF", "33CCCC", "339999", "336666", "006699", "003399", "3333FF", "3333CC", "333399", "333366", "6633CC", "9966FF", "6600FF"],
-            ["00FFCC", "33FFCC", "00FFFF", "00CCCC", "009999", "006666", "003333", "3399CC", "3366CC", "0000FF", "0000CC", "000099", "000066", "000033", "6633FF", "3300FF"],
-            ["00CC99", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "0099CC", "33CCFF", "66CCFF", "6699FF", "3366FF", "0033CC", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "3300CC"],
-            ["[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "00CCFF", "0099FF", "0066FF", "0033FF", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]"]
-        ];
-
-        // 5. CMYK Star (Rows)
-        const starCMYK = [
-            ["M100 Y100"],
-            ["M100 Y90", "M90 Y100"],
-            ["M100 Y70", "M80 Y80", "M70 Y100"],
-            ["M100 Y50", "M80 Y60", "M60 Y70", "M50 Y90"],
-            ["M100", "M100 Y10", "M90 Y20", "M80 Y30", "M70 Y40", "M60 Y50", "M50 Y60", "M40 Y70", "M30 Y80", "M20 Y90", "M10 Y100", "Y100"],
-            ["C10 M90 Y10", "C10 M80 Y20", "C10 M70 Y30", "C10 M60 Y40", "C10 M50 Y50", "C10 M40 Y60", "C10 M30 Y70", "C10 M20 Y80", "C10 M10 Y90"],
-            ["C20 M80 Y10", "C20 M70 Y20", "C20 M60 Y30", "C20 M50 Y40", "C20 M40 Y50", "C20 M30 Y60", "C20 M20 Y70", "C20 M10 Y80"],
-            ["C30 M70 Y10", "C30 M60 Y20", "C30 M50 Y30", "C30 M40 Y40", "C30 M30 Y50", "C30 M20 Y60", "C30 M10 Y70"],
-            ["C40 M70", "C40 M50 Y10", "C40 M40 Y20", "C40 M30 Y30", "C40 M20 Y40", "C40 M10 Y50", "C40 Y70"],
-            ["C50 M90", "C50 M80", "C50 M50 Y10", "C50 M40 Y20", "C50 M30 Y30", "C50 M20 Y40", "C50 M10 Y50", "C50 Y70", "C50 Y90"],
-            ["C70 M90", "C60 M80", "C60 M50 Y10", "C60 M40 Y20", "C60 M30 Y30", "C60 M20 Y40", "C60 M10 Y50", "C60 Y70", "C70 Y90"],
-            ["C100 M100", "C100 M90", "C90 M70", "C80 M40", "C70 M30 Y10", "C70 M20 Y20", "C70 M10 Y30", "C70 Y40", "C80 Y70", "C90 Y90", "C100 Y100"],
-            ["C80 M30", "C80 M20 Y10", "C80 M10 Y20", "C80 Y30"],
-            ["C80 M20", "C90 M10 Y10", "C90 Y20"],
-            ["C100 M10", "C100 Y10"],
-            ["C100"]
-        ];
-
-        // MODAL & PALETTE LOGIC
-        let activeModalHex = "";
-
-        function openModal(hex) {
-            activeModalHex = hex;
-            document.getElementById('inspector-swatch').style.backgroundColor = hex;
-            document.getElementById('inspector-hex').innerText = hex;
-            document.getElementById('inspector-val').innerText = `Perceived Value: ${getVal(hex)}%`;
-            document.getElementById('modal-overlay').classList.add('active');
-        }
-
-        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
-
-        function addInspectorSwatch() {
-            addToPalette(activeModalHex);
-            copyToClipboard(activeModalHex);
-        }
-
-        const MAX_PALETTE = 16;
-        let paletteColors = [];
-
-        function initPalette() {
-            const container = document.getElementById('palette-slots-container');
-            container.innerHTML = '';
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                let slot = document.createElement('div');
-                slot.id = 'p-slot-' + i;
-                slot.dataset.index = i;
-                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50';
-                
-                slot.addEventListener('dragstart', handleDragStart);
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('dragleave', handleDragLeave);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragend', handleDragEnd);
-                
-                container.appendChild(slot);
-            }
-            updatePaletteUI();
-        }
-
-        function addToPalette(hex) {
-            if (paletteColors.length < MAX_PALETTE) { paletteColors.push(hex); updatePaletteUI(); } 
-            else { showToast("Palette Bank is Full (16/16)"); }
-        }
-
-        function removeFromPalette(index, event) {
-            event.stopPropagation();
-            paletteColors.splice(index, 1);
-            updatePaletteUI();
-        }
-
-        function clearPalette() { paletteColors = []; updatePaletteUI(); showToast("Palette Cleared"); }
-
-        function copyAllPaletteHex() {
-            if (paletteColors.length === 0) return showToast("Palette is empty!");
-            copyToClipboard(paletteColors.join(', '));
-        }
-
-        let draggedIndex = null;
-        function handleDragStart(e) {
-            draggedIndex = parseInt(this.dataset.index);
-            if (isNaN(draggedIndex) || draggedIndex >= paletteColors.length) { e.preventDefault(); return; }
-            e.dataTransfer.effectAllowed = 'move';
-            this.classList.add('dragging');
-        }
-        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); }
-        function handleDragLeave() { this.classList.remove('drag-over'); }
-        function handleDrop(e) {
-            e.preventDefault(); this.classList.remove('drag-over');
-            const targetIndex = parseInt(this.dataset.index);
-            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
-                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
-                paletteColors.splice(targetIndex, 0, movedColor);
-                updatePaletteUI();
-            }
-        }
-        function handleDragEnd() {
-            document.querySelectorAll('.palette-slot').forEach(slot => slot.classList.remove('dragging', 'drag-over'));
-            draggedIndex = null;
-        }
-
-        function getContrast(hex) {
-            const rgb = parseInt(hex.substring(1), 16);
-            const r = (rgb >> 16) & 0xff, g = (rgb >>  8) & 0xff, b = (rgb >>  0) & 0xff;
-            return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#0f172a' : '#ffffff';
-        }
-
-        function updatePaletteUI() {
-            document.getElementById('palette-counter').innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                const slot = document.getElementById('p-slot-' + i);
-                if (i < paletteColors.length) {
-                    const hex = paletteColors[i];
-                    slot.style.backgroundColor = hex;
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
-                    slot.setAttribute('draggable', 'true');
-                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrast(hex)}">${hex.substring(1)}</span>
-                        <button class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white" onclick="removeFromPalette(${i}, event)">×</button>`;
-                    slot.onclick = () => copyToClipboard(hex);
-                } else {
-                    slot.style.backgroundColor = 'transparent';
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center';
-                    slot.removeAttribute('draggable');
-                    slot.innerHTML = '';
-                    slot.onclick = null;
-                }
-            }
-        }
-
-        function copyToClipboard(text) {
-            const el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast(`Copied ${text}`);
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-text').innerText = msg;
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2200);
-        }
-
-        window.onload = () => {
-            renderSwatchGrid('tab-hex', hexCols, true); // true = column based
-            renderSwatchGrid('tab-arr2', arr2Rows, false); // false = row based
-            renderSwatchGrid('tab-arr3', arr3Rows, false);
-            renderSwatchGrid('tab-arr4', arr4Rows, false);
-            renderSwatchGrid('tab-star', starCMYK, false, true); // isCMYK = true
-
-            initPalette();
-        };
-
-        window.onclick = function(e) {
-            if (e.target === document.getElementById('modal-overlay')) closeModal();
-        };
-    </script>
-</body>
-</html>
+                    if (hexCode) {
+                        box.title = hexCode + (isCMYK ?
