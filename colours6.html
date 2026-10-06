@@ -8,6 +8,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,7 +89,7 @@
         .hex-swatch:hover {
             transform: scale(1.25);
             z-index: 20;
-            /* clip-path cuts off borders and box-shadows, so we use drop-shadow filter instead */
+            /* clip-path cuts off normal box-shadows, so drop-shadow filter is used instead */
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
         }
 
@@ -181,17 +184,17 @@
 
         <!-- TABS NAV -->
         <div class="flex space-x-2 border-b border-slate-200 w-full max-w-5xl overflow-x-auto">
-            <button class="tab-btn active" onclick="switchTab('tab-hex')">Hexagon Matrix</button>
-            <button class="tab-btn" onclick="switchTab('tab-arr2')">Grid Alpha</button>
-            <button class="tab-btn" onclick="switchTab('tab-arr3')">Grid Beta</button>
-            <button class="tab-btn" onclick="switchTab('tab-arr4')">Grid Gamma</button>
-            <button class="tab-btn" onclick="switchTab('tab-star')">CMYK Star</button>
+            <button class="tab-btn active" onclick="switchTab(event, 'tab-hex')">Hexagon Matrix</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr2')">Grid Alpha</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr3')">Grid Beta</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr4')">Grid Gamma</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-star')">CMYK Star</button>
         </div>
 
         <!-- MATRIX CONTAINERS -->
         <div class="w-full max-w-5xl glass-card rounded-3xl p-6 shadow-md overflow-x-auto min-h-[500px] flex items-center justify-center">
             
-            <!-- Hexagon Matrix (Columns) - Center alignment removed so JS grid math works perfectly -->
+            <!-- Hexagon Matrix (Columns) -->
             <div id="tab-hex" class="tab-content active flex-row justify-center py-6"></div>
 
             <!-- Grid Matrices (Rows) -->
@@ -271,11 +274,11 @@
             if (c && !c.contains(e.target)) c.classList.remove('open');
         });
 
-        // Tabs Logic
-        function switchTab(tabId) {
+        // Tabs Logic (Fixed event reference for Firefox/Safari)
+        function switchTab(e, tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            event.target.classList.add('active');
+            e.currentTarget.classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
 
@@ -289,10 +292,16 @@
 
         function cmykToHex(cmykStr) {
             if (!cmykStr || cmykStr === '[Blank]' || cmykStr === 'Blank') return null;
-            const c = parseInt((cmykStr.match(/C(\d+)/) || [0,0])[1]);
-            const m = parseInt((cmykStr.match(/M(\d+)/) || [0,0])[1]);
-            const y = parseInt((cmykStr.match(/Y(\d+)/) || [0,0])[1]);
-            const k = parseInt((cmykStr.match(/K(\d+)/) || [0,0])[1]);
+            
+            const extract = (regex) => {
+                const match = cmykStr.match(regex);
+                return match ? parseInt(match[1]) : 0;
+            };
+
+            const c = extract(/C(\d+)/);
+            const m = extract(/M(\d+)/);
+            const y = extract(/Y(\d+)/);
+            const k = extract(/K(\d+)/);
 
             const r = Math.round(255 * (1 - c/100) * (1 - k/100));
             const g = Math.round(255 * (1 - m/100) * (1 - k/100));
@@ -307,6 +316,7 @@
         function getVal(hex) {
             if (!hex) return 0;
             const rgb = parseInt(hex.substring(1), 16);
+            if (isNaN(rgb)) return 0;
             const r = (rgb >> 16) & 0xff, g = (rgb >>  8) & 0xff, b = (rgb >>  0) & 0xff;
             return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
         }
@@ -331,7 +341,7 @@
                 if (isHexTab) {
                     groupDiv.className = 'flex flex-col';
                     // Pull odd/even columns left to interlock their zig-zag edges
-                    groupDiv.style.marginLeft = colIndex === 0 ? '0' : '-6px'; 
+                    groupDiv.style.marginLeft = colIndex === 0 ? '0' : '-8px'; 
                     
                     // Smart Grid-Snap Centering algorithm
                     // Calculates how far down the column needs to be pushed to center it
@@ -345,41 +355,4 @@
                         // Odd columns lock strictly to the +15px half-step grid to interlock perfectly
                         topOffsetPx = (Math.round(idealTopItems - 0.5) + 0.5) * STEP_H;
                     }
-                    groupDiv.style.marginTop = `${topOffsetPx}px`;
-                    
-                } else {
-                    groupDiv.className = isColumnBased ? 'flex flex-col gap-1' : 'flex flex-row gap-1';
-                }
-                
-                group.forEach(val => {
-                    const box = document.createElement('div');
-                    const hexCode = isCMYK ? cmykToHex(val) : cleanHex(val);
-
-                    if (isHexTab) {
-                        // Render as tessellating flat-topped hexagon
-                        box.style.width = `${HEX_W}px`;
-                        box.style.height = `${HEX_H}px`;
-                        box.style.clipPath = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
-                        box.style.marginBottom = `${HEX_GAP}px`;
-                        
-                        if (hexCode) {
-                            box.className = 'hex-swatch relative transition-all duration-150';
-                            box.style.backgroundColor = hexCode;
-                        } else {
-                            box.style.backgroundColor = 'transparent';
-                            box.style.cursor = 'default';
-                        }
-                    } else {
-                        // Render as standard grid square
-                        box.className = 'w-6 h-6 sm:w-8 sm:h-8 rounded-sm relative transition-all duration-150';
-                        if (hexCode) {
-                            box.classList.add('matrix-swatch', 'border-white', 'hover:border-2');
-                            box.style.backgroundColor = hexCode;
-                        } else {
-                            box.style.backgroundColor = 'transparent';
-                            box.style.cursor = 'default';
-                        }
-                    }
-
-                    if (hexCode) {
-                        box.title = hexCode + (isCMYK ?
+                    groupDiv.style
