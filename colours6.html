@@ -8,6 +8,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -276,7 +279,7 @@
         }
 
         function cmykToHex(cmykStr) {
-            if (!cmykStr || cmykStr === '[Blank]' || cmykStr === 'Blank') return null;
+            if (!cmykStr) return null;
             const c = parseInt((cmykStr.match(/C(\d+)/) || [0,0])[1]);
             const m = parseInt((cmykStr.match(/M(\d+)/) || [0,0])[1]);
             const y = parseInt((cmykStr.match(/Y(\d+)/) || [0,0])[1]);
@@ -333,8 +336,7 @@
         const hexCols = [
             ["99FF00","66FF00","33FF00","66FF33","33CC00","00CC33","33FF66","00FF33","00FF66","00FF99","00FFCC"],
             ["CCFF00", "99FF33", "99FF66", "66CC33", "339900", "009933", "33CC66", "66FF99", "33FF99", "00FF99"],
-            ["CCFF33", "CCFF66", "66CC00", "00FF00", "00CC00", "009900", "006600", "003300", "00CC66", "66FFCC", "00FFCC"],
-            ["99CC00","669900","666600","666633","669933","66FF66","66CC66","669966","[Blank]","66FFFF","33FFFF","00FFFF","00CCCC","33CC99","00CC99","0099CC","3399CC"],
+            ["99CC00","669900","666600","666633","669933","66FF66","66CC66","669966",,"66FFFF","33FFFF","00FFFF","00CCCC","33CC99","00CC99","0099CC","3399CC"],
             ["CC9900","996600","999900","999933","999966","99CC66","99FF99","99FFCC","99FFFF","66CCCC","33CCCC","009999","006666","003333","006699","003366","0099CC"],
             ["FFCC00","FFCC33","CC9933","CCCC00","CCCC33","CCCC66","CCCC99","CCFFCC","CCFFFF","99CCCC","339999","336666","003333","336699","3399CC","33CCFF","00CCFF"],
             ["FF9900","FFCC66","FFFF00","FFFF33","FFFF66","FFFF99","FFFFCC","999999","666666","333333","CCFFFF","99CCFF","66CCCC","339999","336666","003366","6699FF","3399FF","33CCFF"],
@@ -406,4 +408,166 @@
             ["[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "00CCFF", "0099FF", "0066FF", "0033FF", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]"]
         ];
 
-        // 5
+        // 5. CMYK Star (Rows)
+        const starCMYK = [
+            ["M100 Y100"],
+            ["M100 Y90", "M90 Y100"],
+            ["M100 Y70", "M80 Y80", "M70 Y100"],
+            ["M100 Y50", "M80 Y60", "M60 Y70", "M50 Y90"],
+            ["M100", "M100 Y10", "M90 Y20", "M80 Y30", "M70 Y40", "M60 Y50", "M50 Y60", "M40 Y70", "M30 Y80", "M20 Y90", "M10 Y100", "Y100"],
+            ["C10 M90 Y10", "C10 M80 Y20", "C10 M70 Y30", "C10 M60 Y40", "C10 M50 Y50", "C10 M40 Y60", "C10 M30 Y70", "C10 M20 Y80", "C10 M10 Y90"],
+            ["C20 M80 Y10", "C20 M70 Y20", "C20 M60 Y30", "C20 M50 Y40", "C20 M40 Y50", "C20 M30 Y60", "C20 M20 Y70", "C20 M10 Y80"],
+            ["C30 M70 Y10", "C30 M60 Y20", "C30 M50 Y30", "C30 M40 Y40", "C30 M30 Y50", "C30 M20 Y60", "C30 M10 Y70"],
+            ["C40 M70", "C40 M50 Y10", "C40 M40 Y20", "C40 M30 Y30", "C40 M20 Y40", "C40 M10 Y50", "C40 Y70"],
+            ["C50 M90", "C50 M80", "C50 M50 Y10", "C50 M40 Y20", "C50 M30 Y30", "C50 M20 Y40", "C50 M10 Y50", "C50 Y70", "C50 Y90"],
+            ["C70 M90", "C60 M80", "C60 M50 Y10", "C60 M40 Y20", "C60 M30 Y30", "C60 M20 Y40", "C60 M10 Y50", "C60 Y70", "C70 Y90"],
+            ["C100 M100", "C100 M90", "C90 M70", "C80 M40", "C70 M30 Y10", "C70 M20 Y20", "C70 M10 Y30", "C70 Y40", "C80 Y70", "C90 Y90", "C100 Y100"],
+            ["C80 M30", "C80 M20 Y10", "C80 M10 Y20", "C80 Y30"],
+            ["C80 M20", "C90 M10 Y10", "C90 Y20"],
+            ["C100 M10", "C100 Y10"],
+            ["C100"]
+        ];
+
+        // MODAL & PALETTE LOGIC
+        let activeModalHex = "";
+
+        function openModal(hex) {
+            activeModalHex = hex;
+            document.getElementById('inspector-swatch').style.backgroundColor = hex;
+            document.getElementById('inspector-hex').innerText = hex;
+            document.getElementById('inspector-val').innerText = `Perceived Value: ${getVal(hex)}%`;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+
+        function addInspectorSwatch() {
+            addToPalette(activeModalHex);
+            copyToClipboard(activeModalHex);
+        }
+
+        const MAX_PALETTE = 16;
+        let paletteColors = [];
+
+        function initPalette() {
+            const container = document.getElementById('palette-slots-container');
+            container.innerHTML = '';
+            for (let i = 0; i < MAX_PALETTE; i++) {
+                let slot = document.createElement('div');
+                slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50';
+                
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+                
+                container.appendChild(slot);
+            }
+            updatePaletteUI();
+        }
+
+        function addToPalette(hex) {
+            if (paletteColors.length < MAX_PALETTE) { paletteColors.push(hex); updatePaletteUI(); } 
+            else { showToast("Palette Bank is Full (16/16)"); }
+        }
+
+        function removeFromPalette(index, event) {
+            event.stopPropagation();
+            paletteColors.splice(index, 1);
+            updatePaletteUI();
+        }
+
+        function clearPalette() { paletteColors = []; updatePaletteUI(); showToast("Palette Cleared"); }
+
+        function copyAllPaletteHex() {
+            if (paletteColors.length === 0) return showToast("Palette is empty!");
+            copyToClipboard(paletteColors.join(', '));
+        }
+
+        let draggedIndex = null;
+        function handleDragStart(e) {
+            draggedIndex = parseInt(this.dataset.index);
+            if (isNaN(draggedIndex) || draggedIndex >= paletteColors.length) { e.preventDefault(); return; }
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+        function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); }
+        function handleDragLeave() { this.classList.remove('drag-over'); }
+        function handleDrop(e) {
+            e.preventDefault(); this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, movedColor);
+                updatePaletteUI();
+            }
+        }
+        function handleDragEnd() {
+            document.querySelectorAll('.palette-slot').forEach(slot => slot.classList.remove('dragging', 'drag-over'));
+            draggedIndex = null;
+        }
+
+        function getContrast(hex) {
+            const rgb = parseInt(hex.substring(1), 16);
+            const r = (rgb >> 16) & 0xff, g = (rgb >>  8) & 0xff, b = (rgb >>  0) & 0xff;
+            return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#0f172a' : '#ffffff';
+        }
+
+        function updatePaletteUI() {
+            document.getElementById('palette-counter').innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
+            for (let i = 0; i < MAX_PALETTE; i++) {
+                const slot = document.getElementById('p-slot-' + i);
+                if (i < paletteColors.length) {
+                    const hex = paletteColors[i];
+                    slot.style.backgroundColor = hex;
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
+                    slot.setAttribute('draggable', 'true');
+                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrast(hex)}">${hex.substring(1)}</span>
+                        <button class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white" onclick="removeFromPalette(${i}, event)">×</button>`;
+                    slot.onclick = () => copyToClipboard(hex);
+                } else {
+                    slot.style.backgroundColor = 'transparent';
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center';
+                    slot.removeAttribute('draggable');
+                    slot.innerHTML = '';
+                    slot.onclick = null;
+                }
+            }
+        }
+
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast(`Copied ${text}`);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2200);
+        }
+
+        window.onload = () => {
+            renderSwatchGrid('tab-hex', hexCols, true); // true = column based
+            renderSwatchGrid('tab-arr2', arr2Rows, false); // false = row based
+            renderSwatchGrid('tab-arr3', arr3Rows, false);
+            renderSwatchGrid('tab-arr4', arr4Rows, false);
+            renderSwatchGrid('tab-star', starCMYK, false, true); // isCMYK = true
+
+            initPalette();
+        };
+
+        window.onclick = function(e) {
+            if (e.target === document.getElementById('modal-overlay')) closeModal();
+        };
+    </script>
+</body>
+</html>
