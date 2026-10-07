@@ -452,7 +452,7 @@
                             </div>
                         </div>
 
-                        <!-- DRAFT SWATCHES GRID -->
+                        <!-- DRAFT SWATCHES GRID (SQUARE ASPECT RATIO) -->
                         <div id="draft-swatch-grid" class="grid grid-cols-4 sm:grid-cols-6 gap-2.5 max-h-48 overflow-y-auto p-1">
                             <!-- Injected dynamically -->
                         </div>
@@ -465,7 +465,7 @@
                             </div>
 
                             <div class="flex items-center space-x-3">
-                                <div id="inspector-preview-box" class="w-12 h-12 rounded-xl shadow-inner border border-black/10 flex-shrink-0"></div>
+                                <div id="inspector-preview-box" class="w-12 h-12 aspect-square rounded-xl shadow-inner border border-black/10 flex-shrink-0"></div>
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs font-mono flex-grow">
                                     <div><span class="text-slate-400">RGB:</span> <span id="inspector-rgb" class="font-semibold">0, 0, 0</span></div>
                                     <div><span class="text-slate-400">HSL:</span> <span id="inspector-hsl" class="font-semibold">0%, 0%, 0%</span></div>
@@ -662,7 +662,7 @@
                 </button>
             </div>
 
-            <!-- Full Palette Swatches Detail Grid -->
+            <!-- Full Palette Swatches Detail Grid (Squares) -->
             <div class="space-y-3">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                     <i class="fa-solid fa-swatchbook text-sky-600"></i> Full Swatch Specifications (Click to Copy HEX)
@@ -704,7 +704,7 @@
                     </span>
                     <div>
                         <h3 id="export-modal-title" class="font-bold text-slate-900 text-base">Export Palette</h3>
-                        <p class="text-xs text-slate-400">Choose output code format or download pure swatch card</p>
+                        <p class="text-xs text-slate-400">Choose output code format or download high-res swatch card</p>
                     </div>
                 </div>
                 <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 p-1 text-lg">
@@ -712,7 +712,7 @@
                 </button>
             </div>
 
-            <!-- Export Format Tabs (JSON Removed) -->
+            <!-- Export Format Tabs -->
             <div class="flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
                 <button onclick="switchExportFormat('css')" id="exp-tab-css" class="flex-1 py-1.5 rounded-lg text-slate-700 active font-bold bg-[#B4E3F8] text-[#0369a1]">CSS Vars</button>
                 <button onclick="switchExportFormat('tailwind')" id="exp-tab-tailwind" class="flex-1 py-1.5 rounded-lg text-slate-700">Tailwind</button>
@@ -724,16 +724,16 @@
                 <textarea id="export-code-area" readonly class="w-full h-40 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
             </div>
 
-            <!-- Minimalist Swatch Card Downloads (Clean Color Blocks, No Hex Text) -->
+            <!-- Minimalist Swatch Card Downloads -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Minimalist Swatch Card Image Downloads</span>
-                <p class="text-[11px] text-slate-400">Pure side-by-side solid color blocks with no text, overlays, or backgrounds.</p>
+                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Minimalist High-Res Swatch Card Image Downloads</span>
+                <p class="text-[11px] text-slate-400">High-resolution (1920×1080) side-by-side solid square color blocks with no text or overlay elements.</p>
                 <div class="flex items-center gap-2 pt-1">
                     <button onclick="downloadMinimalPaletteCard('png')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-image text-sky-600"></i> Download PNG
+                        <i class="fa-solid fa-file-image text-sky-600"></i> Download HD PNG
                     </button>
                     <button onclick="downloadMinimalPaletteCard('jpeg')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-image text-emerald-600"></i> Download JPEG
+                        <i class="fa-solid fa-file-image text-emerald-600"></i> Download HD JPEG
                     </button>
                 </div>
             </div>
@@ -1132,7 +1132,7 @@
 
             draftPalette.forEach((hex, idx) => {
                 const card = document.createElement('div');
-                card.className = 'swatch-card relative group rounded-xl overflow-hidden cursor-pointer shadow-sm border border-black/10 flex flex-col h-16 justify-between p-1.5 transition-all';
+                card.className = 'swatch-card relative group rounded-xl overflow-hidden cursor-pointer shadow-sm border border-black/10 flex flex-col aspect-square justify-between p-1.5 transition-all';
                 card.style.backgroundColor = hex;
                 card.onclick = () => inspectColor(hex);
 
@@ -1256,7 +1256,7 @@
                 const swatchesHtml = (palette.colors || []).map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
-                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 h-12 first:rounded-l-xl last:rounded-r-xl relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
+                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 aspect-square relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
                             <span class="font-mono text-[9px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
                         </div>
                     `;
@@ -1271,7 +1271,7 @@
                             </div>
                         </div>
 
-                        <!-- Color Swatch Bar -->
+                        <!-- Square Color Swatch Bar -->
                         <div class="flex items-center w-full rounded-xl overflow-hidden border border-black/10">
                             ${swatchesHtml}
                         </div>
@@ -1282,12 +1282,15 @@
                         </div>
                     </div>
 
-                    <!-- Actions Footer -->
+                    <!-- Actions Footer with Direct High-Res JPEG Download -->
                     <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
                         <span class="text-[#0369a1] font-bold text-[11px] flex items-center gap-1">
-                            <i class="fa-solid fa-pen-to-square text-xs"></i> Click to edit & inspect
+                            <i class="fa-solid fa-pen-to-square text-xs"></i> Click to edit
                         </span>
-                        <div class="flex items-center space-x-2" onclick="event.stopPropagation()">
+                        <div class="flex items-center space-x-1.5" onclick="event.stopPropagation()">
+                            <button onclick="downloadDirectPaletteJPEG('${palette.id}')" title="Download High-Res JPEG Card" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg border border-emerald-200 text-[10px] flex items-center gap-1">
+                                <i class="fa-solid fa-download"></i> JPEG
+                            </button>
                             <button onclick="copyAllHexFromPalette('${palette.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 text-[10px]">
                                 Copy HEX
                             </button>
@@ -1351,7 +1354,7 @@
                 card.onclick = () => copySingleHex(hex);
 
                 card.innerHTML = `
-                    <div class="w-12 h-12 rounded-xl shadow-inner border border-black/10 flex-shrink-0 flex items-center justify-center relative overflow-hidden" style="background-color: ${hex}">
+                    <div class="w-12 h-12 aspect-square rounded-xl shadow-inner border border-black/10 flex-shrink-0 flex items-center justify-center relative overflow-hidden" style="background-color: ${hex}">
                         <i class="fa-solid fa-copy text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${isLight ? '#000' : '#fff'}"></i>
                     </div>
                     <div class="flex-grow font-mono text-xs space-y-0.5">
@@ -1497,17 +1500,30 @@
             showToast("Copied code to clipboard!");
         }
 
-        /* MINIMALIST CARD GENERATION (PURE PURE COLOR BLOCKS ONLY, NO TEXT) */
+        /* DIRECT FRONT-CARD JPEG DOWNLOAD FUNCTION */
+        function downloadDirectPaletteJPEG(id) {
+            const pal = paletteBank.find(p => p.id === id);
+            if (!pal) return;
+            generateHighResCardDownload(pal, 'jpeg');
+        }
+
+        /* MINIMALIST CARD GENERATION (ULTRA HIGH-RES 1920x1080 SOLID SQUARE BLOCKS) */
         function downloadMinimalPaletteCard(fileType = 'png') {
             if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
                 showToast("No active palette colors to download!", "warning");
                 return;
             }
+            generateHighResCardDownload(activeExportPalette, fileType);
+        }
 
-            const colors = activeExportPalette.colors;
+        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
             const cardCanvas = document.createElement('canvas');
-            const canvasWidth = 800;
-            const canvasHeight = 400;
+            // Full HD high-resolution dimensions for high pixel density
+            const canvasWidth = 1920;
+            const canvasHeight = 1080;
             cardCanvas.width = canvasWidth;
             cardCanvas.height = canvasHeight;
             const ctx = cardCanvas.getContext('2d');
@@ -1519,23 +1535,23 @@
                 const x = idx * swatchWidth;
                 const y = 0;
 
-                // Fill color rectangle edge-to-edge (No hex code or text added)
+                // Edge-to-edge solid color blocks with ultra high clarity
                 ctx.fillStyle = hex;
                 ctx.fillRect(x, y, swatchWidth, swatchHeight);
             });
 
             const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
             const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${activeExportPalette.name.toLowerCase().replace(/\s+/g, '_')}_palette.${fileExt}`;
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_hd_palette.${fileExt}`;
 
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.92));
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
             downloadAnchor.setAttribute("download", fileName);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
 
-            showToast(`Downloaded Minimalist ${fileType.toUpperCase()} Swatch Card!`);
+            showToast(`Downloaded High-Res ${fileType.toUpperCase()} Card!`);
         }
 
         /* TAB 3: COLOR HARMONIES ENGINE */
@@ -1592,7 +1608,7 @@
                 const textColor = lum > 0.5 ? '#0f172a' : '#ffffff';
 
                 const item = document.createElement('div');
-                item.className = 'swatch-card h-20 rounded-xl cursor-pointer p-2 flex flex-col justify-between shadow-sm border border-black/10 transition-all hover:scale-105';
+                item.className = 'swatch-card aspect-square rounded-xl cursor-pointer p-2 flex flex-col justify-between shadow-sm border border-black/10 transition-all hover:scale-105';
                 item.style.backgroundColor = hex;
                 item.onclick = () => {
                     addManualColor(hex);
