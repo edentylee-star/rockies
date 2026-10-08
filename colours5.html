@@ -1482,7 +1482,7 @@
             generateHighResCardDownload(pal, 'jpeg');
         }
 
-        /* MINIMALIST CARD GENERATION (ULTRA HIGH-RES 1920x1080 SOLID SQUARE BLOCKS) */
+        /* MINIMALIST CARD GENERATION (DYNAMIC ULTRA HIGH-RES SQUARE BLOCKS) */
         function downloadMinimalPaletteCard(fileType = 'png') {
             if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
                 showToast("No active palette colors to download!", "warning");
@@ -1490,43 +1490,39 @@
             }
             generateHighResCardDownload(activeExportPalette, fileType);
         }
-
+        
         function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
             const colors = paletteObj.colors;
             if (!colors || colors.length === 0) return;
-
+        
+            // Define fixed square size for each color swatch block
+            const squareSize = 1080; // 1080px height & width per swatch for crisp high resolution
+            const swatchCount = colors.length;
+        
             const cardCanvas = document.createElement('canvas');
-            // Full HD high-resolution dimensions for high pixel density
-            const canvasWidth = 1920;
-            const canvasHeight = 1080;
-            cardCanvas.width = canvasWidth;
-            cardCanvas.height = canvasHeight;
+            cardCanvas.width = squareSize * swatchCount; // Dynamic width ensures 1:1 square swatches side-by-side
+            cardCanvas.height = squareSize;
+        
             const ctx = cardCanvas.getContext('2d');
-
-            const swatchWidth = canvasWidth / colors.length;
-            const swatchHeight = canvasHeight;
-
+        
             colors.forEach((hex, idx) => {
-                const x = idx * swatchWidth;
-                const y = 0;
-
-                // Edge-to-edge solid color blocks with ultra high clarity
+                const x = idx * squareSize;
                 ctx.fillStyle = hex;
-                ctx.fillRect(x, y, swatchWidth, swatchHeight);
+                ctx.fillRect(x, 0, squareSize, squareSize);
             });
-
+        
             const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
             const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_hd_palette.${fileExt}`;
-
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_square_swatches.${fileExt}`;
+        
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
             downloadAnchor.setAttribute("download", fileName);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
-
-            showToast(`Downloaded High-Res ${fileType.toUpperCase()} Card!`);
+        
+            showToast(`Downloaded High-Res ${fileType.toUpperCase()} Square Swatches!`);
         }
 
         /* TAB 3: COLOR HARMONIES ENGINE */
