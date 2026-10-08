@@ -8,9 +8,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -262,28 +259,31 @@
                         <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
-                                <span>Palette Tools</span>
+                                <span>Rockie Navigation</span>
                                 <i class="fa-solid fa-chevron-down text-[10px]"></i>
                             </button>
 
                             <div class="nav-dropdown-content">
                                 <a href="index.html" class="nav-dropdown-item">
-                                    <span>🪨</span> Home Hub
+                                    <span>🪨</span> rockie home
                                 </a>
                                 <a href="colours1.html" class="nav-dropdown-item">
-                                    <span>🍀</span> Munsell System
+                                    <span>🍀</span> line rockies
                                 </a>
                                 <a href="colours2.html" class="nav-dropdown-item">
-                                    <span>🍁</span> Ostwald Wheel
+                                    <span>🍁</span> square rockies
                                 </a>
                                 <a href="colours3.html" class="nav-dropdown-item active-tool">
-                                    <span>🌙</span> NCS Atlas (Active)
+                                    <span>🌙</span> circle rockies
                                 </a>
                                 <a href="colours4.html" class="nav-dropdown-item">
-                                    <span>🌼</span> RAL Spectrum
+                                    <span>🌼</span> cube rockies
                                 </a>
                                 <a href="colours5.html" class="nav-dropdown-item">
-                                    <span>🌸</span> Color Matrices
+                                    <span>🌸</span> rockie stash
+                                </a>
+                                <a href="colours5.html" class="nav-dropdown-item">
+                                    <span>🌸</span> rockie shapes
                                 </a>
                             </div>
                         </div>
@@ -295,12 +295,6 @@
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
                             <i class="fa-solid fa-palette"></i>
-                        </div>
-                        <div>
-                            <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                                NCS Colour Atlas
-                            </h1>
-                            <p class="text-xs text-slate-500 hidden sm:block">40-Step Hue Wheel & Barycentric Nuance Triangles</p>
                         </div>
                     </div>
                 </div>
@@ -314,14 +308,6 @@
 
         <!-- INFO CARD -->
         <div class="w-full max-w-3xl glass-card rounded-2xl p-5 shadow-sm space-y-2 text-center backdrop-blur-sm">
-            <div class="flex items-center justify-center space-x-2 text-sky-700 font-bold text-base">
-                <i class="fa-solid fa-circle-info text-sky-500"></i>
-                <h2>Interactive Natural Colour System (NCS) Wheel</h2>
-            </div>
-            <p class="text-xs text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                The Natural Colour System describes color as humans perceive it, built on 6 elementary perceptions: White (W), Black (S), Yellow (Y), Red (R), Blue (B), and Green (G). 
-                <span class="font-semibold text-slate-800">Click any wedge or label</span> on the 40-step circle below to open its corresponding Barycentric Color Nuance Page (<i>s - c - w</i>).
-            </p>
         </div>
 
         <!-- HUE WHEEL CONTAINER -->
@@ -340,7 +326,7 @@
                 <div class="flex items-center space-x-3">
                     <span class="w-3 h-3 rounded-full bg-sky-400 animate-pulse"></span>
                     <h3 id="modal-bar-title" class="font-bold text-sm sm:text-base font-mono tracking-wide">
-                        NCS Colour Atlas - Page -Y
+                        Yellow
                     </h3>
                 </div>
                 <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-red-500 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center font-bold text-sm transition-colors">
