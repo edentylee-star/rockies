@@ -182,9 +182,10 @@
         <!-- TABS NAV -->
         <div class="flex space-x-2 border-b border-slate-200 w-full max-w-5xl overflow-x-auto">
             <button class="tab-btn active" onclick="switchTab(event, 'tab-hex')">Hexagon 1</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-arr2')">Square 1</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-arr3')">Hexagon 2</button>
-            <button class="tab-btn" onclick="switchTab(event, 'tab-arr4')">Square 2</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr2')">Hexagon 2</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr3')">Hexagon 3</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr4')">Square 1</button>
+            <button class="tab-btn" onclick="switchTab(event, 'tab-arr5')">Square 2</button>
             <button class="tab-btn" onclick="switchTab(event, 'tab-star')">Star</button>
         </div>
 
@@ -401,7 +402,7 @@
 
         // --- RAW DATA ---
         
-        // 1. Hexagon Matrix (Columns) - Restored to the perfect 15-column dataset
+        // 1. Hexagon 1
         const hexCols = [
             ["99FF00", "66FF00", "33FF00", "66FF33", "33CC00", "00CC33", "33FF66", "00FF33", "00FF66"],
             ["CCFF00", "99FF33", "99FF66", "66CC33", "339900", "009933", "33CC66", "66FF99", "33FF99", "00FF99"],
@@ -422,7 +423,7 @@
             ["FF0099", "FF00CC", "FF33CC", "CC0099", "9900CC", "CC33FF", "CC00FF", "9900FF", "6600FF"]
         ];
 
-        // 2. Grid Alpha (Rows)
+        // 2. Hexagon 2
         const arr2Rows = [
             ["003333", "336699", "3366CC", "003399", "009999", "0000CC", "000066"],
             ["006666", "006699", "0099CC", "0066CC", "0033CC", "00FFFF", "3333FF", "333399"],
@@ -440,7 +441,26 @@
             ["FFFFFF", "CCCCCC", "999999", "666666", "C0C0C0", "808080", "333333", "000000"]
         ];
 
-        // 3. Grid Beta (Rows with Blanks)
+        // 3. Hexagon 3
+        const arr2Rows = [
+            ["1E00FF", "3C00FF", "5E00FF", "7F00FF", "A200FF", "C300FF", "E100FF"],
+            ["0011FF", "1105FA", "3A0BF4", "5E11EE", "7F12ED", "A111EE", "C50BF4", "EE05FA", "FF00EE"],
+            ["0040FF", "0B2EF4", "1418EB", "381DE2", "5A22DD", "7F24DB", "A522DD", "C71DE2", "EB14E7", "F40BD1", "FF00BF"],
+            ["006EFF", "0B5DF4", "184CE7", "2439DB", "362ED1", "5C34CB", "7F37C8", "A334CB", "C92ED1", "DB24C6", "E718B3", "F40BA2", "FF0091"],
+            ["009DFF", "058CFA", "147CEB", "246ADB", "3259CD", "3E47C1", "5B46B9", "7F49B6", "A446B9", "C13EB8", "CD32A6", "DB2495", "EB1483", "FA0573", "FF0062"],
+            ["00BBFF", "0BAEF4", "1D9AE2", "2E88D1", "3E77C1", "4D66B3", "5B57A8", "7F5BA4", "A457A8", "B34D99", "C13E88", "D12E77", "E21D65", "F40B51", "FF0044"],
+            ["00DDFF", "11C9EE", "22BADD", "34A8CB", "4696B9", "5784A8", "667399", "7F6C93", "99668C", "AB577B", "B94669", "CB3457", "DD2245", "EE1136", "FF0022"],
+            ["00FFFF", "12EDED", "24DBDB", "37C8C8", "49B6B6", "5BA4A4", "6C9393", "808080", "936C6C", "A45B5B", "B64949", "C83737", "DB2424", "ED1212", "FF0000"],
+            ["00FFDD", "11EEC9", "22DDBA", "34CBA8", "46B996", "57A884", "669973", "80936C", "998C66", "A87B57", "B96946", "CB5734", "DD4522", "EE3611", "FF2200"],
+            ["00FFBB", "0BF4AE", "1DE29A", "2ED188", "3EC177", "4DB366", "5BA857", "80A45B", "A4A857", "B3994D", "C1883E", "D1772E", "E2651D", "F4510B", "FF4400"],
+            ["00FF9D", "05FA8C", "14EB7C", "24DB6A", "32CD59", "3EC147", "5BB946", "80B649", "A4B946", "C1B83E", "CDA632", "DB9524", "EB8314", "FA7305", "FF6200"],
+            ["00FF6F", "0BF45D", "18E74C", "24DB39", "36D12E", "5CCB34", "80C837", "A3CB34", "C9D12E", "DBC624", "E7B318", "F4A20B", "FF9100"],
+            ["00FF40", "0BF42E", "14EB18", "38E210", "5ADD22", "80DB24", "A5DD22", "C7E21D", "EBE714", "F4D10B", "FFBF00"],
+            ["00FF11", "11FA05", "3AF40B", "5EEE11", "80ED12", "A1EE11", "C5F40B", "EEFA05", "FFEE00"],
+            ["1EFF00", "3BFF00", "5EFF00", "80FF00", "A1FF00", "C3FF00", "E1FF00"]
+        ];
+
+        // 4. Square 1
         const arr3Rows = [
             ["FFF", "EEEEEE", "999", "888", "777", "666", "555", "444", "333", "222", "111", "000", "FFCC00", "FF9900", "FF6600"],
             ["99CC00", "[Blank]", "BBBBBB", "CCCCCC", "DDDDDD", "CC9900", "FFCC33", "FFCC66", "FF9966", "FF6633", "AA3300", "BB3300", "CC3300", "DD3300", "EE3300"],
@@ -459,7 +479,7 @@
             ["00AA99", "00BB99", "00CC99", "00CCFF", "0099FF", "0099CC", "33CCFF", "66CCFF", "6699FF", "3366FF", "0033CC", "0033FF", "0066FF", "3300AA", "3300BB"]
         ];
 
-        // 4. Grid Gamma (Rows)
+        // 5. Square 2
         const arr4Rows = [
             ["FFFFFF", "CCCCCC", "999999", "666666", "333333", "000000", "FFCC00", "FF9900", "FF6600", "FF3300", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]"],
             ["99CC00", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "CC9900", "FFCC33", "FFCC66", "FF9966", "FF6633", "CC3300", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "CC0033"],
@@ -479,7 +499,7 @@
             ["[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "00CCFF", "0099FF", "0066FF", "0033FF", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]", "[Blank]"]
         ];
 
-        // 5. CMYK Star (Rows)
+        // 6. CMYK Star (Rows)
         const starCMYK = [
             ["M100 Y100"],
             ["M100 Y90", "M90 Y100"],
