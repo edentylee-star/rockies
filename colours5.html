@@ -339,11 +339,8 @@
     <!-- MAIN BODY CONTAINER -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
 
-        <!-- ========================================================= -->
         <!-- TAB 1: IMAGE EXTRACTOR & INTERACTIVE EYEDROPPER -->
-        <!-- ========================================================= -->
         <section id="tab-content-1" class="space-y-6">
-            <!-- TOP CONTROLS & PRESET BAR -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                     <div class="flex items-center gap-2">
@@ -352,7 +349,6 @@
                     </div>
                 </div>
 
-                <!-- DRAG AND DROP ZONE -->
                 <div id="dropzone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)" class="border-2 border-dashed border-slate-300 hover:border-sky-400 bg-slate-50 hover:bg-slate-50/80 rounded-2xl p-6 text-center transition-all cursor-pointer relative">
                     <input type="file" id="image-file-input" accept="image/*" onchange="handleFileSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                     <div class="flex flex-col items-center justify-center space-y-2 pointer-events-none">
@@ -367,10 +363,8 @@
                 </div>
             </div>
 
-            <!-- MAIN WORKSPACE: CANVAS EXTRACTOR & DRAFT PALETTE -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                <!-- IMAGE CANVAS & EYEDROPPER WORKSPACE (7 COLS) -->
                 <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 flex flex-col justify-between">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                         <div class="flex items-center space-x-2">
@@ -382,11 +376,9 @@
                         </span>
                     </div>
 
-                    <!-- IMAGE DISPLAY WORKSPACE -->
                     <div class="relative w-full bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center min-h-[320px] max-h-[480px] p-2 shadow-inner group">
                         <canvas id="main-canvas" class="max-w-full max-h-[440px] h-auto object-contain cursor-crosshair rounded block"></canvas>
                         
-                        <!-- Floating Eyedropper Loupe -->
                         <div id="eyedropper-loupe">
                             <canvas id="loupe-canvas" width="110" height="110" class="pixelated w-full h-full block"></canvas>
                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -394,7 +386,6 @@
                             </div>
                         </div>
 
-                        <!-- Live Hover Color Badge Overlay -->
                         <div id="hover-color-badge" class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur border border-slate-700 text-white rounded-xl px-3 py-1.5 flex items-center space-x-2 text-xs font-mono opacity-0 transition-opacity pointer-events-none shadow-lg">
                             <div id="hover-swatch-box" class="w-4 h-4 rounded border border-white/30"></div>
                             <span id="hover-hex-text" class="font-bold text-sky-300">#FFFFFF</span>
@@ -402,14 +393,12 @@
                         </div>
                     </div>
 
-                    <!-- EXTRACTION SETTINGS BAR -->
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
                         <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-500">
                             <span>Auto Color Extraction Controls</span>
                             <i class="fa-solid fa-sliders text-sky-600"></i>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <!-- Color Count Slider -->
                             <div class="space-y-1">
                                 <div class="flex justify-between text-xs font-medium">
                                     <span class="text-slate-600">Colors to Extract</span>
@@ -418,7 +407,6 @@
                                 <input type="range" id="extract-count" min="3" max="16" value="6" oninput="reextractPalette()">
                             </div>
 
-                            <!-- Extraction Mode Selection -->
                             <div class="space-y-1">
                                 <label class="block text-xs font-medium text-slate-600">Extraction Mode</label>
                                 <select id="extract-mode" onchange="reextractPalette()" class="w-full bg-white border border-slate-300 text-slate-800 text-xs rounded-lg p-2 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -432,7 +420,6 @@
                     </div>
                 </div>
 
-                <!-- DRAFT PALETTE & COLOR INSPECTOR PANEL (5 COLS) -->
                 <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5 flex flex-col justify-between">
                     <div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -452,12 +439,10 @@
                             </div>
                         </div>
 
-                        <!-- DRAFT SWATCHES GRID (SQUARE ASPECT RATIO) -->
                         <div id="draft-swatch-grid" class="grid grid-cols-4 sm:grid-cols-6 gap-2.5 max-h-48 overflow-y-auto p-1">
                             <!-- Injected dynamically -->
                         </div>
 
-                        <!-- ACTIVE COLOR INSPECTOR DETAILS -->
                         <div id="inspector-panel" class="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
                             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
                                 <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Color Inspector</span>
@@ -479,7 +464,6 @@
                             </div>
                         </div>
 
-                        <!-- SAVE PALETTE FORM -->
                         <div class="space-y-3 pt-2">
                             <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Save to Palette Bank</label>
                             <input type="text" id="save-palette-title" placeholder="Palette Name (e.g. Autumn Forest Mood)" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8] focus:border-sky-500">
@@ -487,7 +471,6 @@
                         </div>
                     </div>
 
-                    <!-- COMMIT TO BANK BUTTON -->
                     <button onclick="saveCurrentDraftToBank()" class="w-full py-3 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] font-bold text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 border border-sky-300">
                         <i class="fa-solid fa-bookmark"></i> Save Palette to Bank
                     </button>
@@ -495,11 +478,8 @@
             </div>
         </section>
 
-        <!-- ========================================================= -->
         <!-- TAB 2: SAVED PALETTE BANK -->
-        <!-- ========================================================= -->
         <section id="tab-content-2" class="space-y-6 hidden">
-            <!-- BANK SEARCH & GLOBAL CONTROLS BAR -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">
                     <div>
@@ -510,7 +490,6 @@
                         <p class="text-xs text-slate-500">Pure color palette library stored locally in your browser.</p>
                     </div>
 
-                    <!-- Global Bank Actions -->
                     <div class="flex items-center space-x-2 flex-wrap gap-2">
                         <button onclick="clearPaletteBank()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold rounded-lg border border-red-200 transition-colors flex items-center gap-1.5">
                             <i class="fa-solid fa-trash-can text-xs"></i> Clear All
@@ -518,7 +497,6 @@
                     </div>
                 </div>
 
-                <!-- SEARCH & TAG FILTERING BAR -->
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div class="sm:col-span-8 relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
@@ -533,23 +511,18 @@
                     </div>
                 </div>
 
-                <!-- TAG CHIPS CONTAINER -->
                 <div id="bank-tag-filter-container" class="flex items-center gap-1.5 flex-wrap pt-1 text-xs">
                     <!-- Injected dynamically -->
                 </div>
             </div>
 
-            <!-- SAVED PALETTES GRID CONTAINER -->
             <div id="bank-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Injected dynamically -->
             </div>
         </section>
 
-        <!-- ========================================================= -->
         <!-- TAB 3: COLOR HARMONIES & ANALYSIS TOOL -->
-        <!-- ========================================================= -->
         <section id="tab-content-3" class="space-y-6 hidden">
-            <!-- BASE COLOR SELECTION BAR -->
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-3">
                     <div>
@@ -575,9 +548,7 @@
                 </div>
             </div>
 
-            <!-- HARMONY TYPES GRID -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Complementary -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -588,7 +559,6 @@
                     <div id="harmony-grid-complementary" class="grid grid-cols-2 gap-3"></div>
                 </div>
 
-                <!-- Analogous -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -599,7 +569,6 @@
                     <div id="harmony-grid-analogous" class="grid grid-cols-3 gap-3"></div>
                 </div>
 
-                <!-- Triadic -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -610,7 +579,6 @@
                     <div id="harmony-grid-triadic" class="grid grid-cols-3 gap-3"></div>
                 </div>
 
-                <!-- Tetradic -->
                 <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -621,7 +589,6 @@
                     <div id="harmony-grid-tetradic" class="grid grid-cols-4 gap-3"></div>
                 </div>
 
-                <!-- Monochromatic -->
                 <div class="md:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
                     <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
@@ -635,13 +602,9 @@
         </section>
     </main>
 
-    <!-- ========================================================= -->
     <!-- INTERACTIVE SAVED PALETTE DETAIL VIEWER MODAL -->
-    <!-- ========================================================= -->
     <div id="palette-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-3xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto">
-            
-            <!-- Modal Header -->
             <div class="flex items-start justify-between border-b border-slate-100 pb-4">
                 <div class="flex-grow space-y-2 mr-4">
                     <div class="flex items-center gap-2">
@@ -662,7 +625,6 @@
                 </button>
             </div>
 
-            <!-- Full Palette Swatches Detail Grid (Squares) -->
             <div class="space-y-3">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
                     <i class="fa-solid fa-swatchbook text-sky-600"></i> Full Swatch Specifications (Click to Copy HEX)
@@ -673,7 +635,6 @@
                 </div>
             </div>
 
-            <!-- Modal Action Buttons Bar -->
             <div class="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 pt-4 gap-3">
                 <button onclick="loadDetailPaletteToDraft()" class="w-full sm:w-auto px-4 py-2.5 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] font-bold text-xs rounded-xl transition-colors border border-sky-300 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-file-import"></i> Load into Tab 1 Draft Palette
@@ -712,22 +673,19 @@
                 </button>
             </div>
 
-            <!-- Export Format Tabs -->
             <div class="flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
                 <button onclick="switchExportFormat('css')" id="exp-tab-css" class="flex-1 py-1.5 rounded-lg text-slate-700 active font-bold bg-[#B4E3F8] text-[#0369a1]">CSS Vars</button>
                 <button onclick="switchExportFormat('tailwind')" id="exp-tab-tailwind" class="flex-1 py-1.5 rounded-lg text-slate-700">Tailwind</button>
                 <button onclick="switchExportFormat('hex')" id="exp-tab-hex" class="flex-1 py-1.5 rounded-lg text-slate-700">HEX List</button>
             </div>
 
-            <!-- Code Output Box -->
             <div class="relative">
                 <textarea id="export-code-area" readonly class="w-full h-40 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
             </div>
 
-            <!-- Minimalist Swatch Card Downloads -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
                 <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Minimalist High-Res Swatch Card Image Downloads</span>
-                <p class="text-[11px] text-slate-400">High-resolution (1920×1080) side-by-side solid square color blocks with no text or overlay elements.</p>
+                <p class="text-[11px] text-slate-400">High-resolution side-by-side solid square color blocks with no text or overlay elements.</p>
                 <div class="flex items-center gap-2 pt-1">
                     <button onclick="downloadMinimalPaletteCard('png')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
                         <i class="fa-solid fa-file-image text-sky-600"></i> Download HD PNG
@@ -738,7 +696,6 @@
                 </div>
             </div>
 
-            <!-- Modal Action Buttons -->
             <div class="flex items-center justify-between pt-1">
                 <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-colors">
                     Close
@@ -753,982 +710,7 @@
     <!-- TOAST NOTIFICATIONS CONTAINER -->
     <div id="toast-container" class="fixed top-16 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- ========================================================= -->
-    <!-- JAVASCRIPT APPLICATION CORE ENGINE -->
-    <!-- ========================================================= -->
     <script>
         /* APPLICATION STATE */
         let activeTab = 1;
         let paletteBank = [];
-        let draftPalette = []; // Array of hex strings e.g. ['#FF0000', ...]
-        let activeInspectorHex = "#0284c7";
-        let activeExportPalette = null;
-        let activeDetailPalette = null;
-        let activeExportFormat = "css";
-
-        // Main Image Canvas & Offscreen Image references
-        let mainCanvas, mainCtx, loupeCanvas, loupeCtx;
-        let loadedImage = null;
-
-        /* TOP NAVIGATION DROPDOWN TOGGLER */
-        function toggleNavDropdown(event) {
-            event.stopPropagation();
-            const container = document.getElementById('nav-dropdown-container');
-            container.classList.toggle('open');
-        }
-
-        document.addEventListener('click', function(e) {
-            const container = document.getElementById('nav-dropdown-container');
-            if (container && !container.contains(e.target)) {
-                container.classList.remove('open');
-            }
-        });
-
-        /* INITIALIZATION ON WINDOW LOAD */
-        window.onload = function() {
-            mainCanvas = document.getElementById('main-canvas');
-            mainCtx = mainCanvas.getContext('2d', { willReadFrequently: true });
-            loupeCanvas = document.getElementById('loupe-canvas');
-            loupeCtx = loupeCanvas.getContext('2d');
-
-            loadBankFromStorage();
-            renderCanvasPlaceholder();
-            setupEyedropperListeners();
-            updateHarmonies('#0284c7');
-            renderPaletteBank();
-        };
-
-        function renderCanvasPlaceholder() {
-            mainCanvas.width = 600;
-            mainCanvas.height = 360;
-            mainCtx.fillStyle = '#0f172a';
-            mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
-
-            mainCtx.fillStyle = '#38bdf8';
-            mainCtx.font = 'bold 16px Inter, sans-serif';
-            mainCtx.textAlign = 'center';
-            mainCtx.fillText('Drop image here or browse a file above', mainCanvas.width / 2, mainCanvas.height / 2 - 10);
-
-            mainCtx.fillStyle = '#94a3b8';
-            mainCtx.font = '12px Inter, sans-serif';
-            mainCtx.fillText('Hover to inspect • Click to pick color', mainCanvas.width / 2, mainCanvas.height / 2 + 15);
-        }
-
-        /* LOCAL STORAGE PERSISTENCE ENGINE */
-        function loadBankFromStorage() {
-            try {
-                const stored = localStorage.getItem('paletteVault_bank_v1');
-                if (stored) {
-                    paletteBank = JSON.parse(stored);
-                    paletteBank.forEach(p => {
-                        delete p.thumbnail;
-                        delete p.imageData;
-                    });
-                }
-            } catch(e) {
-                console.error("Error loading palette bank from storage", e);
-                paletteBank = [];
-            }
-
-            if (!Array.isArray(paletteBank) || paletteBank.length === 0) {
-                paletteBank = [
-                    {
-                        id: 'sample-1',
-                        name: 'Pastel Horizon',
-                        tags: ['pastel', 'soft', 'ui', 'gradient'],
-                        date: new Date().toLocaleDateString(),
-                        colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD']
-                    },
-                    {
-                        id: 'sample-2',
-                        name: 'Deep Cyberpunk Neon',
-                        tags: ['cyberpunk', 'dark', 'neon', 'ui'],
-                        date: new Date().toLocaleDateString(),
-                        colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308']
-                    },
-                    {
-                        id: 'sample-3',
-                        name: 'Earthy Forest',
-                        tags: ['nature', 'forest', 'warm', 'earthy'],
-                        date: new Date().toLocaleDateString(),
-                        colors: ['#064E3B', '#047857', '#10B981', '#A7F3D0', '#78350F']
-                    }
-                ];
-                saveBankToStorage();
-            }
-            updateBankBadge();
-        }
-
-        function saveBankToStorage() {
-            const sanitizedBank = paletteBank.map(p => ({
-                id: p.id,
-                name: p.name,
-                tags: p.tags,
-                date: p.date,
-                colors: p.colors
-            }));
-            localStorage.setItem('paletteVault_bank_v1', JSON.stringify(sanitizedBank));
-            updateBankBadge();
-        }
-
-        function updateBankBadge() {
-            const badge = document.getElementById('bank-count-badge');
-            if (badge) badge.innerText = paletteBank.length;
-        }
-
-        /* DRAG AND DROP HANDLERS */
-        function handleDragOver(e) {
-            e.preventDefault();
-            document.getElementById('dropzone').classList.add('dropzone-active');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            document.getElementById('dropzone').classList.remove('dropzone-active');
-        }
-
-        function handleFileDrop(e) {
-            e.preventDefault();
-            document.getElementById('dropzone').classList.remove('dropzone-active');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                processFile(e.dataTransfer.files[0]);
-            }
-        }
-
-        function handleFileSelect(e) {
-            if (e.target.files && e.target.files[0]) {
-                processFile(e.target.files[0]);
-            }
-        }
-
-        function processFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showToast("Please select a valid image file!", "warning");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                const img = new Image();
-                img.onload = function() {
-                    loadedImage = img;
-                    renderImageToCanvas();
-                    showToast("Image loaded successfully!");
-                };
-                img.src = evt.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function renderImageToCanvas() {
-            if (!loadedImage) return;
-
-            const maxW = 700;
-            const maxH = 440;
-            let w = loadedImage.width;
-            let h = loadedImage.height;
-
-            if (w > maxW || h > maxH) {
-                const ratio = Math.min(maxW / w, maxH / h);
-                w = Math.round(w * ratio);
-                h = Math.round(h * ratio);
-            }
-
-            mainCanvas.width = w;
-            mainCanvas.height = h;
-            mainCtx.drawImage(loadedImage, 0, 0, w, h);
-
-            reextractPalette();
-        }
-
-        /* AUTOMATIC COLOR EXTRACTION ALGORITHM (K-MEANS CLUSTERING) */
-        function reextractPalette() {
-            if (!loadedImage || mainCanvas.width === 0) return;
-
-            const count = parseInt(document.getElementById('extract-count').value);
-            const mode = document.getElementById('extract-mode').value;
-            document.getElementById('extract-count-val').innerText = `${count} Colors`;
-
-            const sampleCanvas = document.createElement('canvas');
-            const sampleSize = 100;
-            sampleCanvas.width = sampleSize;
-            sampleCanvas.height = sampleSize;
-            const sampleCtx = sampleCanvas.getContext('2d');
-            sampleCtx.drawImage(mainCanvas, 0, 0, sampleSize, sampleSize);
-
-            const imgData = sampleCtx.getImageData(0, 0, sampleSize, sampleSize).data;
-            let pixels = [];
-
-            for (let i = 0; i < imgData.length; i += 4) {
-                const a = imgData[i + 3];
-                if (a < 128) continue;
-                const r = imgData[i];
-                const g = imgData[i + 1];
-                const b = imgData[i + 2];
-
-                const [h, s, l] = rgbToHsl(r, g, b);
-
-                if (mode === 'vibrant' && (s < 0.25 || l < 0.2 || l > 0.85)) continue;
-                if (mode === 'soft' && (l < 0.55 || s > 0.6)) continue;
-                if (mode === 'deep' && l > 0.45) continue;
-
-                pixels.push([r, g, b]);
-            }
-
-            if (pixels.length < count * 5) {
-                pixels = [];
-                for (let i = 0; i < imgData.length; i += 16) {
-                    if (imgData[i + 3] >= 128) {
-                        pixels.push([imgData[i], imgData[i + 1], imgData[i + 2]]);
-                    }
-                }
-            }
-
-            const centroids = kMeansCluster(pixels, count, 10);
-            draftPalette = centroids.map(c => rgbToHex(c[0], c[1], c[2]));
-
-            renderDraftPaletteGrid();
-            if (draftPalette.length > 0) {
-                inspectColor(draftPalette[0]);
-            }
-        }
-
-        function kMeansCluster(pixels, k, maxIter = 10) {
-            if (pixels.length === 0) return [];
-            if (pixels.length <= k) return pixels;
-
-            let centroids = [];
-            let step = Math.floor(pixels.length / k);
-            for (let i = 0; i < k; i++) {
-                centroids.push([...pixels[(i * step) % pixels.length]]);
-            }
-
-            for (let iter = 0; iter < maxIter; iter++) {
-                let clusters = Array.from({ length: k }, () => []);
-                for (let p of pixels) {
-                    let minDist = Infinity;
-                    let closestIdx = 0;
-                    for (let c = 0; c < k; c++) {
-                        let dist = (p[0] - centroids[c][0]) ** 2 + (p[1] - centroids[c][1]) ** 2 + (p[2] - centroids[c][2]) ** 2;
-                        if (dist < minDist) {
-                            minDist = dist;
-                            closestIdx = c;
-                        }
-                    }
-                    clusters[closestIdx].push(p);
-                }
-
-                let newCentroids = [];
-                for (let c = 0; c < k; c++) {
-                    if (clusters[c].length === 0) {
-                        newCentroids.push(centroids[c]);
-                    } else {
-                        let sumR = 0, sumG = 0, sumB = 0;
-                        for (let p of clusters[c]) {
-                            sumR += p[0]; sumG += p[1]; sumB += p[2];
-                        }
-                        let len = clusters[c].length;
-                        newCentroids.push([Math.round(sumR / len), Math.round(sumG / len), Math.round(sumB / len)]);
-                    }
-                }
-                centroids = newCentroids;
-            }
-            return centroids;
-        }
-
-        /* INTERACTIVE CANVAS EYEDROPPER & LOUPE LENS */
-        function setupEyedropperListeners() {
-            const loupe = document.getElementById('eyedropper-loupe');
-            const badge = document.getElementById('hover-color-badge');
-            const hoverSwatch = document.getElementById('hover-swatch-box');
-            const hoverHex = document.getElementById('hover-hex-text');
-            const hoverRgb = document.getElementById('hover-rgb-text');
-
-            mainCanvas.addEventListener('mousemove', (e) => {
-                const rect = mainCanvas.getBoundingClientRect();
-                const scaleX = mainCanvas.width / rect.width;
-                const scaleY = mainCanvas.height / rect.height;
-
-                const mouseX = Math.floor((e.clientX - rect.left) * scaleX);
-                const mouseY = Math.floor((e.clientY - rect.top) * scaleY);
-
-                if (mouseX < 0 || mouseX >= mainCanvas.width || mouseY < 0 || mouseY >= mainCanvas.height) {
-                    loupe.style.display = 'none';
-                    badge.style.opacity = '0';
-                    return;
-                }
-
-                loupe.style.display = 'block';
-                loupe.style.left = `${e.clientX - rect.left - 55}px`;
-                loupe.style.top = `${e.clientY - rect.top - 55}px`;
-
-                const zoomSize = 11;
-                const srcX = Math.max(0, Math.min(mainCanvas.width - zoomSize, mouseX - Math.floor(zoomSize / 2)));
-                const srcY = Math.max(0, Math.min(mainCanvas.height - zoomSize, mouseY - Math.floor(zoomSize / 2)));
-
-                loupeCtx.imageSmoothingEnabled = false;
-                loupeCtx.drawImage(mainCanvas, srcX, srcY, zoomSize, zoomSize, 0, 0, 110, 110);
-
-                const p = mainCtx.getImageData(mouseX, mouseY, 1, 1).data;
-                const hex = rgbToHex(p[0], p[1], p[2]);
-
-                hoverSwatch.style.backgroundColor = hex;
-                hoverHex.innerText = hex;
-                hoverRgb.innerText = `RGB: ${p[0]}, ${p[1]}, ${p[2]}`;
-                badge.style.opacity = '1';
-            });
-
-            mainCanvas.addEventListener('mouseleave', () => {
-                loupe.style.display = 'none';
-                badge.style.opacity = '0';
-            });
-
-            mainCanvas.addEventListener('click', (e) => {
-                const rect = mainCanvas.getBoundingClientRect();
-                const scaleX = mainCanvas.width / rect.width;
-                const scaleY = mainCanvas.height / rect.height;
-
-                const mouseX = Math.floor((e.clientX - rect.left) * scaleX);
-                const mouseY = Math.floor((e.clientY - rect.top) * scaleY);
-
-                const p = mainCtx.getImageData(mouseX, mouseY, 1, 1).data;
-                const hex = rgbToHex(p[0], p[1], p[2]);
-
-                addManualColor(hex);
-            });
-        }
-
-        /* DRAFT PALETTE MANAGEMENT */
-        function addManualColor(hex) {
-            hex = hex.toUpperCase();
-            if (!draftPalette.includes(hex)) {
-                draftPalette.push(hex);
-                renderDraftPaletteGrid();
-                inspectColor(hex);
-                showToast(`Added ${hex} to draft!`);
-            } else {
-                showToast(`${hex} is already in draft palette`, "warning");
-            }
-        }
-
-        function removeDraftColor(index) {
-            draftPalette.splice(index, 1);
-            renderDraftPaletteGrid();
-            if (draftPalette.length > 0) {
-                inspectColor(draftPalette[0]);
-            }
-        }
-
-        function clearDraftPalette() {
-            draftPalette = [];
-            renderDraftPaletteGrid();
-            showToast("Draft palette cleared!");
-        }
-
-        function renderDraftPaletteGrid() {
-            const container = document.getElementById('draft-swatch-grid');
-            document.getElementById('draft-count-tag').innerText = draftPalette.length;
-
-            container.innerHTML = '';
-
-            draftPalette.forEach((hex, idx) => {
-                const card = document.createElement('div');
-                card.className = 'swatch-card relative group rounded-xl overflow-hidden cursor-pointer shadow-sm border border-black/10 flex flex-col aspect-square justify-between p-1.5 transition-all';
-                card.style.backgroundColor = hex;
-                card.onclick = () => inspectColor(hex);
-
-                const lum = getPerceivedLuminanceHex(hex);
-                const textColor = lum > 0.5 ? '#0f172a' : '#ffffff';
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onclick="event.stopPropagation(); removeDraftColor(${idx})" class="w-4 h-4 rounded-full bg-black/40 hover:bg-red-600 text-white text-[9px] flex items-center justify-center">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                    <span class="font-mono text-[10px] font-bold text-center tracking-tighter truncate" style="color: ${textColor}">
-                        ${hex}
-                    </span>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function inspectColor(hex) {
-            activeInspectorHex = hex.toUpperCase();
-            const [r, g, b] = hexToRgb(activeInspectorHex);
-            const [h, s, l] = rgbToHsl(r, g, b);
-            const lumPct = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
-
-            document.getElementById('inspector-hex').innerText = activeInspectorHex;
-            document.getElementById('inspector-preview-box').style.backgroundColor = activeInspectorHex;
-            document.getElementById('inspector-rgb').innerText = `${r}, ${g}, ${b}`;
-            document.getElementById('inspector-hsl').innerText = `${h}%, ${s}%, ${l}%`;
-            document.getElementById('inspector-val').innerText = `${lumPct}%`;
-
-            const contrastVal = lumPct > 50 ? 'Dark Text Pass' : 'White Text Pass';
-            document.getElementById('inspector-wcag').innerText = contrastVal;
-
-            const wcagBar = document.getElementById('wcag-preview-bar');
-            wcagBar.style.backgroundColor = activeInspectorHex;
-            wcagBar.style.color = lumPct > 50 ? '#0f172a' : '#ffffff';
-            wcagBar.style.borderColor = lumPct > 50 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)';
-
-            document.getElementById('harmony-base-picker').value = activeInspectorHex;
-            document.getElementById('harmony-base-text').value = activeInspectorHex;
-            updateHarmonies(activeInspectorHex);
-        }
-
-        function saveCurrentDraftToBank() {
-            if (draftPalette.length === 0) {
-                showToast("Draft palette is empty!", "warning");
-                return;
-            }
-
-            const titleInput = document.getElementById('save-palette-title');
-            const tagsInput = document.getElementById('save-palette-tags');
-
-            const name = titleInput.value.trim() || `Palette ${paletteBank.length + 1}`;
-            const rawTags = tagsInput.value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
-            const tags = rawTags.length > 0 ? rawTags : ['extracted', 'custom'];
-
-            const newEntry = {
-                id: 'pal_' + Date.now(),
-                name,
-                tags,
-                date: new Date().toLocaleDateString(),
-                colors: [...draftPalette]
-            };
-
-            paletteBank.unshift(newEntry);
-            saveBankToStorage();
-
-            titleInput.value = '';
-            tagsInput.value = '';
-
-            showToast(`Saved "${name}" to Palette Bank!`);
-            switchTab(2);
-        }
-
-        /* TAB 2: SAVED PALETTE BANK & DETAIL MODAL ENGINE */
-        function renderPaletteBank() {
-            const grid = document.getElementById('bank-grid');
-            if (!grid) return;
-
-            const searchVal = (document.getElementById('bank-search-input')?.value || '').toLowerCase().trim();
-            const sortBy = document.getElementById('bank-sort-select')?.value || 'newest';
-
-            renderBankTagChips();
-
-            let filtered = paletteBank.filter(p => {
-                const matchName = p.name.toLowerCase().includes(searchVal);
-                const matchTags = (p.tags || []).some(t => t.toLowerCase().includes(searchVal));
-                const matchColors = (p.colors || []).some(c => c.toLowerCase().includes(searchVal));
-                return matchName || matchTags || matchColors;
-            });
-
-            if (sortBy === 'oldest') {
-                filtered.reverse();
-            } else if (sortBy === 'name') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-            }
-
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">
-                        <i class="fa-solid fa-box-open text-3xl mb-2 text-slate-300 block"></i>
-                        <p class="font-bold text-sm text-slate-600">No saved palettes found</p>
-                        <p class="text-xs">Try extracting a new palette from Tab 1 or adjust your search filter.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach(palette => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 hover:border-sky-300 transition-all cursor-pointer flex flex-col justify-between group';
-                card.onclick = () => openPaletteDetailModal(palette.id);
-
-                const tagsHtml = (palette.tags || []).map(t => `<span class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200">#${t}</span>`).join(' ');
-
-                const swatchesHtml = (palette.colors || []).map(c => {
-                    const lum = getPerceivedLuminanceHex(c);
-                    return `
-                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 aspect-square relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
-                            <span class="font-mono text-[9px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
-                        </div>
-                    `;
-                }).join('');
-
-                card.innerHTML = `
-                    <div class="space-y-3">
-                        <div class="flex items-start justify-between gap-2">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-base group-hover:text-[#0369a1] transition-colors">${palette.name}</h3>
-                                <p class="text-[10px] text-slate-400 font-medium">Saved on ${palette.date} • ${palette.colors.length} colors</p>
-                            </div>
-                        </div>
-
-                        <!-- Square Color Swatch Bar -->
-                        <div class="flex items-center w-full rounded-xl overflow-hidden border border-black/10">
-                            ${swatchesHtml}
-                        </div>
-
-                        <!-- Tags -->
-                        <div class="flex flex-wrap gap-1">
-                            ${tagsHtml}
-                        </div>
-                    </div>
-
-                    <!-- Actions Footer with Direct High-Res JPEG Download -->
-                    <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
-                        <span class="text-[#0369a1] font-bold text-[11px] flex items-center gap-1">
-                            <i class="fa-solid fa-pen-to-square text-xs"></i> Click to edit
-                        </span>
-                        <div class="flex items-center space-x-1.5" onclick="event.stopPropagation()">
-                            <button onclick="downloadDirectPaletteJPEG('${palette.id}')" title="Download High-Res JPEG Card" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg border border-emerald-200 text-[10px] flex items-center gap-1">
-                                <i class="fa-solid fa-download"></i> JPEG
-                            </button>
-                            <button onclick="copyAllHexFromPalette('${palette.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 text-[10px]">
-                                Copy HEX
-                            </button>
-                            <button onclick="deletePaletteFromBank('${palette.id}')" class="p-1 text-slate-400 hover:text-red-500 transition-colors">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-        }
-
-        function renderBankTagChips() {
-            const container = document.getElementById('bank-tag-filter-container');
-            if (!container) return;
-
-            const allTags = new Set();
-            paletteBank.forEach(p => (p.tags || []).forEach(t => allTags.add(t)));
-
-            if (allTags.size === 0) {
-                container.innerHTML = '';
-                return;
-            }
-
-            let html = `<span class="text-slate-400 text-[10px] uppercase font-bold mr-1">Filter Tags:</span>`;
-            allTags.forEach(tag => {
-                html += `<button onclick="filterBankByTag('${tag}')" class="bg-slate-100 hover:bg-[#B4E3F8] text-slate-600 hover:text-[#0369a1] text-[10px] font-semibold px-2 py-0.5 rounded-full border border-slate-200 transition-colors">#${tag}</button>`;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function filterBankByTag(tag) {
-            const searchInput = document.getElementById('bank-search-input');
-            if (searchInput) searchInput.value = tag;
-            renderPaletteBank();
-        }
-
-        /* DETAIL MODAL FUNCTIONS */
-        function openPaletteDetailModal(id) {
-            activeDetailPalette = paletteBank.find(p => p.id === id);
-            if (!activeDetailPalette) return;
-
-            document.getElementById('detail-edit-name').value = activeDetailPalette.name;
-            document.getElementById('detail-modal-date').innerText = `Saved on ${activeDetailPalette.date} • ${activeDetailPalette.colors.length} total colors`;
-            document.getElementById('detail-edit-tags').value = activeDetailPalette.tags ? activeDetailPalette.tags.join(', ') : '';
-
-            const grid = document.getElementById('detail-modal-swatches-grid');
-            grid.innerHTML = '';
-
-            activeDetailPalette.colors.forEach((hex) => {
-                const [r, g, b] = hexToRgb(hex);
-                const [h, s, l] = rgbToHsl(r, g, b);
-                const lumPct = (getPerceivedLuminance(r, g, b) * 100).toFixed(1);
-                const isLight = lumPct > 50;
-
-                const card = document.createElement('div');
-                card.className = 'bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center space-x-3 cursor-pointer hover:border-sky-400 transition-all shadow-sm group';
-                card.onclick = () => copySingleHex(hex);
-
-                card.innerHTML = `
-                    <div class="w-12 h-12 aspect-square rounded-xl shadow-inner border border-black/10 flex-shrink-0 flex items-center justify-center relative overflow-hidden" style="background-color: ${hex}">
-                        <i class="fa-solid fa-copy text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${isLight ? '#000' : '#fff'}"></i>
-                    </div>
-                    <div class="flex-grow font-mono text-xs space-y-0.5">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-slate-900 text-sm">${hex}</span>
-                            <span class="text-[9px] px-1.5 py-0.5 rounded font-sans font-bold ${isLight ? 'bg-amber-100 text-amber-800' : 'bg-slate-800 text-slate-100'}">${isLight ? 'AAA Dark' : 'AAA White'}</span>
-                        </div>
-                        <div class="text-[10px] text-slate-500">RGB: ${r}, ${g}, ${b}</div>
-                        <div class="text-[10px] text-slate-400">HSL: ${h}%, ${s}%, ${l}% • Lum: ${lumPct}%</div>
-                    </div>
-                `;
-
-                grid.appendChild(card);
-            });
-
-            document.getElementById('palette-detail-modal').classList.remove('hidden');
-        }
-
-        function closePaletteDetailModal() {
-            document.getElementById('palette-detail-modal').classList.add('hidden');
-        }
-
-        function saveDetailPaletteChanges() {
-            if (!activeDetailPalette) return;
-
-            const newName = document.getElementById('detail-edit-name').value.trim();
-            const rawTags = document.getElementById('detail-edit-tags').value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
-
-            if (!newName) {
-                showToast("Palette name cannot be empty!", "warning");
-                return;
-            }
-
-            activeDetailPalette.name = newName;
-            activeDetailPalette.tags = rawTags.length > 0 ? rawTags : ['custom'];
-
-            saveBankToStorage();
-            renderPaletteBank();
-            showToast("Palette updated successfully!");
-        }
-
-        function loadDetailPaletteToDraft() {
-            if (!activeDetailPalette) return;
-            draftPalette = [...activeDetailPalette.colors];
-            renderDraftPaletteGrid();
-            if (draftPalette.length > 0) inspectColor(draftPalette[0]);
-            closePaletteDetailModal();
-            switchTab(1);
-            showToast(`Loaded "${activeDetailPalette.name}" into Tab 1 Draft!`);
-        }
-
-        function copyDetailPaletteAllHex() {
-            if (!activeDetailPalette) return;
-            copyToClipboard(activeDetailPalette.colors.join(', '));
-            showToast(`Copied all ${activeDetailPalette.colors.length} HEX codes!`);
-        }
-
-        function openExportModalFromDetail() {
-            if (!activeDetailPalette) return;
-            activeExportPalette = activeDetailPalette;
-            closePaletteDetailModal();
-            openExportModalForPalette(activeExportPalette.id);
-        }
-
-        function deleteDetailPalette() {
-            if (!activeDetailPalette) return;
-            deletePaletteFromBank(activeDetailPalette.id);
-            closePaletteDetailModal();
-        }
-
-        function copySingleHex(hex) {
-            copyToClipboard(hex);
-            showToast(`Copied ${hex} to clipboard!`);
-        }
-
-        function copyAllHexFromPalette(id) {
-            const pal = paletteBank.find(p => p.id === id);
-            if (pal) {
-                copyToClipboard(pal.colors.join(', '));
-                showToast(`Copied all colors from "${pal.name}"!`);
-            }
-        }
-
-        function deletePaletteFromBank(id) {
-            paletteBank = paletteBank.filter(p => p.id !== id);
-            saveBankToStorage();
-            renderPaletteBank();
-            showToast("Palette deleted from bank.");
-        }
-
-        function clearPaletteBank() {
-            if (paletteBank.length === 0) return;
-            paletteBank = [];
-            saveBankToStorage();
-            renderPaletteBank();
-            showToast("Palette bank cleared.");
-        }
-
-        /* EXPORT MODAL & MINIMALIST SWATCH CARD GENERATOR */
-        function openExportModalForPalette(id) {
-            activeExportPalette = paletteBank.find(p => p.id === id);
-            if (!activeExportPalette) return;
-
-            document.getElementById('export-modal-title').innerText = `Export "${activeExportPalette.name}"`;
-            document.getElementById('export-modal').classList.remove('hidden');
-            switchExportFormat('css');
-        }
-
-        function closeExportModal() {
-            document.getElementById('export-modal').classList.add('hidden');
-        }
-
-        function switchExportFormat(fmt) {
-            activeExportFormat = fmt;
-            ['css', 'tailwind', 'hex'].forEach(f => {
-                const btn = document.getElementById(`exp-tab-${f}`);
-                if (!btn) return;
-                if (f === fmt) {
-                    btn.className = 'flex-1 py-1.5 rounded-lg text-slate-700 active font-bold bg-[#B4E3F8] text-[#0369a1]';
-                } else {
-                    btn.className = 'flex-1 py-1.5 rounded-lg text-slate-700';
-                }
-            });
-
-            if (!activeExportPalette) return;
-            const area = document.getElementById('export-code-area');
-            const colors = activeExportPalette.colors;
-
-            if (fmt === 'css') {
-                area.value = `:root {\n` + colors.map((c, i) => `  --color-${i + 1}: ${c};`).join('\n') + `\n}`;
-            } else if (fmt === 'tailwind') {
-                area.value = `theme: {\n  extend: {\n    colors: {\n      palette: {\n` +
-                    colors.map((c, i) => `        '${i + 1}': '${c}',`).join('\n') +
-                    `\n      }\n    }\n  }\n}`;
-            } else if (fmt === 'hex') {
-                area.value = colors.join(', ');
-            }
-        }
-
-        function copyExportCode() {
-            const area = document.getElementById('export-code-area');
-            copyToClipboard(area.value);
-            showToast("Copied code to clipboard!");
-        }
-
-        /* DIRECT FRONT-CARD JPEG DOWNLOAD FUNCTION */
-        function downloadDirectPaletteJPEG(id) {
-            const pal = paletteBank.find(p => p.id === id);
-            if (!pal) return;
-            generateHighResCardDownload(pal, 'jpeg');
-        }
-
-        /* MINIMALIST CARD GENERATION (ULTRA HIGH-RES 1920x1080 SOLID SQUARE BLOCKS) */
-        function downloadMinimalPaletteCard(fileType = 'png') {
-            if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
-                showToast("No active palette colors to download!", "warning");
-                return;
-            }
-            generateHighResCardDownload(activeExportPalette, fileType);
-        }
-
-        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
-            const colors = paletteObj.colors;
-            if (!colors || colors.length === 0) return;
-
-            const cardCanvas = document.createElement('canvas');
-            // Full HD high-resolution dimensions for high pixel density
-            const canvasWidth = 1920;
-            const canvasHeight = 1080;
-            cardCanvas.width = canvasWidth;
-            cardCanvas.height = canvasHeight;
-            const ctx = cardCanvas.getContext('2d');
-
-            const swatchWidth = canvasWidth / colors.length;
-            const swatchHeight = canvasHeight;
-
-            colors.forEach((hex, idx) => {
-                const x = idx * swatchWidth;
-                const y = 0;
-
-                // Edge-to-edge solid color blocks with ultra high clarity
-                ctx.fillStyle = hex;
-                ctx.fillRect(x, y, swatchWidth, swatchHeight);
-            });
-
-            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
-            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_hd_palette.${fileExt}`;
-
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
-            downloadAnchor.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            showToast(`Downloaded High-Res ${fileType.toUpperCase()} Card!`);
-        }
-
-        /* TAB 3: COLOR HARMONIES ENGINE */
-        function updateHarmoniesFromPicker(val) {
-            document.getElementById('harmony-base-text').value = val.toUpperCase();
-            updateHarmonies(val);
-        }
-
-        function updateHarmoniesFromText(val) {
-            if (/^#[0-9A-F]{6}$/i.test(val)) {
-                document.getElementById('harmony-base-picker').value = val;
-                updateHarmonies(val);
-            }
-        }
-
-        function updateHarmonies(baseHex) {
-            const [r, g, b] = hexToRgb(baseHex);
-            const [h, s, l] = rgbToHsl(r, g, b);
-
-            const compH = (h + 180) % 360;
-            const compHex = hslToHex(compH, s, l);
-            renderHarmonySection('harmony-grid-complementary', [baseHex, compHex]);
-
-            const ana1 = hslToHex((h + 330) % 360, s, l);
-            const ana2 = hslToHex((h + 30) % 360, s, l);
-            renderHarmonySection('harmony-grid-analogous', [ana1, baseHex, ana2]);
-
-            const tri1 = hslToHex((h + 120) % 360, s, l);
-            const tri2 = hslToHex((h + 240) % 360, s, l);
-            renderHarmonySection('harmony-grid-triadic', [baseHex, tri1, tri2]);
-
-            const tet1 = hslToHex((h + 90) % 360, s, l);
-            const tet2 = hslToHex((h + 180) % 360, s, l);
-            const tet3 = hslToHex((h + 270) % 360, s, l);
-            renderHarmonySection('harmony-grid-tetradic', [baseHex, tet1, tet2, tet3]);
-
-            const mono = [
-                hslToHex(h, s, Math.max(10, l - 30)),
-                hslToHex(h, s, Math.max(20, l - 15)),
-                baseHex,
-                hslToHex(h, s, Math.min(85, l + 15)),
-                hslToHex(h, s, Math.min(95, l + 30))
-            ];
-            renderHarmonySection('harmony-grid-monochromatic', mono);
-        }
-
-        function renderHarmonySection(elementId, colors) {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-            container.innerHTML = '';
-
-            colors.forEach(hex => {
-                const lum = getPerceivedLuminanceHex(hex);
-                const textColor = lum > 0.5 ? '#0f172a' : '#ffffff';
-
-                const item = document.createElement('div');
-                item.className = 'swatch-card aspect-square rounded-xl cursor-pointer p-2 flex flex-col justify-between shadow-sm border border-black/10 transition-all hover:scale-105';
-                item.style.backgroundColor = hex;
-                item.onclick = () => {
-                    addManualColor(hex);
-                    switchTab(1);
-                };
-
-                item.innerHTML = `
-                    <div class="flex justify-end">
-                        <span class="w-5 h-5 rounded-full bg-black/20 text-white text-[10px] flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-plus"></i>
-                        </span>
-                    </div>
-                    <span class="font-mono text-xs font-bold tracking-tight text-center" style="color: ${textColor}">${hex.toUpperCase()}</span>
-                `;
-
-                container.appendChild(item);
-            });
-        }
-
-        /* HELPER COLOR MATHEMATICS & UTILITIES */
-        function getPerceivedLuminance(r, g, b) {
-            return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255.0;
-        }
-
-        function getPerceivedLuminanceHex(hex) {
-            const [r, g, b] = hexToRgb(hex);
-            return getPerceivedLuminance(r, g, b);
-        }
-
-        function rgbToHex(r, g, b) {
-            return "#" + [r, g, b].map(x => {
-                const h = Math.round(x).toString(16);
-                return h.length === 1 ? "0" + h : h;
-            }).join("").toUpperCase();
-        }
-
-        function hexToRgb(hex) {
-            hex = hex.replace('#', '');
-            if (hex.length === 3) {
-                hex = hex.split('').map(c => c + c).join('');
-            }
-            const num = parseInt(hex, 16);
-            return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
-        }
-
-        function rgbToHsl(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-
-            if (max === min) {
-                h = s = 0;
-            } else {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                    case g: h = (b - r) / d + 2; break;
-                    case b: h = (r - g) / d + 4; break;
-                }
-                h /= 6;
-            }
-            return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
-        }
-
-        function hslToHex(h, s, l) {
-            s /= 100; l /= 100;
-            const k = n => (n + h / 30) % 12;
-            const a = s * Math.min(l, 1 - l);
-            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-            return rgbToHex(255 * f(0), 255 * f(8), 255 * f(4));
-        }
-
-        function copyToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        }
-
-        /* TOAST SYSTEM */
-        function showToast(message, type = "success") {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-
-            const toast = document.createElement('div');
-            toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 bg-white text-slate-800 ${type === 'warning' ? 'border-amber-300' : 'border-sky-300'}`;
-
-            toast.innerHTML = `
-                <span class="w-2 h-2 rounded-full ${type === 'warning' ? 'bg-amber-500' : 'bg-[#0284c7]'}"></span>
-                <span>${message}</span>
-            `;
-
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 2500);
-        }
-
-        /* TAB NAVIGATION MANAGER */
-        function switchTab(tabNum) {
-            activeTab = tabNum;
-            for (let i = 1; i <= 3; i++) {
-                const btn = document.getElementById(`tab-btn-${i}`);
-                const content = document.getElementById(`tab-content-${i}`);
-                if (i === tabNum) {
-                    if (btn) btn.classList.add('active');
-                    if (content) content.classList.remove('hidden');
-                } else {
-                    if (btn) btn.classList.remove('active');
-                    if (content) content.classList.add('hidden');
-                }
-            }
-
-            if (tabNum === 2) renderPaletteBank();
-        }
-    </script>
-</body>
-</html>
