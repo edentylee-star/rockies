@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palette Vault - Image Extractor & Palette Bank</title>
+    <title>secret stash</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -702,7 +702,7 @@
             <!-- Minimalist Swatch Card Downloads -->
             <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
                 <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Minimalist High-Res Swatch Card Image Downloads</span>
-                <p class="text-[11px] text-slate-400">High-resolution (1080×1080px per color) side-by-side solid square color blocks with no text or overlay elements.</p>
+                <p class="text-[11px] text-slate-400">High-resolution square color blocks with crisp white margins in 8-swatch grid rows with dynamic height.</p>
                 <div class="flex items-center gap-2 pt-1">
                     <button type="button" onclick="downloadMinimalPaletteCard('png')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
                         <i class="fa-solid fa-file-image text-sky-600"></i> Download HD PNG
@@ -812,21 +812,21 @@
                         name: 'Pastel Horizon',
                         tags: ['pastel', 'soft', 'ui', 'gradient'],
                         date: new Date().toLocaleDateString(),
-                        colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD']
+                        colors: ['#F9A8D4', '#FCD34D', '#A7F3D0', '#BAE6FD', '#C4B5FD', '#F472B6', '#FBBF24', '#34D399']
                     },
                     {
                         id: 'sample-2',
                         name: 'Deep Cyberpunk Neon',
                         tags: ['cyberpunk', 'dark', 'neon', 'ui'],
                         date: new Date().toLocaleDateString(),
-                        colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308']
+                        colors: ['#0F172A', '#38BDF8', '#F43F5E', '#A855F7', '#EAB308', '#0284C7', '#E11D48', '#9333EA', '#CA8A04', '#0369A1']
                     },
                     {
                         id: 'sample-3',
                         name: 'Earthy Forest',
                         tags: ['nature', 'forest', 'warm', 'earthy'],
                         date: new Date().toLocaleDateString(),
-                        colors: ['#064E3B', '#047857', '#10B981', '#A7F3D0', '#78350F']
+                        colors: ['#064E3B', '#047857', '#10B981', '#A7F3D0', '#78350F', '#B45309', '#D97706', '#FBBF24']
                     }
                 ];
                 saveBankToStorage();
@@ -1231,8 +1231,8 @@
                 const swatchesHtml = (palette.colors || []).map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
-                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="flex-1 aspect-square relative group/swatch flex items-end justify-center p-1 transition-transform hover:scale-105 hover:z-10 shadow-sm" style="background-color: ${c}">
-                            <span class="font-mono text-[9px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
+                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="w-full aspect-square relative group/swatch flex items-center justify-center rounded-lg shadow-sm transition-transform hover:scale-105 hover:z-10 border border-slate-200/60" style="background-color: ${c}">
+                            <span class="font-mono text-[8px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
                         </div>
                     `;
                 }).join('');
@@ -1246,8 +1246,8 @@
                             </div>
                         </div>
 
-                        <!-- Square Color Swatch Bar -->
-                        <div class="flex items-center w-full rounded-xl overflow-hidden border border-black/10">
+                        <!-- 8-Column Square Color Swatch Grid with White Margin Spacing -->
+                        <div class="grid grid-cols-8 gap-1.5 p-1.5 bg-white border border-slate-200 rounded-xl">
                             ${swatchesHtml}
                         </div>
 
@@ -1482,7 +1482,7 @@
             generateHighResCardDownload(pal, 'jpeg');
         }
 
-        /* MINIMALIST CARD GENERATION (DYNAMIC ULTRA HIGH-RES SQUARE BLOCKS) */
+        /* MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES SQUARE GRID WITH WHITE MARGINS & DYNAMIC HEIGHT) */
         function downloadMinimalPaletteCard(fileType = 'png') {
             if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
                 showToast("No active palette colors to download!", "warning");
@@ -1495,25 +1495,42 @@
             const colors = paletteObj.colors;
             if (!colors || colors.length === 0) return;
         
-            // Define fixed square size for each color swatch block
-            const squareSize = 1080; // 1080px height & width per swatch for crisp high resolution
-            const swatchCount = colors.length;
+            const cols = 8; // Exactly 8 swatches per row
+            const swatchSize = 400; // Crisp high-res square swatch dimension (400x400px)
+            const margin = 20; // Crisp white spacing/margin between swatches and borders
+            
+            const totalSwatches = colors.length;
+            const rows = Math.ceil(totalSwatches / cols);
+
+            // Dynamic width and height calculations
+            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
+            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
         
             const cardCanvas = document.createElement('canvas');
-            cardCanvas.width = squareSize * swatchCount; // Dynamic width ensures 1:1 square swatches side-by-side
-            cardCanvas.height = squareSize;
+            cardCanvas.width = canvasWidth;
+            cardCanvas.height = canvasHeight;
         
             const ctx = cardCanvas.getContext('2d');
         
+            // Fill background with clean white for margins
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            // Render square swatches
             colors.forEach((hex, idx) => {
-                const x = idx * squareSize;
+                const colIndex = idx % cols;
+                const rowIndex = Math.floor(idx / cols);
+
+                const x = margin + colIndex * (swatchSize + margin);
+                const y = margin + rowIndex * (swatchSize + margin);
+
                 ctx.fillStyle = hex;
-                ctx.fillRect(x, 0, squareSize, squareSize);
+                ctx.fillRect(x, y, swatchSize, swatchSize);
             });
         
             const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
             const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_square_swatches.${fileExt}`;
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_8col_square_swatches.${fileExt}`;
         
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
@@ -1522,7 +1539,7 @@
             downloadAnchor.click();
             downloadAnchor.remove();
         
-            showToast(`Downloaded High-Res ${fileType.toUpperCase()} Square Swatches!`);
+            showToast(`Downloaded High-Res 8-Column ${fileType.toUpperCase()} Swatch Card!`);
         }
 
         /* TAB 3: COLOR HARMONIES ENGINE */
