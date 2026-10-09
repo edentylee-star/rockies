@@ -143,6 +143,20 @@
             backdrop-filter: blur(4px);
         }
 
+        /* Global Comparison Palette Slot Drag States */
+        .palette-slot {
+            transition: all 0.15s ease;
+        }
+        .palette-slot.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+        }
+        .palette-slot.drag-over {
+            border-color: #0284c7;
+            background-color: #E6F4FA;
+            transform: scale(1.05);
+        }
+
         /* TOP-LEFT NAVIGATION PANEL & HOME BUTTON */
         .nav-header-left {
             display: flex;
@@ -220,19 +234,13 @@
             color: #0284c7;
         }
         
-        .nav-dropdown-item.active-tool {
-            background-color: #f0f9ff;
-            color: #0284c7;
-            font-weight: 700;
-        }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-white text-slate-800">
+<body class="min-h-screen flex flex-col bg-white text-slate-800 pb-24">
 
     <!-- TOP NAVIGATION HEADER -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
@@ -605,9 +613,7 @@
         </section>
     </main>
 
-    <!-- ========================================================= -->
     <!-- INTERACTIVE SAVED PALETTE DETAIL VIEWER MODAL -->
-    <!-- ========================================================= -->
     <div id="palette-detail-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
         <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-3xl w-full p-6 space-y-6 max-h-[90vh] overflow-y-auto">
             
@@ -729,7 +735,7 @@
                     </div>
                     <span id="palette-counter" class="font-bold text-slate-900 text-xs sm:text-sm">Global Comparison Palette (0/16)</span>
                 </div>
-                <button onclick="clearPalette()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
+                <button onclick="clearGlobalPalette()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-trash-can text-[11px]"></i>
                     <span>Clear</span>
                 </button>
@@ -738,7 +744,7 @@
             <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1"></div>
 
             <div class="flex items-center space-x-2">
-                <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-[#22ACEC]">
+                <button onclick="copyAllGlobalPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-[#22ACEC]">
                     <i class="fa-solid fa-copy text-xs"></i>
                     <span>Copy All HEX</span>
                 </button>
@@ -749,9 +755,7 @@
     <!-- TOAST NOTIFICATIONS CONTAINER -->
     <div id="toast-container" class="fixed top-16 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- ========================================================= -->
     <!-- JAVASCRIPT APPLICATION CORE ENGINE -->
-    <!-- ========================================================= -->
     <script>
         /* APPLICATION STATE */
         let activeTab = 1;
@@ -761,6 +765,11 @@
         let activeExportPalette = null;
         let activeDetailPalette = null;
         let activeExportFormat = "css";
+
+        /* GLOBAL COMPARISON PALETTE STATE & DRAG-AND-DROP */
+        const MAX_GLOBAL_PALETTE = 16;
+        let globalPaletteColors = [];
+        let globalDraggedIndex = null;
 
         // Main Image Canvas & Offscreen Image references
         let mainCanvas, mainCtx, loupeCanvas, loupeCtx;
@@ -787,6 +796,7 @@
             loupeCanvas = document.getElementById('loupe-canvas');
             loupeCtx = loupeCanvas.getContext('2d');
 
+            initGlobalPaletteUI();
             loadBankFromStorage();
             renderCanvasPlaceholder();
             setupEyedropperListeners();
@@ -808,6 +818,139 @@
             mainCtx.fillStyle = '#94a3b8';
             mainCtx.font = '12px Inter, sans-serif';
             mainCtx.fillText('Hover to inspect • Click to pick color', mainCanvas.width / 2, mainCanvas.height / 2 + 15);
+        }
+
+        /* GLOBAL COMPARISON PALETTE DRAWER ENGINE */
+        function initGlobalPaletteUI() {
+            const container = document.getElementById('palette-slots-container');
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 0; i < MAX_GLOBAL_PALETTE; i++) {
+                let slot = document.createElement('div');
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all relative overflow-hidden';
+                slot.id = 'g-slot-' + i;
+                slot.dataset.index = i;
+
+                slot.addEventListener('dragstart', handleGlobalDragStart);
+                slot.addEventListener('dragover', handleGlobalDragOver);
+                slot.addEventListener('dragleave', handleGlobalDragLeave);
+                slot.addEventListener('drop', handleGlobalDrop);
+                slot.addEventListener('dragend', handleGlobalDragEnd);
+
+                container.appendChild(slot);
+            }
+            updateGlobalPaletteUI();
+        }
+
+        function addToGlobalPalette(hex) {
+            hex = hex.toUpperCase();
+            if (globalPaletteColors.length < MAX_GLOBAL_PALETTE) {
+                globalPaletteColors.push(hex);
+                updateGlobalPaletteUI();
+                showToast(`Added ${hex} to Comparison Drawer`);
+            } else {
+                showToast("Comparison Drawer is Full (16/16)", "warning");
+            }
+        }
+
+        function removeFromGlobalPalette(index, event) {
+            event.stopPropagation();
+            globalPaletteColors.splice(index, 1);
+            updateGlobalPaletteUI();
+        }
+
+        function clearGlobalPalette() {
+            globalPaletteColors = [];
+            updateGlobalPaletteUI();
+            showToast("Comparison Palette Cleared");
+        }
+
+        function copyAllGlobalPaletteHex() {
+            if (globalPaletteColors.length === 0) {
+                showToast("Comparison Palette is empty!", "warning");
+                return;
+            }
+            copyToClipboard(globalPaletteColors.join(', '));
+            showToast(`Copied all ${globalPaletteColors.length} HEX codes!`);
+        }
+
+        function handleGlobalDragStart(e) {
+            const index = parseInt(this.dataset.index);
+            if (isNaN(index) || index >= globalPaletteColors.length) {
+                e.preventDefault();
+                return;
+            }
+            globalDraggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+
+        function handleGlobalDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleGlobalDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleGlobalDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (globalDraggedIndex !== null && !isNaN(targetIndex) && targetIndex < globalPaletteColors.length) {
+                const movedColor = globalPaletteColors.splice(globalDraggedIndex, 1)[0];
+                globalPaletteColors.splice(targetIndex, 0, movedColor);
+                updateGlobalPaletteUI();
+            }
+        }
+
+        function handleGlobalDragEnd(e) {
+            document.querySelectorAll('.palette-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            globalDraggedIndex = null;
+        }
+
+        function updateGlobalPaletteUI() {
+            const counter = document.getElementById('palette-counter');
+            if (counter) counter.innerText = `Global Comparison Palette (${globalPaletteColors.length}/16)`;
+
+            for (let i = 0; i < MAX_GLOBAL_PALETTE; i++) {
+                const slot = document.getElementById('g-slot-' + i);
+                if (!slot) continue;
+                slot.innerHTML = '';
+
+                if (i < globalPaletteColors.length) {
+                    const hex = globalPaletteColors[i];
+                    const lum = getPerceivedLuminanceHex(hex);
+                    const textColor = lum > 0.5 ? '#0f172a' : '#ffffff';
+
+                    slot.style.backgroundColor = hex;
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
+                    slot.setAttribute('draggable', 'true');
+
+                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${textColor}">${hex.substring(1)}</span>`;
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.title = 'Remove color';
+                    removeBtn.onclick = (e) => removeFromGlobalPalette(i, e);
+                    slot.appendChild(removeBtn);
+
+                    slot.onclick = () => {
+                        copyToClipboard(hex);
+                        showToast(`Copied ${hex}`);
+                    };
+                } else {
+                    slot.style.backgroundColor = 'transparent';
+                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all';
+                    slot.removeAttribute('draggable');
+                    slot.onclick = null;
+                }
+            }
         }
 
         /* LOCAL STORAGE PERSISTENCE ENGINE */
@@ -1090,6 +1233,7 @@
                 const hex = rgbToHex(p[0], p[1], p[2]);
 
                 addManualColor(hex);
+                addToGlobalPalette(hex);
             });
         }
 
@@ -1130,7 +1274,10 @@
                 const card = document.createElement('div');
                 card.className = 'swatch-card relative group rounded-xl overflow-hidden cursor-pointer shadow-sm border border-black/10 flex flex-col aspect-square justify-between p-1.5 transition-all';
                 card.style.backgroundColor = hex;
-                card.onclick = () => inspectColor(hex);
+                card.onclick = () => {
+                    inspectColor(hex);
+                    addToGlobalPalette(hex);
+                };
 
                 const lum = getPerceivedLuminanceHex(hex);
                 const textColor = lum > 0.5 ? '#0f172a' : '#ffffff';
@@ -1244,7 +1391,7 @@
                 const swatchesHtml = (palette.colors || []).map(c => {
                     const lum = getPerceivedLuminanceHex(c);
                     return `
-                        <div onclick="event.stopPropagation(); copySingleHex('${c}')" title="Click to copy ${c}" class="w-full aspect-square relative group/swatch flex items-center justify-center rounded-lg shadow-sm transition-transform hover:scale-105 hover:z-10 border border-slate-200/60" style="background-color: ${c}">
+                        <div onclick="event.stopPropagation(); addToGlobalPalette('${c}'); copySingleHex('${c}')" title="Click to copy & compare ${c}" class="w-full aspect-square relative group/swatch flex items-center justify-center rounded-lg shadow-sm transition-transform hover:scale-105 hover:z-10 border border-slate-200/60" style="background-color: ${c}">
                             <span class="font-mono text-[8px] font-bold opacity-0 group-hover/swatch:opacity-100 transition-opacity" style="color: ${lum > 0.5 ? '#000' : '#fff'}">${c}</span>
                         </div>
                     `;
@@ -1342,11 +1489,14 @@
 
                 const card = document.createElement('div');
                 card.className = 'bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center space-x-3 cursor-pointer hover:border-sky-400 transition-all shadow-sm group';
-                card.onclick = () => copySingleHex(hex);
+                card.onclick = () => {
+                    addToGlobalPalette(hex);
+                    copySingleHex(hex);
+                };
 
                 card.innerHTML = `
                     <div class="w-12 h-12 aspect-square rounded-xl shadow-inner border border-black/10 flex-shrink-0 flex items-center justify-center relative overflow-hidden" style="background-color: ${hex}">
-                        <i class="fa-solid fa-copy text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${isLight ? '#000' : '#fff'}"></i>
+                        <i class="fa-solid fa-plus text-xs opacity-0 group-hover:opacity-100 transition-opacity" style="color: ${isLight ? '#000' : '#fff'}"></i>
                     </div>
                     <div class="flex-grow font-mono text-xs space-y-0.5">
                         <div class="flex items-center justify-between">
@@ -1573,7 +1723,7 @@
             const colors = paletteObj.colors;
             if (!colors || colors.length === 0) return;
 
-            const cols = 3; // 3 columns layout matching the detail view
+            const cols = 3;
             const cardW = 380;
             const cardH = 140;
             const gapX = 20;
@@ -1590,11 +1740,9 @@
             canvas.height = canvasH;
             const ctx = canvas.getContext('2d');
 
-            // White background
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvasW, canvasH);
 
-            // Header Title
             ctx.fillStyle = '#475569';
             ctx.font = 'bold 16px Inter, sans-serif';
             ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
@@ -1606,13 +1754,11 @@
                 const x = padding + c * (cardW + gapX);
                 const y = padding + headerH + r * (cardH + gapY);
 
-                // Card background with rounded corners & border
                 ctx.fillStyle = '#F8FAFC';
                 ctx.strokeStyle = '#E2E8F0';
                 ctx.lineWidth = 2;
                 roundRect(ctx, x, y, cardW, cardH, 20, true, true);
 
-                // Swatch Box (Rounded Square)
                 const swatchS = 96;
                 const swatchX = x + 20;
                 const swatchY = y + 22;
@@ -1622,25 +1768,20 @@
                 ctx.lineWidth = 1;
                 roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
 
-                // Color Calculations
                 const [rgbR, rgbG, rgbB] = hexToRgb(hex);
                 const [hslH, hslS, hslL] = rgbToHsl(rgbR, rgbG, rgbB);
                 const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
 
-                // Text Specifications Column
                 const textX = swatchX + swatchS + 20;
 
-                // HEX Title
                 ctx.fillStyle = '#0F172A';
                 ctx.font = 'bold 22px "JetBrains Mono", monospace';
                 ctx.fillText(hex.toUpperCase(), textX, y + 46);
 
-                // RGB Specification Line
                 ctx.fillStyle = '#64748B';
                 ctx.font = '14px "JetBrains Mono", monospace';
                 ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
 
-                // HSL & Luminance Specification Line
                 ctx.fillStyle = '#94A3B8';
                 ctx.font = '13px "JetBrains Mono", monospace';
                 ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
@@ -1660,7 +1801,6 @@
             showToast(`Downloaded Expanded Specification Card!`);
         }
 
-        // Helper Canvas Rounded Rectangle Function
         function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
             ctx.beginPath();
             ctx.moveTo(x + radius, y);
@@ -1735,6 +1875,7 @@
                 item.style.backgroundColor = hex;
                 item.onclick = () => {
                     addManualColor(hex);
+                    addToGlobalPalette(hex);
                     switchTab(1);
                 };
 
