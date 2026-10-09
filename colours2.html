@@ -111,7 +111,7 @@
             cursor: pointer;
         }
         .swatch:hover {
-            transform: scale(1.2) !important;
+            transform: scale(1.25) !important;
             box-shadow: 0 6px 14px -2px rgba(0,0,0,0.5);
             z-index: 50 !important;
         }
@@ -222,12 +222,6 @@
             color: #0284c7;
         }
 
-        .nav-dropdown-item.active-tool {
-            background-color: #f0f9ff;
-            color: #0284c7;
-            font-weight: 700;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
@@ -260,7 +254,6 @@
                 <!-- Left Container: Dropdown Navigation & Logo + Title -->
                 <div class="flex flex-wrap items-center gap-3 sm:gap-4">
                     <div class="nav-header-left">
-                        <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
                                 <span>Rockie Navigation</span>
@@ -268,40 +261,23 @@
                             </button>
 
                             <div class="nav-dropdown-content">
-                                <a href="index.html" class="nav-dropdown-item">
-                                    <span>🪨</span> rockie home
-                                </a>
-                                <a href="colours1.html" class="nav-dropdown-item">
-                                    <span>🌙</span> line rockies
-                                </a>
-                                <a href="colours2.html" class="nav-dropdown-item">
-                                    <span>🍀</span> square rockies
-                                </a>
-                                <a href="colours3.html" class="nav-dropdown-item">
-                                    <span>🍁</span> circle rockies
-                                </a>
-                                <a href="colours4.html" class="nav-dropdown-item">
-                                    <span>🌼</span> cube rockies
-                                </a>
-                                <a href="colours5.html" class="nav-dropdown-item">
-                                    <span>🌸</span> collected rockies
-                                </a>
-                                <a href="colours6.html" class="nav-dropdown-item">
-                                    <span>🌵</span> rockie shapes
-                                </a>
+                                <a href="index.html" class="nav-dropdown-item"><span>🪨</span> rockie home</a>
+                                <a href="colours1.html" class="nav-dropdown-item"><span>🌙</span> line rockies</a>
+                                <a href="colours2.html" class="nav-dropdown-item"><span>🍀</span> square rockies</a>
+                                <a href="colours3.html" class="nav-dropdown-item"><span>🍁</span> circle rockies</a>
+                                <a href="colours4.html" class="nav-dropdown-item"><span>🌼</span> cube rockies</a>
+                                <a href="colours5.html" class="nav-dropdown-item"><span>🌸</span> collected rockies</a>
+                                <a href="colours6.html" class="nav-dropdown-item"><span>🌵</span> rockie shapes</a>
                             </div>
                         </div>
                     </div>
 
                     <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
 
-                    <!-- Logo & Title -->
                     <div class="flex items-center space-x-3">
-                        <div>
-                            <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                                rockies in a square
-                            </h1>
-                        </div>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                            rockies in a square
+                        </h1>
                     </div>
                 </div>
 
@@ -335,11 +311,8 @@
         <!-- TAB 1: COLOUR MATRICES -->
         <!-- ========================================================= -->
         <section id="tab1" class="tab-content space-y-6">
-            <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
-                    <!-- Matrix Mode Dropdown -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Mode</label>
                         <select id="t1-mode" onchange="onModeChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -349,18 +322,15 @@
                         </select>
                     </div>
 
-                    <!-- Trio Filter (Visible when Mode 3 is active) -->
                     <div id="trio-filter-wrapper" class="space-y-1">
                         <label class="font-semibold text-slate-600 block flex items-center justify-between">
                             <span>Trio Combination</span>
                             <span class="text-[10px] text-[#0369a1] font-mono">(20 Trios)</span>
                         </label>
                         <select id="t1-trio-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <!-- Options injected dynamically -->
                         </select>
                     </div>
 
-                    <!-- Neutral Corner Filter -->
                     <div id="neutral-filter-wrapper" class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Neutral Corner</label>
                         <select id="t1-neutral-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -371,7 +341,6 @@
                         </select>
                     </div>
 
-                    <!-- Resolution Dropdown -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Resolution</label>
                         <select id="t1-res" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -383,7 +352,6 @@
                         </select>
                     </div>
 
-                    <!-- Iso-Line Tracking -->
                     <div class="space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200">
                         <div class="flex items-center justify-between mb-1">
                             <label class="inline-flex items-center cursor-pointer space-x-1.5">
@@ -397,7 +365,6 @@
                     </div>
                 </div>
 
-                <!-- Display Format Toggles & Adjustments -->
                 <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 pt-2 border-t border-slate-100 text-xs items-center">
                     <div class="space-y-1 col-span-2 sm:col-span-1 flex flex-col justify-center">
                         <label class="inline-flex items-center cursor-pointer space-x-2">
@@ -412,7 +379,6 @@
                         </label>
                     </div>
 
-                    <!-- Sliders: Tint, Tone, Shade, Saturation -->
                     <div class="space-y-1">
                         <div class="flex justify-between font-semibold text-slate-600">
                             <span>Tint (White):</span>
@@ -444,7 +410,6 @@
                 </div>
             </div>
 
-            <!-- Matrices Grid Target -->
             <div class="space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 gap-2">
                     <h3 id="t1-header" class="text-base font-bold text-slate-900">Generated Colour Matrices</h3>
@@ -458,14 +423,8 @@
         <!-- TAB 2: CUSTOM CORNER MATRIX & PRE-SAVED PALETTES -->
         <!-- ========================================================= -->
         <section id="tab2" class="tab-content hidden space-y-6">
-            
-            <!-- Controls Bar: 4 Corner Inputs -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-
-                <!-- 4 Corner Input Panels Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    
-                    <!-- Top-Left (TL) Corner -->
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                         <div class="flex items-center justify-between font-bold text-slate-700">
                             <span>Top-Left (TL)</span>
@@ -487,7 +446,6 @@
                         </div>
                     </div>
 
-                    <!-- Top-Right (TR) Corner -->
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                         <div class="flex items-center justify-between font-bold text-slate-700">
                             <span>Top-Right (TR)</span>
@@ -509,7 +467,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom-Left (BL) Corner -->
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                         <div class="flex items-center justify-between font-bold text-slate-700">
                             <span>Bottom-Left (BL)</span>
@@ -531,7 +488,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom-Right (BR) Corner -->
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                         <div class="flex items-center justify-between font-bold text-slate-700">
                             <span>Bottom-Right (BR)</span>
@@ -554,7 +510,6 @@
                     </div>
                 </div>
 
-                <!-- Matrix Adjustments Toolbar -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-slate-100">
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Resolution</label>
@@ -608,7 +563,6 @@
                     </div>
                 </div>
 
-                <!-- Checkboxes Row -->
                 <div class="flex items-center gap-6 text-xs font-semibold text-slate-700 pt-1">
                     <label class="inline-flex items-center cursor-pointer space-x-2">
                         <input type="checkbox" id="cc-showval" onchange="renderTab2Custom()" class="sr-only peer">
@@ -628,13 +582,11 @@
                 </div>
             </div>
 
-            <!-- Custom Matrix Display Target -->
             <div class="space-y-4">
                 <h3 class="text-base font-bold text-slate-900 border-b pb-2">Custom Matrix</h3>
                 <div id="matrices-target-custom" class="flex justify-center"></div>
             </div>
 
-            <!-- Pre-Saved Palettes Section -->
             <div class="space-y-4 pt-4">
                 <div class="border-b pb-2">
                     <h3 class="text-base font-bold text-slate-900">Pre-Saved Corner Palettes</h3>
@@ -648,12 +600,8 @@
         <!-- TAB 3: HUE CONSTANTS MATRIX -->
         <!-- ========================================================= -->
         <section id="tab3" class="tab-content hidden space-y-6">
-            
-            <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <!-- Hue Resolution -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Angle Step Resolution</label>
                         <select id="t2-res" onchange="renderTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
@@ -667,7 +615,6 @@
                         </select>
                     </div>
 
-                    <!-- Display Format Mode -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Color Space Mode</label>
                         <select id="t2-format" onchange="updateTab2Controls(); renderTab3();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
@@ -680,7 +627,6 @@
                         </select>
                     </div>
 
-                    <!-- Dynamic Slider 1 -->
                     <div id="slider1-container" class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                         <div class="flex justify-between font-semibold text-slate-600">
                             <span id="lbl-s1">Lightness:</span>
@@ -689,7 +635,6 @@
                         <input type="range" id="t2-s1" value="50" min="0" max="100" oninput="updateVal('val-s1', this.value); renderTab3()">
                     </div>
 
-                    <!-- Dynamic Slider 2 -->
                     <div id="slider2-container" class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200 hidden">
                         <div class="flex justify-between font-semibold text-slate-600">
                             <span id="lbl-s2">Slider 2:</span>
@@ -699,7 +644,6 @@
                     </div>
                 </div>
 
-                <!-- Toggles Row -->
                 <div class="flex items-center gap-6 text-xs font-semibold text-slate-700 pt-2 border-t border-slate-100">
                     <label class="inline-flex items-center cursor-pointer space-x-2">
                         <input type="checkbox" id="t2-showval" onchange="renderTab3()" class="sr-only peer">
@@ -719,7 +663,6 @@
                 </div>
             </div>
 
-            <!-- Dynamic Surface Container -->
             <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
                 <div id="t2-container" class="min-w-full"></div>
             </div>
@@ -729,12 +672,8 @@
         <!-- TAB 4: PERCEIVED VALUE GRAPH (FIXED Y-AXIS LUMINANCE CHART) -->
         <!-- ========================================================= -->
         <section id="tab4" class="tab-content hidden space-y-6">
-            
-            <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
-                    <!-- Resolution -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Resolution</label>
                         <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -748,10 +687,9 @@
                         </select>
                     </div>
 
-                    <!-- Spectrum Density Mode -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Spectrum Density</label>
-                        <select id="t3-density" onchange="toggleTTSControls(); renderTab4();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                        <select id="t3-density" onchange="onDensityChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                             <option value="max_chroma">10 levels</option>
                             <option value="standard">15 levels</option>
                             <option value="tint_tone_shade">Steps of Tints, Tones, & Shades</option>
@@ -759,7 +697,6 @@
                         </select>
                     </div>
 
-                    <!-- Sorting Order -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Order</label>
                         <select id="t3-sort" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -768,7 +705,6 @@
                         </select>
                     </div>
 
-                    <!-- Display Value Toggle -->
                     <div class="space-y-1 flex flex-col justify-center">
                         <label class="inline-flex items-center cursor-pointer space-x-2">
                             <input type="checkbox" id="t3-showval" onchange="renderTab4()" class="sr-only peer" checked>
@@ -777,7 +713,6 @@
                         </label>
                     </div>
 
-                    <!-- Iso-Line Tracking -->
                     <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                         <div class="flex items-center justify-between mb-1">
                             <label class="inline-flex items-center cursor-pointer space-x-1.5">
@@ -791,8 +726,8 @@
                     </div>
                 </div>
 
-                <!-- DYNAMIC TINTS / TONES / SHADES TOGGLE BAR (Visible only when 'Steps of Tints, Tones, & Shades' is active) -->
-                <div id="tts-toggles-container" class="hidden flex-wrap items-center gap-6 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
+                <!-- DYNAMIC LAYER TOGGLES (Shown when Tint/Tone/Shade density option is selected) -->
+                <div id="tts-toggles-container" class="hidden flex-wrap items-center gap-6 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-700">
                     <span class="font-bold text-[#0369a1] flex items-center gap-1.5">
                         <i class="fa-solid fa-layer-group text-sky-500"></i> Active Layers:
                     </span>
@@ -824,27 +759,19 @@
             <!-- Canvas Scatter Plot Container -->
             <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
                 <div class="flex h-[620px] overflow-x-auto relative">
-                    
-                    <!-- Sticky Y-Axis Sidebar -->
                     <div id="pv-y-axis-sidebar" class="sticky left-0 top-0 bottom-0 w-28 bg-slate-900 text-slate-200 font-mono text-xs font-bold flex flex-col justify-between py-6 px-3 border-r border-slate-800 z-30 flex-shrink-0 shadow-xl select-none">
-                        <!-- Y-Axis step labels injected dynamically -->
                     </div>
 
-                    <!-- Plot Target Canvas Area -->
                     <div id="pv-plot-target" class="relative bg-slate-950 flex-grow min-w-[1800px] h-full select-none overflow-hidden">
-                        <!-- Guide lines and color nodes injected dynamically -->
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- ========================================================= -->
     <!-- GLOBAL COMPARISON PALETTE DRAWER -->
-    <!-- ========================================================= -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-            
             <div class="flex items-center justify-between md:justify-start space-x-3">
                 <div class="flex items-center space-x-2.5">
                     <div class="w-8 h-8 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-sm">
@@ -858,12 +785,8 @@
                 </button>
             </div>
 
-            <!-- Swatch Slots Container -->
-            <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1">
-                <!-- 16 slots injected dynamically -->
-            </div>
+            <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1"></div>
 
-            <!-- Action Controls -->
             <div class="flex items-center space-x-2">
                 <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-[#22ACEC]">
                     <i class="fa-solid fa-copy text-xs"></i>
@@ -879,18 +802,13 @@
         <span id="toast-text">Copied to clipboard!</span>
     </div>
 
-    <!-- GRAPH HOVER TOOLTIP -->
     <div id="chart-tooltip" class="chart-tooltip"></div>
 
-    <!-- ========================================================= -->
-    <!-- JAVASCRIPT APPLICATION CORE -->
-    <!-- ========================================================= -->
     <script>
         const MAX_PALETTE = 16;
         let paletteColors = [];
         let draggedIndex = null;
 
-        /* Core 6 Chromatic Colors */
         const CHROMATIC_COLORS = [
             { name: "Red", hex: "#FF0000" },
             { name: "Yellow", hex: "#FFFF00" },
@@ -900,7 +818,6 @@
             { name: "Magenta", hex: "#FF00FF" }
         ];
 
-        /* TOP NAVIGATION DROPDOWN TOGGLER */
         function toggleNavDropdown(event) {
             event.stopPropagation();
             const container = document.getElementById('nav-dropdown-container');
@@ -914,7 +831,6 @@
             }
         });
 
-        /* HELPERS */
         function updateVal(id, val) { 
             const el = document.getElementById(id);
             if(el) el.innerText = val + '%'; 
@@ -930,7 +846,7 @@
             if (tabId === 'tab1') renderTab1();
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
-            if (tabId === 'tab4') { toggleTTSControls(); renderTab4(); }
+            if (tabId === 'tab4') { onDensityChange(); }
         }
 
         function hexToRgb(hex) {
@@ -988,7 +904,6 @@
             return { r: r * 255, g: g * 255, b: b * 255 };
         }
 
-        /* PERCEIVED VALUE LUMINANCE (0 - 100%) */
         function getPerceivedValue(r, g, b) {
             return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
         }
@@ -1019,7 +934,6 @@
             el.select();
             document.execCommand('copy');
             document.body.removeChild(el);
-
             showToast(`Copied ${text}`);
         }
 
@@ -1030,7 +944,6 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2200);
         }
 
-        /* GENERATE ALL 20 MATHEMATICAL TRIOS (6 COMBINATION 3) */
         function getAll20Trios() {
             const trios = [];
             const n = CHROMATIC_COLORS.length;
@@ -1266,7 +1179,6 @@
             renderTab2Custom();
         }
 
-        /* 28 PRE-SAVED PALETTES */
         const preSavedPalettes = [
             ["#FFFFFF", "#00A0E9", "#1D2099", "#E4007F"],
             ["#FFFFFF", "#E4007F", "#E60012", "#FFF100"],
@@ -1518,23 +1430,23 @@
             return div;
         }
 
-        /* TOGGLE VISIBILITY OF TINTS/TONES/SHADES CHECKBOX BAR */
-        function toggleTTSControls() {
+        /* TOGGLE VISIBILITY & AUTOMATIC RE-RENDER FOR DENSE MODES */
+        function onDensityChange() {
             const densityMode = document.getElementById('t3-density').value;
             const container = document.getElementById('tts-toggles-container');
-            if (!container) return;
-            if (densityMode === 'tint_tone_shade') {
-                container.classList.remove('hidden');
-                container.classList.add('flex');
-            } else {
-                container.classList.add('hidden');
-                container.classList.remove('flex');
+            if (container) {
+                if (densityMode === 'tint_tone_shade') {
+                    container.classList.remove('hidden');
+                    container.classList.add('flex');
+                } else {
+                    container.classList.add('hidden');
+                    container.classList.remove('flex');
+                }
             }
+            renderTab4();
         }
 
-        /* ========================================================= */
-        /* TAB 4: PERCEIVED VALUE GRAPH ENGINE (FIXED MAP TO TRUE Y-AXIS LUMINANCE) */
-        /* ========================================================= */
+        /* TAB 4: GRAPH ENGINE */
         function renderTab4() {
             const target = document.getElementById('pv-plot-target');
             const sidebar = document.getElementById('pv-y-axis-sidebar');
@@ -1550,12 +1462,9 @@
             const trackIso = document.getElementById('t3-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3-isoval').value);
 
-            // Set fixed dimensions for exact mathematical alignment
             const paddingTop = 40;
-            const paddingBottom = 40;
-            const chartHeight = 540; // Usable plot height in pixels
+            const chartHeight = 540;
 
-            // Render Y-Axis Sidebar Labels & Step Marks (Val 10 = 100% down to Val 0 = 0%)
             const ySteps = [
                 { name: "Val 10 (100%)", pv: 100, class: "text-sky-300 font-extrabold" },
                 { name: "Val 9 (90%)",  pv: 90,  class: "text-slate-300" },
@@ -1587,7 +1496,6 @@
                 target.appendChild(guideLine);
             });
 
-            // Calculate Hue Columns (0° to 360°)
             let hues = [];
             for(let h = 0; h < 360; h += res) hues.push(h);
 
@@ -1601,24 +1509,20 @@
 
             const colWidth = Math.max(55, Math.floor(1700 / hues.length));
 
-            // Generate Swatches based on selected density
             hues.forEach((hue, colIdx) => {
                 const colX = colIdx * colWidth + 50;
 
-                // Vertical Hue Axis Line
                 const colLine = document.createElement('div');
                 colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60 z-0';
                 colLine.style.left = colX + 'px';
                 target.appendChild(colLine);
 
-                // Column Top Label (Hue Angle)
                 const label = document.createElement('div');
                 label.className = 'absolute top-2 font-mono text-[10px] font-bold text-sky-400 -translate-x-1/2 z-20';
                 label.style.left = colX + 'px';
                 label.innerText = hue + '°';
                 target.appendChild(label);
 
-                // Determine Lightness & Saturation Sampling Strategy
                 let samples = [];
                 if (densityMode === 'max_chroma') {
                     for (let l = 10; l <= 90; l += 10) {
@@ -1660,7 +1564,6 @@
                     }
                 }
 
-                // Render each color swatch at its EXACT perceived value Y position
                 samples.forEach((sample, sampleIdx) => {
                     let baseRgb = hslToRgbObj(hue, sample.s, sample.l);
                     let colorHex;
@@ -1674,17 +1577,14 @@
                     const rgbObj = hexToRgb(colorHex);
                     const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
 
-                    // MATHEMATICAL Y-POSITION: y = paddingTop + (100 - pv) / 100 * chartHeight
                     const yPos = paddingTop + ((100 - pv) / 100) * chartHeight;
 
-                    // Horizontal offset calculation based on series group to allow stacked visualization
                     let groupOffset = 0;
-                    if (sample.group === 'tint') groupOffset = -10;
+                    if (sample.group === 'tint') groupOffset = -12;
                     else if (sample.group === 'tone') groupOffset = 0;
-                    else if (sample.group === 'shade') groupOffset = 10;
+                    else if (sample.group === 'shade') groupOffset = 12;
 
-                    const jitterX = groupOffset + ((sampleIdx % 3 - 1) * 2);
-                    const xPos = colX + jitterX;
+                    const xPos = colX + groupOffset;
 
                     const node = document.createElement('div');
                     node.className = 'absolute w-8 h-5 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/30 shadow-md cursor-pointer -translate-x-1/2 -translate-y-1/2 transition-transform duration-150';
@@ -1698,17 +1598,14 @@
                         node.style.color = textColor;
                     }
 
-                    // Iso-line Highlight Check
                     if (trackIso && Math.abs(pv - isoVal) <= 3) {
                         node.classList.add("iso-matched");
                     }
 
-                    // Tooltip listeners
                     node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj, sample.type);
                     node.onmousemove = (e) => updateChartTooltipPos(e);
                     node.onmouseleave = () => hideChartTooltip();
 
-                    // Click to copy and add to palette
                     node.onclick = () => {
                         addToPalette(colorHex);
                         copyToClipboard(colorHex);
@@ -1719,13 +1616,12 @@
             });
         }
 
-        /* TAB 4 TOOLTIP CONTROLS */
         function showChartTooltip(e, hue, s, l, hex, pv, rgb, typeLabel = "") {
             const tooltip = document.getElementById('chart-tooltip');
             if (!tooltip) return;
             tooltip.style.display = 'block';
             tooltip.innerHTML = `
-                <div class="font-bold text-sky-300">Hue: ${hue}° ${typeLabel ? `(\${typeLabel})` : ''} | HSL(${hue}, ${s}%, ${l}%)</div>
+                <div class="font-bold text-sky-300">Hue: ${hue}° ${typeLabel ? `(\${typeLabel})` : ''}</div>
                 <div>HEX: <span class="font-bold text-white">${hex}</span></div>
                 <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
                 <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
@@ -1877,8 +1773,7 @@
             renderPreSavedPalettes();
             updateTab2Controls();
             renderTab3();
-            toggleTTSControls();
-            setTimeout(renderTab4, 50);
+            onDensityChange();
         };
     </script>
 </body>
