@@ -445,12 +445,7 @@
                                     <div><span class="text-slate-400">RGB:</span> <span id="inspector-rgb" class="font-semibold">0, 0, 0</span></div>
                                     <div><span class="text-slate-400">HSL:</span> <span id="inspector-hsl" class="font-semibold">0%, 0%, 0%</span></div>
                                     <div><span class="text-slate-400">Luminance:</span> <span id="inspector-val" class="font-semibold">0%</span></div>
-                                    <div><span class="text-slate-400">WCAG:</span> <span id="inspector-wcag" class="font-semibold">AAA</span></div>
                                 </div>
-                            </div>
-
-                            <div id="wcag-preview-bar" class="p-2 rounded-lg text-xs font-bold text-center flex items-center justify-center gap-2 border">
-                                <span>Sample Contrast Text Preview</span>
                             </div>
                         </div>
 
@@ -679,7 +674,7 @@
                     </span>
                     <div>
                         <h3 id="export-modal-title" class="font-bold text-slate-900 text-base">Export Palette</h3>
-                        <p class="text-xs text-slate-400">Choose output code format or download high-res swatch card</p>
+                        <p class="text-xs text-slate-400">Choose output code format or download swatch card images</p>
                     </div>
                 </div>
                 <button onclick="closeExportModal()" class="text-slate-400 hover:text-slate-600 p-1 text-lg">
@@ -696,19 +691,18 @@
 
             <!-- Code Output Box -->
             <div class="relative">
-                <textarea id="export-code-area" readonly class="w-full h-40 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
+                <textarea id="export-code-area" readonly class="w-full h-32 bg-slate-900 text-sky-300 font-mono text-xs p-3 rounded-xl border border-slate-800 focus:outline-none resize-none"></textarea>
             </div>
 
-            <!-- Minimalist Swatch Card Downloads -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex flex-col gap-2">
-                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Minimalist High-Res Swatch Card Image Downloads</span>
-                <p class="text-[11px] text-slate-400">High-resolution square color blocks with crisp white margins in 8-swatch grid rows with dynamic height.</p>
-                <div class="flex items-center gap-2 pt-1">
-                    <button type="button" onclick="downloadMinimalPaletteCard('png')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-image text-sky-600"></i> Download HD PNG
+            <!-- Swatch Card Image Downloads Section -->
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">High-Res Swatch Card Image Downloads</span>
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <button type="button" onclick="downloadMinimalPaletteCard('jpeg')" class="w-full py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-border-all text-sky-600"></i> Minimalist Swatches JPEG (8-Column Grid)
                     </button>
-                    <button type="button" onclick="downloadMinimalPaletteCard('jpeg')" class="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-200">
-                        <i class="fa-solid fa-file-image text-emerald-600"></i> Download HD JPEG
+                    <button type="button" onclick="downloadExpandedPaletteCard('jpeg')" class="w-full py-2 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-slate-200 shadow-sm">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i> Expanded Specifications JPEG (RGB, HSL, Lum Cards)
                     </button>
                 </div>
             </div>
@@ -1141,14 +1135,6 @@
             document.getElementById('inspector-hsl').innerText = `${h}%, ${s}%, ${l}%`;
             document.getElementById('inspector-val').innerText = `${lumPct}%`;
 
-            const contrastVal = lumPct > 50 ? 'Dark Text Pass' : 'White Text Pass';
-            document.getElementById('inspector-wcag').innerText = contrastVal;
-
-            const wcagBar = document.getElementById('wcag-preview-bar');
-            wcagBar.style.backgroundColor = activeInspectorHex;
-            wcagBar.style.color = lumPct > 50 ? '#0f172a' : '#ffffff';
-            wcagBar.style.borderColor = lumPct > 50 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.2)';
-
             document.getElementById('harmony-base-picker').value = activeInspectorHex;
             document.getElementById('harmony-base-text').value = activeInspectorHex;
             updateHarmonies(activeInspectorHex);
@@ -1257,14 +1243,17 @@
                         </div>
                     </div>
 
-                    <!-- Actions Footer with Direct High-Res JPEG Download -->
+                    <!-- Actions Footer with Direct Downloads -->
                     <div class="flex items-center justify-between border-t border-slate-100 pt-3 text-xs">
                         <span class="text-[#0369a1] font-bold text-[11px] flex items-center gap-1">
                             <i class="fa-solid fa-pen-to-square text-xs"></i> Click to edit
                         </span>
                         <div class="flex items-center space-x-1.5" onclick="event.stopPropagation()">
-                            <button onclick="downloadDirectPaletteJPEG('${palette.id}')" title="Download High-Res JPEG Card" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg border border-emerald-200 text-[10px] flex items-center gap-1">
-                                <i class="fa-solid fa-download"></i> JPEG
+                            <button onclick="downloadDirectPaletteJPEG('${palette.id}')" title="Download High-Res Minimal JPEG Card" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-lg border border-emerald-200 text-[10px] flex items-center gap-1">
+                                <i class="fa-solid fa-download"></i> Minimal
+                            </button>
+                            <button onclick="downloadDirectExpandedJPEG('${palette.id}')" title="Download High-Res Expanded Specification JPEG" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg border border-indigo-200 text-[10px] flex items-center gap-1">
+                                <i class="fa-solid fa-download"></i> Expanded
                             </button>
                             <button onclick="copyAllHexFromPalette('${palette.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg border border-slate-200 text-[10px]">
                                 Copy HEX
@@ -1335,7 +1324,6 @@
                     <div class="flex-grow font-mono text-xs space-y-0.5">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-slate-900 text-sm">${hex}</span>
-                            <span class="text-[9px] px-1.5 py-0.5 rounded font-sans font-bold ${isLight ? 'bg-amber-100 text-amber-800' : 'bg-slate-800 text-slate-100'}">${isLight ? 'AAA Dark' : 'AAA White'}</span>
                         </div>
                         <div class="text-[10px] text-slate-500">RGB: ${r}, ${g}, ${b}</div>
                         <div class="text-[10px] text-slate-400">HSL: ${h}%, ${s}%, ${l}% • Lum: ${lumPct}%</div>
@@ -1428,7 +1416,7 @@
             showToast("Palette bank cleared.");
         }
 
-        /* EXPORT MODAL & MINIMALIST SWATCH CARD GENERATOR */
+        /* EXPORT MODAL & SWATCH CARD GENERATOR */
         function openExportModalForPalette(id) {
             activeExportPalette = paletteBank.find(p => p.id === id);
             if (!activeExportPalette) return;
@@ -1475,15 +1463,21 @@
             showToast("Copied code to clipboard!");
         }
 
-        /* DIRECT FRONT-CARD JPEG DOWNLOAD FUNCTION */
+        /* DIRECT FRONT-CARD DOWNLOAD HANDLERS */
         function downloadDirectPaletteJPEG(id) {
             const pal = paletteBank.find(p => p.id === id);
             if (!pal) return;
             generateHighResCardDownload(pal, 'jpeg');
         }
 
-        /* MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES SQUARE GRID WITH WHITE MARGINS & DYNAMIC HEIGHT) */
-        function downloadMinimalPaletteCard(fileType = 'png') {
+        function downloadDirectExpandedJPEG(id) {
+            const pal = paletteBank.find(p => p.id === id);
+            if (!pal) return;
+            generateExpandedSpecCardDownload(pal, 'jpeg');
+        }
+
+        /* 1. MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
+        function downloadMinimalPaletteCard(fileType = 'jpeg') {
             if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
                 showToast("No active palette colors to download!", "warning");
                 return;
@@ -1495,14 +1489,13 @@
             const colors = paletteObj.colors;
             if (!colors || colors.length === 0) return;
         
-            const cols = 8; // Exactly 8 swatches per row
-            const swatchSize = 400; // Crisp high-res square swatch dimension (400x400px)
-            const margin = 20; // Crisp white spacing/margin between swatches and borders
+            const cols = 8;
+            const swatchSize = 400;
+            const margin = 20;
             
             const totalSwatches = colors.length;
             const rows = Math.ceil(totalSwatches / cols);
 
-            // Dynamic width and height calculations
             const canvasWidth = cols * swatchSize + (cols + 1) * margin;
             const canvasHeight = rows * swatchSize + (rows + 1) * margin;
         
@@ -1512,11 +1505,9 @@
         
             const ctx = cardCanvas.getContext('2d');
         
-            // Fill background with clean white for margins
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            // Render square swatches
             colors.forEach((hex, idx) => {
                 const colIndex = idx % cols;
                 const rowIndex = Math.floor(idx / cols);
@@ -1530,7 +1521,7 @@
         
             const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
             const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_8col_square_swatches.${fileExt}`;
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
         
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
@@ -1539,7 +1530,124 @@
             downloadAnchor.click();
             downloadAnchor.remove();
         
-            showToast(`Downloaded High-Res 8-Column ${fileType.toUpperCase()} Swatch Card!`);
+            showToast(`Downloaded Minimal Swatch Card!`);
+        }
+
+        /* 2. EXPANDED SPECIFICATION CARD GENERATION (CARDS WITH HEX, RGB, HSL, LUM) */
+        function downloadExpandedPaletteCard(fileType = 'jpeg') {
+            if (!activeExportPalette || !activeExportPalette.colors || activeExportPalette.colors.length === 0) {
+                showToast("No active palette colors to download!", "warning");
+                return;
+            }
+            generateExpandedSpecCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 3; // 3 columns layout matching the detail view
+            const cardW = 380;
+            const cardH = 140;
+            const gapX = 20;
+            const gapY = 20;
+            const padding = 30;
+            const headerH = 60;
+
+            const rows = Math.ceil(colors.length / cols);
+            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
+            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            const ctx = canvas.getContext('2d');
+
+            // White background
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            // Header Title
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
+
+            colors.forEach((hex, idx) => {
+                const c = idx % cols;
+                const r = Math.floor(idx / cols);
+
+                const x = padding + c * (cardW + gapX);
+                const y = padding + headerH + r * (cardH + gapY);
+
+                // Card background with rounded corners & border
+                ctx.fillStyle = '#F8FAFC';
+                ctx.strokeStyle = '#E2E8F0';
+                ctx.lineWidth = 2;
+                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
+
+                // Swatch Box (Rounded Square)
+                const swatchS = 96;
+                const swatchX = x + 20;
+                const swatchY = y + 22;
+
+                ctx.fillStyle = hex;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
+
+                // Color Calculations
+                const [rgbR, rgbG, rgbB] = hexToRgb(hex);
+                const [hslH, hslS, hslL] = rgbToHsl(rgbR, rgbG, rgbB);
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                // Text Specifications Column
+                const textX = swatchX + swatchS + 20;
+
+                // HEX Title
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                // RGB Specification Line
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                // HSL & Luminance Specification Line
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
+        }
+
+        // Helper Canvas Rounded Rectangle Function
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
         }
 
         /* TAB 3: COLOR HARMONIES ENGINE */
