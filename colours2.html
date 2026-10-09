@@ -671,12 +671,12 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Color Space Mode</label>
                         <select id="t2-format" onchange="updateTab2Controls(); renderTab3();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
-                            <option value="1">1: Adjust Lightness</option>
-                            <option value="2">2: Adjust Saturation</option>
-                            <option value="3">3: Adjust Tone and Shade</option>
-                            <option value="4">4: Adjust Shade and Tone</option>
-                            <option value="5">5: Adjust Brightness and Shade</option>
-                            <option value="6">6: Adjust Brightness and Tone</option>
+                            <option value="1">1: Adjust Lightness against saturation</option>
+                            <option value="2">2: Adjust Saturation against lightness</option>
+                            <option value="3">3: Adjust Tone and Shade against tints</option>
+                            <option value="4">4: Adjust Shade and Tone against tints</option>
+                            <option value="5">5: Adjust Brightness and Shade against tones</option>
+                            <option value="6">6: Adjust Brightness and Tone against tones</option>
                         </select>
                     </div>
 
@@ -720,13 +720,13 @@
             </div>
 
             <!-- Dynamic Surface Container -->
-            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
-                <div id="t2-container" class="min-w-full"></div>
+            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto w-full max-w-full">
+                <div id="t2-container" class="min-w-max inline-block align-middle"></div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: PERCEIVED VALUE GRAPH (FIXED Y-AXIS LUMINANCE CHART) -->
+        <!-- TAB 4: PERCEIVED VALUE GRAPH -->
         <!-- ========================================================= -->
         <section id="tab4" class="tab-content hidden space-y-6">
             
