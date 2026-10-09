@@ -297,9 +297,6 @@
 
                     <!-- Logo & Title -->
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-xl">
-                            <i class="fa-solid fa-border-all"></i>
-                        </div>
                         <div>
                             <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                                 rockies in a square
@@ -346,9 +343,9 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Mode</label>
                         <select id="t1-mode" onchange="onModeChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="2">Groups of 2 (Opposite Corners)</option>
-                            <option value="3" selected>Groups of 3 (20 Chromatic Trios)</option>
-                            <option value="4">Groups of 4 (Corner Gradients)</option>
+                            <option value="2">2 colours</option>
+                            <option value="3" selected>3 colours</option>
+                            <option value="4">4 colours</option>
                         </select>
                     </div>
 
@@ -378,11 +375,11 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Resolution</label>
                         <select id="t1-res" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="4">4 × 4 Grid</option>
-                            <option value="6">6 × 6 Grid</option>
-                            <option value="8" selected>8 × 8 Grid</option>
-                            <option value="10">10 × 10 Grid</option>
-                            <option value="12">12 × 12 Grid</option>
+                            <option value="4">4 × 4</option>
+                            <option value="6">6 × 6</option>
+                            <option value="8" selected>8 × 8</option>
+                            <option value="10">10 × 10</option>
+                            <option value="12">12 × 12</option>
                         </select>
                     </div>
 
@@ -562,11 +559,11 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Resolution</label>
                         <select id="cc-res" onchange="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-medium">
-                            <option value="4">4 × 4 Grid</option>
-                            <option value="6">6 × 6 Grid</option>
-                            <option value="8" selected>8 × 8 Grid</option>
-                            <option value="10">10 × 10 Grid</option>
-                            <option value="12">12 × 12 Grid</option>
+                            <option value="4">4 × 4</option>
+                            <option value="6">6 × 6</option>
+                            <option value="8" selected>8 × 8</option>
+                            <option value="10">10 × 10</option>
+                            <option value="12">12 × 12</option>
                         </select>
                     </div>
 
@@ -633,7 +630,7 @@
 
             <!-- Custom Matrix Display Target -->
             <div class="space-y-4">
-                <h3 class="text-base font-bold text-slate-900 border-b pb-2">Custom Corner Color Matrix</h3>
+                <h3 class="text-base font-bold text-slate-900 border-b pb-2">Custom Matrix</h3>
                 <div id="matrices-target-custom" class="flex justify-center"></div>
             </div>
 
@@ -666,6 +663,7 @@
                             <option value="22.5">22.5° Intervals (16 Columns)</option>
                             <option value="30">30° Intervals (12 Columns)</option>
                             <option value="45">45° Intervals (8 Columns)</option>
+                            <option value="60">60° Intervals (6 Columns)</option>
                         </select>
                     </div>
 
@@ -673,12 +671,12 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Color Space Mode</label>
                         <select id="t2-format" onchange="updateTab2Controls(); renderTab3();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
-                            <option value="1">1: Y=Sat, Slider=Lightness</option>
-                            <option value="2">2: Y=Lightness, Slider=Sat</option>
-                            <option value="3">3: Y=Brightness, Slider1=Tone, Slider2=Shade</option>
-                            <option value="4">4: Y=Brightness, Slider1=Shade, Slider2=Tone</option>
-                            <option value="5">5: Y=Tone, Slider1=Brightness, Slider2=Shade</option>
-                            <option value="6">6: Y=Shade, Slider1=Brightness, Slider2=Tone</option>
+                            <option value="1">1: Adjust Lightness</option>
+                            <option value="2">2: Adjust Saturation</option>
+                            <option value="3">3: Adjust Tone and Shade</option>
+                            <option value="4">4: Adjust Shade and Tone</option>
+                            <option value="5">5: Adjust Brightness and Shade</option>
+                            <option value="6">6: Adjust Brightness and Tone</option>
                         </select>
                     </div>
 
@@ -740,10 +738,13 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Resolution</label>
                         <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="10">10° Intervals (36 Hue Columns)</option>
-                            <option value="15" selected>15° Intervals (24 Hue Columns)</option>
-                            <option value="30">30° Intervals (12 Hue Columns)</option>
-                            <option value="45">45° Intervals (8 Hue Columns)</option>
+                            <option value="10">10° Intervals (36 Columns)</option>
+                            <option value="15" selected>15° Intervals (24 Columns)</option>
+                            <option value="20" selected>20° Intervals (18 Columns)</option>
+                            <option value="22.5" selected>22.5° Intervals (16 Columns)</option>
+                            <option value="30">30° Intervals (12 Columns)</option>
+                            <option value="45">45° Intervals (8 Columns)</option>
+                            <option value="60">60° Intervals (6 Columns)</option>
                         </select>
                     </div>
 
@@ -751,9 +752,9 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Spectrum Density</label>
                         <select id="t3-density" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="max_chroma">Max Chroma Spectrum (9 Lightness Steps)</option>
-                            <option value="standard" selected>Standard Spectrum Grid (15 Swatches / Hue)</option>
-                            <option value="high_density">High-Density Spectrum (45 Swatches / Hue)</option>
+                            <option value="max_chroma">10 levels</option>
+                            <option value="standard">15 levels</option>
+                            <option value="high_density">45 levels</option>
                         </select>
                     </div>
 
@@ -791,7 +792,7 @@
 
                 <div class="text-[11px] text-slate-500 font-medium flex items-center gap-2 pt-1 border-t border-slate-100">
                     <i class="fa-solid fa-circle-info text-sky-500"></i>
-                    <span><b>Perceived Value Y-Axis Alignment:</b> Swatches are mapped exactly by perceived luminance percentage <code>Y = (100 - PerceivedVal)%</code>. Swatches on the same horizontal line share the exact same perceived brightness.</span>
+                    <span>Swatches are mapped by perceived luminance percentage <code>Y = (100 - PerceivedVal)%</code>.</span>
                 </div>
             </div>
 
