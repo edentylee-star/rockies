@@ -681,9 +681,9 @@
 
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Spectrum Steps</label>
-                        <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                        <select id="t3-density" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                             <option value="6">6 Levels</option>
-                            <option value="8">8 Levels</option>
+                            <option value="8" selected>8 Levels</option>
                             <option value="10">10 Levels</option>
                             <option value="12">12 Levels</option>
                             <option value="15">15 Levels</option>
@@ -1438,14 +1438,14 @@
             target.innerHTML = '';
             sidebar.innerHTML = '';
 
-            const res = parseInt(document.getElementById('t3-res').value);
-            const densityMode = document.getElementById('t3-density').value;
+            const res = parseFloat(document.getElementById('t3-res').value);
+            const numLevels = parseInt(document.getElementById('t3-density').value);
             const sortMode = document.getElementById('t3-sort').value;
             const showVal = document.getElementById('t3-showval').checked;
             const trackIso = document.getElementById('t3-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3-isoval').value);
 
-            // Safely retrieve Layer Toggles with default fallbacks to prevent errors
+            // Layer toggles
             const showBase = document.getElementById('t3-show-base') ? document.getElementById('t3-show-base').checked : true;
             const showTints = document.getElementById('t3-show-tints') ? document.getElementById('t3-show-tints').checked : false;
             const showTones = document.getElementById('t3-show-tones') ? document.getElementById('t3-show-tones').checked : false;
@@ -1456,16 +1456,16 @@
 
             const ySteps = [
                 { name: "Val 10 (100%)", pv: 100, class: "text-sky-300 font-extrabold" },
-                { name: "Val 9 (90%)",  pv: 90,  class: "text-slate-300" },
-                { name: "Val 8 (80%)",  pv: 80,  class: "text-slate-300" },
-                { name: "Val 7 (70%)",  pv: 70,  class: "text-slate-300" },
-                { name: "Val 6 (60%)",  pv: 60,  class: "text-slate-300" },
-                { name: "Val 5 (50%)",  pv: 50,  class: "text-sky-300 font-extrabold" },
-                { name: "Val 4 (40%)",  pv: 40,  class: "text-slate-300" },
-                { name: "Val 3 (30%)",  pv: 30,  class: "text-slate-300" },
-                { name: "Val 2 (20%)",  pv: 20,  class: "text-slate-300" },
-                { name: "Val 1 (10%)",  pv: 10,  class: "text-slate-300" },
-                { name: "Val 0 (0%)",   pv: 0,   class: "text-sky-300 font-extrabold" }
+                { name: "Val 9 (90%)",   pv: 90,  class: "text-slate-300" },
+                { name: "Val 8 (80%)",   pv: 80,  class: "text-slate-300" },
+                { name: "Val 7 (70%)",   pv: 70,  class: "text-slate-300" },
+                { name: "Val 6 (60%)",   pv: 60,  class: "text-slate-300" },
+                { name: "Val 5 (50%)",   pv: 50,  class: "text-sky-300 font-extrabold" },
+                { name: "Val 4 (40%)",   pv: 40,  class: "text-slate-300" },
+                { name: "Val 3 (30%)",   pv: 30,  class: "text-slate-300" },
+                { name: "Val 2 (20%)",   pv: 20,  class: "text-slate-300" },
+                { name: "Val 1 (10%)",   pv: 10,  class: "text-slate-300" },
+                { name: "Val 0 (0%)",    pv: 0,   class: "text-sky-300 font-extrabold" }
             ];
 
             ySteps.forEach(step => {
@@ -1512,25 +1512,11 @@
                 label.innerText = hue + '°';
                 target.appendChild(label);
 
+                // Dynamically build lightness steps according to selected Spectrum Steps
                 let baseSamples = [];
-                if (densityMode === 'max_chroma') { // 10 Levels
-                    for (let l = 10; l <= 90; l += 10) {
-                        baseSamples.push({ s: 100, l: l, label: '10 levels' });
-                    }
-                } else if (densityMode === 'standard') { // 15 Levels
-                    const lVals = [15, 30, 45, 60, 75];
-                    const sVals = [40, 70, 100];
-                    lVals.forEach(l => {
-                        sVals.forEach(s => {
-                            baseSamples.push({ s: s, l: l, label: '15 levels' });
-                        });
-                    });
-                } else if (densityMode === 'high_density') { // 45 Levels
-                    for (let l = 10; l <= 90; l += 8) {
-                        for (let s = 20; s <= 100; s += 20) {
-                            baseSamples.push({ s: s, l: l, label: '45 levels' });
-                        }
-                    }
+                for (let i = 1; i <= numLevels; i++) {
+                    let lightness = Math.round((i / (numLevels + 1)) * 100);
+                    baseSamples.push({ s: 100, l: lightness, label: `${numLevels} levels` });
                 }
 
                 let activeSamples = [];
