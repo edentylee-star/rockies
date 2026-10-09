@@ -227,7 +227,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* TAB 4 GRAPH TOOLTIP */
+        /* GRAPH TOOLTIP */
         .chart-tooltip {
             position: fixed;
             pointer-events: none;
@@ -295,9 +295,13 @@
                         <i class="fa-solid fa-palette text-xs"></i>
                         <span>3. Hue Constants</span>
                     </button>
+                    <button onclick="switchTab('tab-3d')" id="btn-tab-3d" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
+                        <i class="fa-solid fa-cubes text-xs"></i>
+                        <span>4. 3D Color Grids</span>
+                    </button>
                     <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-chart-line text-xs"></i>
-                        <span>4. Perceived Value Graph</span>
+                        <span>5. Perceived Value Graph</span>
                     </button>
                 </nav>
             </div>
@@ -662,7 +666,55 @@
             </div>
         </section>
 
-        <!-- TAB 4: PERCEIVED VALUE GRAPH -->
+        <!-- TAB 4: 3D COLOR GRIDS (NEW) -->
+        <section id="tab-3d" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">3D Slice Model</label>
+                        <select id="t3d-model" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="rgb" selected>1. RGB Cube Slices (Red vs Green across Blue)</option>
+                            <option value="hsb">2. HSB Spectrum (Hue vs Saturation across Value)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Slice / Sub-step Resolution</label>
+                        <select id="t3d-res" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="11" selected>11 Steps (0.0 to 1.0)</option>
+                            <option value="6">6 Steps (0.2 intervals)</option>
+                            <option value="16">16 Steps (fine resolution)</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1 flex flex-col justify-center">
+                        <label class="inline-flex items-center cursor-pointer space-x-2">
+                            <input type="checkbox" id="t3d-showval" onchange="renderTab3D()" class="sr-only peer">
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span class="text-xs font-semibold text-slate-700">Show Perceived Value (%)</span>
+                        </label>
+                    </div>
+
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="inline-flex items-center cursor-pointer space-x-1.5">
+                                <input type="checkbox" id="t3d-isoline" onchange="renderTab3D()" class="sr-only peer">
+                                <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                                <span class="text-xs font-semibold text-slate-700">Track Iso-Line</span>
+                            </label>
+                            <span id="val-t3d-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
+                        </div>
+                        <input type="range" id="t3d-isoval" value="50" min="0" max="100" oninput="updateVal('val-t3d-iso', this.value); renderTab3D()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
+                <div id="t3d-target" class="min-w-full space-y-6"></div>
+            </div>
+        </section>
+
+        <!-- TAB 5: PERCEIVED VALUE GRAPH -->
         <section id="tab4" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
@@ -719,7 +771,7 @@
                     </div>
                 </div>
 
-                <!-- INDEPENDENT LAYER TOGGLES (Available for all step density levels) -->
+                <!-- INDEPENDENT LAYER TOGGLES -->
                 <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-700">
                     <span class="font-bold text-[#0369a1] flex items-center gap-1.5">
                         <i class="fa-solid fa-layer-group text-sky-500"></i> Active Layers:
@@ -845,6 +897,7 @@
             if (tabId === 'tab1') renderTab1();
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
+            if (tabId === 'tab-3d') { renderTab3D(); }
             if (tabId === 'tab4') { renderTab4(); }
         }
 
@@ -901,6 +954,24 @@
                 r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
             }
             return { r: r * 255, g: g * 255, b: b * 255 };
+        }
+
+        function hsvToRgbObj(h, s, v) {
+            h = (h % 360 + 360) % 360;
+            s /= 100; v /= 100;
+            let c = v * s;
+            let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            let m = v - c;
+            let r = 0, g = 0, b = 0;
+
+            if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
+            else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
+            else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
+            else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
+            else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
+            else if (h >= 300 && h < 360) { r = c; g = 0; b = x; }
+
+            return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
         }
 
         function getPerceivedValue(r, g, b) {
@@ -1421,6 +1492,144 @@
             container.appendChild(grid);
         }
 
+        /* TAB 4: NEW 3D COLOR GRIDS ENGINE */
+        function renderTab3D() {
+            const target = document.getElementById('t3d-target');
+            if (!target) return;
+            target.innerHTML = '';
+
+            const model = document.getElementById('t3d-model').value;
+            const steps = parseInt(document.getElementById('t3d-res').value);
+            const showVal = document.getElementById('t3d-showval').checked;
+            const trackIso = document.getElementById('t3d-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t3d-isoval').value);
+
+            const outerContainer = document.createElement('div');
+            outerContainer.className = 'space-y-6';
+
+            if (model === 'rgb') {
+                // Header Axis Legend
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between font-mono text-xs font-bold text-slate-700 bg-slate-100 p-3 rounded-xl border border-slate-200';
+                header.innerHTML = `<span>Red: 0.0 → 1.0 (Rows)</span><span class="text-sky-600">Green: 0.0 → 1.0 (Columns)</span><span class="text-indigo-600">Blue: Slices (Top to Bottom: 0.0 → 1.0)</span>`;
+                outerContainer.appendChild(header);
+
+                // Build each Blue slice
+                for (let bIdx = 0; bIdx < steps; bIdx++) {
+                    const bVal = bIdx / (steps - 1 || 1);
+                    const bLabel = bVal.toFixed(1);
+
+                    const block = document.createElement('div');
+                    block.className = 'flex items-center gap-4 border-b border-slate-200 pb-4';
+
+                    const sliceLabel = document.createElement('div');
+                    sliceLabel.className = 'w-12 font-mono text-xs font-bold text-slate-600 text-right shrink-0';
+                    sliceLabel.innerText = bLabel;
+                    block.appendChild(sliceLabel);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'grid gap-0.5 rounded-lg overflow-hidden border border-black/10 shadow-sm';
+                    grid.style.gridTemplateColumns = `repeat(${steps}, minmax(18px, 1fr))`;
+
+                    for (let rIdx = 0; rIdx < steps; rIdx++) {
+                        const rVal = rIdx / (steps - 1 || 1);
+                        for (let gIdx = 0; gIdx < steps; gIdx++) {
+                            const gVal = gIdx / (steps - 1 || 1);
+
+                            const r255 = Math.round(rVal * 255);
+                            const g255 = Math.round(gVal * 255);
+                            const b255 = Math.round(bVal * 255);
+
+                            const hex = rgbToHex(r255, g255, b255);
+                            const pv = getPerceivedValue(r255, g255, b255);
+
+                            const cell = document.createElement('div');
+                            cell.className = 'h-5 swatch flex items-center justify-center font-mono text-[7px] font-bold select-none';
+                            cell.style.backgroundColor = hex;
+                            cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                            if (showVal) {
+                                cell.innerText = pv;
+                                cell.style.color = getContrastTextColor(hex);
+                            }
+
+                            if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                                cell.classList.add("iso-matched");
+                            }
+
+                            cell.onmouseenter = (e) => showChartTooltip(e, `RGB(${rLabel}, ${gLabel}, ${bLabel})`, 100, 50, hex, pv, {r: r255, g: g255, b: b255}, `R:${rLabel} G:${gLabel} B:${bLabel}`);
+                            cell.onmousemove = (e) => updateChartTooltipPos(e);
+                            cell.onmouseleave = () => hideChartTooltip();
+
+                            grid.appendChild(cell);
+                        }
+                    }
+                    block.appendChild(grid);
+                    outerContainer.appendChild(block);
+                }
+            } else {
+                // HSB Model
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between font-mono text-xs font-bold text-slate-700 bg-slate-100 p-3 rounded-xl border border-slate-200';
+                header.innerHTML = `<span>Hue: 0.0 → 1.0 (Rows)</span><span class="text-sky-600">Saturation: 0.0 → 1.0 (Columns)</span><span class="text-amber-600">Brightness / Value: 1.0 → 0.0 (Top to Bottom)</span>`;
+                outerContainer.appendChild(header);
+
+                for (let vIdx = 0; vIdx < steps; vIdx++) {
+                    const vVal = 1 - (vIdx / (steps - 1 || 1));
+                    const vLabel = vVal.toFixed(1);
+
+                    const block = document.createElement('div');
+                    block.className = 'flex items-center gap-4 border-b border-slate-200 pb-4';
+
+                    const sliceLabel = document.createElement('div');
+                    sliceLabel.className = 'w-12 font-mono text-xs font-bold text-slate-600 text-right shrink-0';
+                    sliceLabel.innerText = vLabel;
+                    block.appendChild(sliceLabel);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'grid gap-0.5 rounded-lg overflow-hidden border border-black/10 shadow-sm';
+                    grid.style.gridTemplateColumns = `repeat(${steps}, minmax(18px, 1fr))`;
+
+                    for (let hIdx = 0; hIdx < steps; hIdx++) {
+                        const hVal = hIdx / (steps - 1 || 1);
+                        const hueDeg = hVal * 360;
+
+                        for (let sIdx = 0; sIdx < steps; sIdx++) {
+                            const sVal = sIdx / (steps - 1 || 1);
+
+                            const rgbObj = hsvToRgbObj(hueDeg, sVal * 100, vVal * 100);
+                            const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                            const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                            const cell = document.createElement('div');
+                            cell.className = 'h-5 swatch flex items-center justify-center font-mono text-[7px] font-bold select-none';
+                            cell.style.backgroundColor = hex;
+                            cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                            if (showVal) {
+                                cell.innerText = pv;
+                                cell.style.color = getContrastTextColor(hex);
+                            }
+
+                            if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                                cell.classList.add("iso-matched");
+                            }
+
+                            cell.onmouseenter = (e) => showChartTooltip(e, Math.round(hueDeg), Math.round(sVal * 100), Math.round(vVal * 100), hex, pv, rgbObj, `H:${hVal.toFixed(1)} S:${sVal.toFixed(1)} B:${vLabel}`);
+                            cell.onmousemove = (e) => updateChartTooltipPos(e);
+                            cell.onmouseleave = () => hideChartTooltip();
+
+                            grid.appendChild(cell);
+                        }
+                    }
+                    block.appendChild(grid);
+                    outerContainer.appendChild(block);
+                }
+            }
+
+            target.appendChild(outerContainer);
+        }
+
         function createAxisLabel(text, isY = false) {
             const div = document.createElement('div');
             div.className = 'flex items-center justify-center font-mono text-[10px] font-bold text-slate-400 py-1';
@@ -1429,7 +1638,7 @@
             return div;
         }
 
-        /* TAB 4: GRAPH ENGINE */
+        /* TAB 5: GRAPH ENGINE */
         function renderTab4() {
             const target = document.getElementById('pv-plot-target');
             const sidebar = document.getElementById('pv-y-axis-sidebar');
@@ -1512,7 +1721,7 @@
                 label.innerText = hue + '°';
                 target.appendChild(label);
 
-                // Dynamically build lightness steps according to selected Spectrum Steps
+                // Build lightness steps
                 let baseSamples = [];
                 for (let i = 1; i <= numLevels; i++) {
                     let lightness = Math.round((i / (numLevels + 1)) * 100);
@@ -1633,7 +1842,7 @@
             if (!tooltip) return;
             tooltip.style.display = 'block';
             tooltip.innerHTML = `
-                <div class="font-bold text-sky-300">Hue: ${hue}° ${typeLabel ? `(\${typeLabel})` : ''}</div>
+                <div class="font-bold text-sky-300">Hue/Title: ${hue}${typeof hue === 'number' ? '°' : ''} ${typeLabel ? `(\${typeLabel})` : ''}</div>
                 <div>HEX: <span class="font-bold text-white">${hex}</span></div>
                 <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
                 <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
@@ -1785,6 +1994,7 @@
             renderPreSavedPalettes();
             updateTab2Controls();
             renderTab3();
+            renderTab3D();
             renderTab4();
         };
     </script>
