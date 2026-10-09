@@ -671,12 +671,12 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Color Space Mode</label>
                         <select id="t2-format" onchange="updateTab2Controls(); renderTab3();" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
-                            <option value="1">1: Adjust Lightness against saturation</option>
-                            <option value="2">2: Adjust Saturation against lightness</option>
-                            <option value="3">3: Adjust Tone and Shade against tints</option>
-                            <option value="4">4: Adjust Shade and Tone against tints</option>
-                            <option value="5">5: Adjust Brightness and Shade against tones</option>
-                            <option value="6">6: Adjust Brightness and Tone against tones</option>
+                            <option value="1">1: Adjust Lightness</option>
+                            <option value="2">2: Adjust Saturation</option>
+                            <option value="3">3: Adjust Tone and Shade</option>
+                            <option value="4">4: Adjust Shade and Tone</option>
+                            <option value="5">5: Adjust Brightness and Shade</option>
+                            <option value="6">6: Adjust Brightness and Tone</option>
                         </select>
                     </div>
 
@@ -720,13 +720,13 @@
             </div>
 
             <!-- Dynamic Surface Container -->
-            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto w-full max-w-full">
-                <div id="t2-container" class="min-w-max inline-block align-middle"></div>
+            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
+                <div id="t2-container" class="min-w-full"></div>
             </div>
         </section>
 
         <!-- ========================================================= -->
-        <!-- TAB 4: PERCEIVED VALUE GRAPH -->
+        <!-- TAB 4: PERCEIVED VALUE GRAPH (FIXED Y-AXIS LUMINANCE CHART) -->
         <!-- ========================================================= -->
         <section id="tab4" class="tab-content hidden space-y-6">
             
@@ -740,8 +740,8 @@
                         <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                             <option value="10">10° Intervals (36 Columns)</option>
                             <option value="15" selected>15° Intervals (24 Columns)</option>
-                            <option value="20" selected>20° Intervals (18 Columns)</option>
-                            <option value="22.5" selected>22.5° Intervals (16 Columns)</option>
+                            <option value="20">20° Intervals (18 Columns)</option>
+                            <option value="22.5">22.5° Intervals (16 Columns)</option>
                             <option value="30">30° Intervals (12 Columns)</option>
                             <option value="45">45° Intervals (8 Columns)</option>
                             <option value="60">60° Intervals (6 Columns)</option>
@@ -754,6 +754,7 @@
                         <select id="t3-density" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                             <option value="max_chroma">10 levels</option>
                             <option value="standard">15 levels</option>
+                            <option value="tint_tone_shade">Steps of Tints, Tones, & Shades (33 levels)</option>
                             <option value="high_density">45 levels</option>
                         </select>
                     </div>
@@ -1586,28 +1587,49 @@
                 let samples = [];
                 if (densityMode === 'max_chroma') {
                     for (let l = 10; l <= 90; l += 10) {
-                        samples.push({ s: 100, l: l });
+                        samples.push({ type: 'Max Chroma', s: 100, l: l, tint: 0, tone: 0, shade: 0 });
                     }
                 } else if (densityMode === 'standard') {
                     const lVals = [15, 30, 45, 60, 75, 88];
                     const sVals = [40, 75, 100];
                     lVals.forEach(l => {
                         sVals.forEach(s => {
-                            samples.push({ s: s, l: l });
+                            samples.push({ type: 'Standard', s: s, l: l, tint: 0, tone: 0, shade: 0 });
                         });
                     });
+                } else if (densityMode === 'tint_tone_shade') {
+                    // 10 Steps of Pure Tints (adding White 0% -> 100%)
+                    for (let pct = 0; pct <= 100; pct += 10) {
+                        samples.push({ type: `Tint ${pct}%`, s: 100, l: 50, tint: pct, tone: 0, shade: 0 });
+                    }
+                    // 10 Steps of Pure Tones (adding Grey 10% -> 100%)
+                    for (let pct = 10; pct <= 100; pct += 10) {
+                        samples.push({ type: `Tone ${pct}%`, s: 100, l: 50, tint: 0, tone: pct, shade: 0 });
+                    }
+                    // 10 Steps of Pure Shades (adding Black 10% -> 100%)
+                    for (let pct = 10; pct <= 100; pct += 10) {
+                        samples.push({ type: `Shade ${pct}%`, s: 100, l: 50, tint: 0, tone: 0, shade: pct });
+                    }
                 } else if (densityMode === 'high_density') {
                     for (let l = 10; l <= 90; l += 8) {
                         for (let s = 20; s <= 100; s += 20) {
-                            samples.push({ s: s, l: l });
+                            samples.push({ type: 'High Density', s: s, l: l, tint: 0, tone: 0, shade: 0 });
                         }
                     }
                 }
 
                 // Render each color swatch at its EXACT perceived value Y position
                 samples.forEach((sample, sampleIdx) => {
-                    const rgbObj = hslToRgbObj(hue, sample.s, sample.l);
-                    const colorHex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                    let baseRgb = hslToRgbObj(hue, sample.s, sample.l);
+                    let colorHex;
+
+                    if (sample.tint > 0 || sample.tone > 0 || sample.shade > 0) {
+                        colorHex = applyAdjustments(baseRgb, sample.tint, sample.tone, sample.shade, 100);
+                    } else {
+                        colorHex = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+                    }
+
+                    const rgbObj = hexToRgb(colorHex);
                     const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
 
                     // MATHEMATICAL Y-POSITION: y = paddingTop + (100 - pv) / 100 * chartHeight
@@ -1635,7 +1657,7 @@
                     }
 
                     // Tooltip listeners
-                    node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj);
+                    node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj, sample.type);
                     node.onmousemove = (e) => updateChartTooltipPos(e);
                     node.onmouseleave = () => hideChartTooltip();
 
@@ -1651,12 +1673,12 @@
         }
 
         /* TAB 4 TOOLTIP CONTROLS */
-        function showChartTooltip(e, hue, s, l, hex, pv, rgb) {
+        function showChartTooltip(e, hue, s, l, hex, pv, rgb, typeLabel = "") {
             const tooltip = document.getElementById('chart-tooltip');
             if (!tooltip) return;
             tooltip.style.display = 'block';
             tooltip.innerHTML = `
-                <div class="font-bold text-sky-300">Hue: ${hue}° | HSL(${hue}, ${s}%, ${l}%)</div>
+                <div class="font-bold text-sky-300">Hue: ${hue}° ${typeLabel ? `(\${typeLabel})` : ''} | HSL(${hue}, ${s}%, ${l}%)</div>
                 <div>HEX: <span class="font-bold text-white">${hex}</span></div>
                 <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
                 <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
