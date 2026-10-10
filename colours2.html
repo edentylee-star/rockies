@@ -309,7 +309,7 @@
     </header>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
+    <main class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6">
 
         <!-- TAB 1: COLOUR MATRICES -->
         <section id="tab1" class="tab-content space-y-6">
@@ -666,18 +666,10 @@
             </div>
         </section>
 
-        <!-- TAB 4: 3D COLOR GRIDS (NEW) -->
+        <!-- TAB 4: 3D COLOR GRIDS (SIDE-BY-SIDE MATCHING REFERENCE IMAGES) -->
         <section id="tab-3d" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">3D Slice Model</label>
-                        <select id="t3d-model" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="rgb" selected>1. RGB Cube Slices (Red vs Green across Blue)</option>
-                            <option value="hsb">2. HSB Spectrum (Hue vs Saturation across Value)</option>
-                        </select>
-                    </div>
-
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Slice / Sub-step Resolution</label>
                         <select id="t3d-res" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
@@ -709,8 +701,25 @@
                 </div>
             </div>
 
-            <div class="glass-card rounded-2xl p-4 border border-slate-200 shadow-sm overflow-x-auto">
-                <div id="t3d-target" class="min-w-full space-y-6"></div>
+            <!-- SIDE BY SIDE CONTAINER -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <!-- PANEL 1: RGB SLICES -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
+                    <div class="border-b pb-2">
+                        <h3 class="text-base font-bold text-slate-900">1. RGB Cube Slices</h3>
+                        <p class="text-xs text-slate-500">Red (Rows 0.0-1.0) × Green (Cols 0.0-1.0) sliced across Blue levels</p>
+                    </div>
+                    <div id="t3d-target-rgb" class="min-w-[500px]"></div>
+                </div>
+
+                <!-- PANEL 2: HSB SPECTRUM -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
+                    <div class="border-b pb-2">
+                        <h3 class="text-base font-bold text-slate-900">2. HSB Spectrum Grid</h3>
+                        <p class="text-xs text-slate-500">Hue (Rows 0.0-1.0) × Saturation (Cols 0.0-1.0) sliced across Brightness levels</p>
+                    </div>
+                    <div id="t3d-target-hsb" class="min-w-[500px]"></div>
+                </div>
             </div>
         </section>
 
@@ -1492,142 +1501,202 @@
             container.appendChild(grid);
         }
 
-        /* TAB 4: NEW 3D COLOR GRIDS ENGINE */
+        /* TAB 4: 3D COLOR GRIDS ENGINE (EXACT MATCHING LAYOUT FOR BOTH IMAGES) */
         function renderTab3D() {
-            const target = document.getElementById('t3d-target');
-            if (!target) return;
-            target.innerHTML = '';
+            const targetRGB = document.getElementById('t3d-target-rgb');
+            const targetHSB = document.getElementById('t3d-target-hsb');
+            if (!targetRGB || !targetHSB) return;
 
-            const model = document.getElementById('t3d-model').value;
+            targetRGB.innerHTML = '';
+            targetHSB.innerHTML = '';
+
             const steps = parseInt(document.getElementById('t3d-res').value);
             const showVal = document.getElementById('t3d-showval').checked;
             const trackIso = document.getElementById('t3d-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3d-isoval').value);
 
-            const outerContainer = document.createElement('div');
-            outerContainer.className = 'space-y-6';
+            // ==========================================
+            // 1. RENDER RGB CUBE SLICES (IMAGE 1 STYLE)
+            // ==========================================
+            const rgbHeader = document.createElement('div');
+            rgbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
+            rgbHeader.innerHTML = `<span>Red</span><span class="font-bold">Green</span><span>Blue</span>`;
+            targetRGB.appendChild(rgbHeader);
 
-            if (model === 'rgb') {
-                // Header Axis Legend
-                const header = document.createElement('div');
-                header.className = 'flex items-center justify-between font-mono text-xs font-bold text-slate-700 bg-slate-100 p-3 rounded-xl border border-slate-200';
-                header.innerHTML = `<span>Red: 0.0 → 1.0 (Rows)</span><span class="text-sky-600">Green: 0.0 → 1.0 (Columns)</span><span class="text-indigo-600">Blue: Slices (Top to Bottom: 0.0 → 1.0)</span>`;
-                outerContainer.appendChild(header);
+            // Top X-Axis Labels (0.0 to 1.0)
+            const rgbTopAxis = document.createElement('div');
+            rgbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
+            const rgbTopColGrid = document.createElement('div');
+            rgbTopColGrid.className = 'grid flex-grow text-center font-mono text-[10px] text-slate-500';
+            rgbTopColGrid.style.gridTemplateColumns = `repeat(${steps}, minmax(0, 1fr))`;
+            for (let i = 0; i < steps; i++) {
+                const val = (i / (steps - 1 || 1)).toFixed(1);
+                rgbTopColGrid.innerHTML += `<span>${val}</span>`;
+            }
+            rgbTopAxis.appendChild(rgbTopColGrid);
+            targetRGB.appendChild(rgbTopAxis);
 
-                // Build each Blue slice
+            // Body Grid Slices Container
+            const rgbMainBox = document.createElement('div');
+            rgbMainBox.className = 'relative flex gap-3';
+
+            const rgbRowsContainer = document.createElement('div');
+            rgbRowsContainer.className = 'flex-grow space-y-1.5';
+
+            for (let rIdx = 0; rIdx < steps; rIdx++) {
+                const rVal = rIdx / (steps - 1 || 1);
+                const rLabel = rVal.toFixed(1);
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex items-center gap-2';
+
+                // Left Row Label (Red: 0.0 to 1.0)
+                const leftLabel = document.createElement('div');
+                leftLabel.className = 'w-8 font-mono text-[10px] font-semibold text-slate-600 text-left shrink-0';
+                leftLabel.innerText = rLabel;
+                rowDiv.appendChild(leftLabel);
+
+                // Grid Slice
+                const grid = document.createElement('div');
+                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
+                grid.style.gridTemplateColumns = `repeat(${steps}, minmax(0, 1fr))`;
+
                 for (let bIdx = 0; bIdx < steps; bIdx++) {
                     const bVal = bIdx / (steps - 1 || 1);
-                    const bLabel = bVal.toFixed(1);
+                    for (let gIdx = 0; gIdx < steps; gIdx++) {
+                        const gVal = gIdx / (steps - 1 || 1);
 
-                    const block = document.createElement('div');
-                    block.className = 'flex items-center gap-4 border-b border-slate-200 pb-4';
+                        const r255 = Math.round(rVal * 255);
+                        const g255 = Math.round(gVal * 255);
+                        const b255 = Math.round(bVal * 255);
 
-                    const sliceLabel = document.createElement('div');
-                    sliceLabel.className = 'w-12 font-mono text-xs font-bold text-slate-600 text-right shrink-0';
-                    sliceLabel.innerText = bLabel;
-                    block.appendChild(sliceLabel);
+                        const hex = rgbToHex(r255, g255, b255);
+                        const pv = getPerceivedValue(r255, g255, b255);
 
-                    const grid = document.createElement('div');
-                    grid.className = 'grid gap-0.5 rounded-lg overflow-hidden border border-black/10 shadow-sm';
-                    grid.style.gridTemplateColumns = `repeat(${steps}, minmax(18px, 1fr))`;
+                        const cell = document.createElement('div');
+                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
+                        cell.style.backgroundColor = hex;
+                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
 
-                    for (let rIdx = 0; rIdx < steps; rIdx++) {
-                        const rVal = rIdx / (steps - 1 || 1);
-                        for (let gIdx = 0; gIdx < steps; gIdx++) {
-                            const gVal = gIdx / (steps - 1 || 1);
-
-                            const r255 = Math.round(rVal * 255);
-                            const g255 = Math.round(gVal * 255);
-                            const b255 = Math.round(bVal * 255);
-
-                            const hex = rgbToHex(r255, g255, b255);
-                            const pv = getPerceivedValue(r255, g255, b255);
-
-                            const cell = document.createElement('div');
-                            cell.className = 'h-5 swatch flex items-center justify-center font-mono text-[7px] font-bold select-none';
-                            cell.style.backgroundColor = hex;
-                            cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-
-                            if (showVal) {
-                                cell.innerText = pv;
-                                cell.style.color = getContrastTextColor(hex);
-                            }
-
-                            if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                                cell.classList.add("iso-matched");
-                            }
-
-                            cell.onmouseenter = (e) => showChartTooltip(e, `RGB(${rLabel}, ${gLabel}, ${bLabel})`, 100, 50, hex, pv, {r: r255, g: g255, b: b255}, `R:${rLabel} G:${gLabel} B:${bLabel}`);
-                            cell.onmousemove = (e) => updateChartTooltipPos(e);
-                            cell.onmouseleave = () => hideChartTooltip();
-
-                            grid.appendChild(cell);
+                        if (showVal) {
+                            cell.innerText = pv;
+                            cell.style.color = getContrastTextColor(hex);
                         }
+
+                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                            cell.classList.add("iso-matched");
+                        }
+
+                        cell.onmouseenter = (e) => showChartTooltip(e, `Red:${rLabel} Green:${gVal.toFixed(1)} Blue:${bVal.toFixed(1)}`, 100, 50, hex, pv, {r: r255, g: g255, b: b255});
+                        cell.onmousemove = (e) => updateChartTooltipPos(e);
+                        cell.onmouseleave = () => hideChartTooltip();
+
+                        grid.appendChild(cell);
                     }
-                    block.appendChild(grid);
-                    outerContainer.appendChild(block);
                 }
-            } else {
-                // HSB Model
-                const header = document.createElement('div');
-                header.className = 'flex items-center justify-between font-mono text-xs font-bold text-slate-700 bg-slate-100 p-3 rounded-xl border border-slate-200';
-                header.innerHTML = `<span>Hue: 0.0 → 1.0 (Rows)</span><span class="text-sky-600">Saturation: 0.0 → 1.0 (Columns)</span><span class="text-amber-600">Brightness / Value: 1.0 → 0.0 (Top to Bottom)</span>`;
-                outerContainer.appendChild(header);
+                rowDiv.appendChild(grid);
+                rgbRowsContainer.appendChild(rowDiv);
+            }
+            rgbMainBox.appendChild(rgbRowsContainer);
+
+            // Right Blue Slice Pointer
+            const rgbRightSide = document.createElement('div');
+            rgbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
+            rgbRightSide.innerHTML = `<span>0.0</span><span>↓</span><span>1.0</span>`;
+            rgbMainBox.appendChild(rgbRightSide);
+
+            targetRGB.appendChild(rgbMainBox);
+
+
+            // ==========================================
+            // 2. RENDER HSB SPECTRUM GRID (IMAGE 2 STYLE)
+            // ==========================================
+            const hsbHeader = document.createElement('div');
+            hsbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
+            hsbHeader.innerHTML = `<span>Hue</span><span class="font-bold">Saturation</span><span>Brightness</span>`;
+            targetHSB.appendChild(hsbHeader);
+
+            // Top X-Axis Labels (Saturation: 0.0 to 1.0)
+            const hsbTopAxis = document.createElement('div');
+            hsbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
+            const hsbTopColGrid = document.createElement('div');
+            hsbTopColGrid.className = 'grid flex-grow text-center font-mono text-[10px] text-slate-500';
+            hsbTopColGrid.style.gridTemplateColumns = `repeat(${steps}, minmax(0, 1fr))`;
+            for (let i = 0; i < steps; i++) {
+                const val = (i / (steps - 1 || 1)).toFixed(1);
+                hsbTopColGrid.innerHTML += `<span>${val}</span>`;
+            }
+            hsbTopAxis.appendChild(hsbTopColGrid);
+            targetHSB.appendChild(hsbTopAxis);
+
+            // Body Grid Slices Container
+            const hsbMainBox = document.createElement('div');
+            hsbMainBox.className = 'relative flex gap-3';
+
+            const hsbRowsContainer = document.createElement('div');
+            hsbRowsContainer.className = 'flex-grow space-y-1.5';
+
+            for (let hIdx = 0; hIdx < steps; hIdx++) {
+                const hVal = hIdx / (steps - 1 || 1);
+                const hLabel = hVal.toFixed(1);
+                const hueDeg = hVal * 360;
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex items-center gap-2';
+
+                // Left Row Label (Hue: 0.0 to 1.0)
+                const leftLabel = document.createElement('div');
+                leftLabel.className = 'w-8 font-mono text-[10px] font-semibold text-slate-600 text-left shrink-0';
+                leftLabel.innerText = hLabel;
+                rowDiv.appendChild(leftLabel);
+
+                // Grid Slice
+                const grid = document.createElement('div');
+                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
+                grid.style.gridTemplateColumns = `repeat(${steps}, minmax(0, 1fr))`;
 
                 for (let vIdx = 0; vIdx < steps; vIdx++) {
                     const vVal = 1 - (vIdx / (steps - 1 || 1));
-                    const vLabel = vVal.toFixed(1);
+                    for (let sIdx = 0; sIdx < steps; sIdx++) {
+                        const sVal = sIdx / (steps - 1 || 1);
 
-                    const block = document.createElement('div');
-                    block.className = 'flex items-center gap-4 border-b border-slate-200 pb-4';
+                        const rgbObj = hsvToRgbObj(hueDeg, sVal * 100, vVal * 100);
+                        const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
 
-                    const sliceLabel = document.createElement('div');
-                    sliceLabel.className = 'w-12 font-mono text-xs font-bold text-slate-600 text-right shrink-0';
-                    sliceLabel.innerText = vLabel;
-                    block.appendChild(sliceLabel);
+                        const cell = document.createElement('div');
+                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
+                        cell.style.backgroundColor = hex;
+                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
 
-                    const grid = document.createElement('div');
-                    grid.className = 'grid gap-0.5 rounded-lg overflow-hidden border border-black/10 shadow-sm';
-                    grid.style.gridTemplateColumns = `repeat(${steps}, minmax(18px, 1fr))`;
-
-                    for (let hIdx = 0; hIdx < steps; hIdx++) {
-                        const hVal = hIdx / (steps - 1 || 1);
-                        const hueDeg = hVal * 360;
-
-                        for (let sIdx = 0; sIdx < steps; sIdx++) {
-                            const sVal = sIdx / (steps - 1 || 1);
-
-                            const rgbObj = hsvToRgbObj(hueDeg, sVal * 100, vVal * 100);
-                            const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
-                            const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
-
-                            const cell = document.createElement('div');
-                            cell.className = 'h-5 swatch flex items-center justify-center font-mono text-[7px] font-bold select-none';
-                            cell.style.backgroundColor = hex;
-                            cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-
-                            if (showVal) {
-                                cell.innerText = pv;
-                                cell.style.color = getContrastTextColor(hex);
-                            }
-
-                            if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                                cell.classList.add("iso-matched");
-                            }
-
-                            cell.onmouseenter = (e) => showChartTooltip(e, Math.round(hueDeg), Math.round(sVal * 100), Math.round(vVal * 100), hex, pv, rgbObj, `H:${hVal.toFixed(1)} S:${sVal.toFixed(1)} B:${vLabel}`);
-                            cell.onmousemove = (e) => updateChartTooltipPos(e);
-                            cell.onmouseleave = () => hideChartTooltip();
-
-                            grid.appendChild(cell);
+                        if (showVal) {
+                            cell.innerText = pv;
+                            cell.style.color = getContrastTextColor(hex);
                         }
-                    }
-                    block.appendChild(grid);
-                    outerContainer.appendChild(block);
-                }
-            }
 
-            target.appendChild(outerContainer);
+                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                            cell.classList.add("iso-matched");
+                        }
+
+                        cell.onmouseenter = (e) => showChartTooltip(e, `Hue:${hLabel} Sat:${sVal.toFixed(1)} Brightness:${vVal.toFixed(1)}`, Math.round(sVal*100), Math.round(vVal*100), hex, pv, rgbObj);
+                        cell.onmousemove = (e) => updateChartTooltipPos(e);
+                        cell.onmouseleave = () => hideChartTooltip();
+
+                        grid.appendChild(cell);
+                    }
+                }
+                rowDiv.appendChild(grid);
+                hsbRowsContainer.appendChild(rowDiv);
+            }
+            hsbMainBox.appendChild(hsbRowsContainer);
+
+            // Right Brightness Slice Pointer
+            const hsbRightSide = document.createElement('div');
+            hsbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
+            hsbRightSide.innerHTML = `<span>1.0</span><span>↓</span><span>0.0</span>`;
+            hsbMainBox.appendChild(hsbRightSide);
+
+            targetHSB.appendChild(hsbMainBox);
         }
 
         function createAxisLabel(text, isY = false) {
@@ -1842,7 +1911,7 @@
             if (!tooltip) return;
             tooltip.style.display = 'block';
             tooltip.innerHTML = `
-                <div class="font-bold text-sky-300">Hue/Title: ${hue}${typeof hue === 'number' ? '°' : ''} ${typeLabel ? `(\${typeLabel})` : ''}</div>
+                <div class="font-bold text-sky-300">${hue}${typeof hue === 'number' ? '°' : ''} ${typeLabel ? `(\${typeLabel})` : ''}</div>
                 <div>HEX: <span class="font-bold text-white">${hex}</span></div>
                 <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
                 <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
