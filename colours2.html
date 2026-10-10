@@ -666,7 +666,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: 3D COLOR GRIDS (INDEPENDENT X/Y STEP CONTROL INTERVALS) -->
+        <!-- TAB 4: 3D COLOR GRIDS -->
         <section id="tab-3d" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
@@ -862,10 +862,22 @@
 
             <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1"></div>
 
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-[#22ACEC]">
                     <i class="fa-solid fa-copy text-xs"></i>
                     <span>Copy All HEX</span>
+                </button>
+
+                <!-- DOWNLOAD MINIMAL JPEG BUTTON -->
+                <button onclick="downloadMinimalPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-download text-xs text-sky-400"></i>
+                    <span>Minimal JPEG</span>
+                </button>
+
+                <!-- DOWNLOAD EXPANDED JPEG BUTTON -->
+                <button onclick="downloadExpandedPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-file-image text-xs text-sky-400"></i>
+                    <span>Expanded JPEG</span>
                 </button>
             </div>
         </div>
@@ -1000,6 +1012,10 @@
 
         function getPerceivedValue(r, g, b) {
             return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
+        }
+
+        function getPerceivedLuminance(r, g, b) {
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
         }
 
         function applyAdjustments(rgb, tint, tone, shade, satRatio) {
@@ -1516,7 +1532,7 @@
             container.appendChild(grid);
         }
 
-        /* TAB 4: 3D COLOR GRIDS ENGINE (INDEPENDENT X & Y STEP INTERVALS) */
+        /* TAB 4: 3D COLOR GRIDS ENGINE */
         function renderTab3D() {
             const targetRGB = document.getElementById('t3d-target-rgb');
             const targetHSB = document.getElementById('t3d-target-hsb');
@@ -1531,7 +1547,6 @@
             const trackIso = document.getElementById('t3d-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3d-isoval').value);
 
-            // Compute array of step values for X and Y axes
             const getStepsArray = (interval) => {
                 const arr = [];
                 for (let val = 0; val <= 1.0001; val += interval) {
@@ -1543,15 +1558,12 @@
             const xSteps = getStepsArray(xStepInterval);
             const ySteps = getStepsArray(yStepInterval);
 
-            // ==========================================
-            // 1. RENDER RGB CUBE SLICES (IMAGE 1 STYLE)
-            // ==========================================
+            // RGB SLICES
             const rgbHeader = document.createElement('div');
             rgbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
             rgbHeader.innerHTML = `<span>Red</span><span class="font-bold">Green</span><span>Blue</span>`;
             targetRGB.appendChild(rgbHeader);
 
-            // Top X-Axis Labels
             const rgbTopAxis = document.createElement('div');
             rgbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
             const rgbTopColGrid = document.createElement('div');
@@ -1563,7 +1575,6 @@
             rgbTopAxis.appendChild(rgbTopColGrid);
             targetRGB.appendChild(rgbTopAxis);
 
-            // Body Grid Slices Container
             const rgbMainBox = document.createElement('div');
             rgbMainBox.className = 'relative flex gap-3';
 
@@ -1571,18 +1582,16 @@
             rgbRowsContainer.className = 'flex-grow space-y-1.5';
 
             ySteps.forEach(rVal => {
-                const rLabel = rVal.toFixed(2).replace(/\.?0+\$/, '');
+                const rLabel = rVal.toFixed(2).replace(/\.?0+$/, '');
 
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'flex items-center gap-2';
 
-                // Left Row Label (Red)
                 const leftLabel = document.createElement('div');
                 leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
                 leftLabel.innerText = rLabel;
                 rowDiv.appendChild(leftLabel);
 
-                // Grid Slice
                 const grid = document.createElement('div');
                 grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
                 grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
@@ -1622,7 +1631,6 @@
             });
             rgbMainBox.appendChild(rgbRowsContainer);
 
-            // Right Blue Slice Pointer
             const rgbRightSide = document.createElement('div');
             rgbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
             rgbRightSide.innerHTML = `<span>0.0</span><span>↓</span><span>1.0</span>`;
@@ -1631,15 +1639,12 @@
             targetRGB.appendChild(rgbMainBox);
 
 
-            // ==========================================
-            // 2. RENDER HSB SPECTRUM GRID (IMAGE 2 STYLE)
-            // ==========================================
+            // HSB SPECTRUM
             const hsbHeader = document.createElement('div');
             hsbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
             hsbHeader.innerHTML = `<span>Hue</span><span class="font-bold">Saturation</span><span>Brightness</span>`;
             targetHSB.appendChild(hsbHeader);
 
-            // Top X-Axis Labels (Saturation)
             const hsbTopAxis = document.createElement('div');
             hsbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
             const hsbTopColGrid = document.createElement('div');
@@ -1651,7 +1656,6 @@
             hsbTopAxis.appendChild(hsbTopColGrid);
             targetHSB.appendChild(hsbTopAxis);
 
-            // Body Grid Slices Container
             const hsbMainBox = document.createElement('div');
             hsbMainBox.className = 'relative flex gap-3';
 
@@ -1665,13 +1669,11 @@
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'flex items-center gap-2';
 
-                // Left Row Label (Hue)
                 const leftLabel = document.createElement('div');
                 leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
                 leftLabel.innerText = hLabel;
                 rowDiv.appendChild(leftLabel);
 
-                // Grid Slice
                 const grid = document.createElement('div');
                 grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
                 grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
@@ -1709,7 +1711,6 @@
             });
             hsbMainBox.appendChild(hsbRowsContainer);
 
-            // Right Brightness Slice Pointer
             const hsbRightSide = document.createElement('div');
             hsbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
             hsbRightSide.innerHTML = `<span>1.0</span><span>↓</span><span>0.0</span>`;
@@ -1742,7 +1743,6 @@
             const trackIso = document.getElementById('t3-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3-isoval').value);
 
-            // Layer toggles
             const showBase = document.getElementById('t3-show-base') ? document.getElementById('t3-show-base').checked : true;
             const showTints = document.getElementById('t3-show-tints') ? document.getElementById('t3-show-tints').checked : false;
             const showTones = document.getElementById('t3-show-tones') ? document.getElementById('t3-show-tones').checked : false;
@@ -1809,7 +1809,6 @@
                 label.innerText = hue + '°';
                 target.appendChild(label);
 
-                // Build lightness steps
                 let baseSamples = [];
                 for (let i = 1; i <= numLevels; i++) {
                     let lightness = Math.round((i / (numLevels + 1)) * 100);
@@ -1999,6 +1998,180 @@
                 return;
             }
             copyToClipboard(paletteColors.join(', '));
+        }
+
+        /* 1. MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
+        function downloadMinimalPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
+            generateHighResCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 8;
+            const swatchSize = 400;
+            const margin = 20;
+
+            const totalSwatches = colors.length;
+            const rows = Math.ceil(totalSwatches / cols);
+
+            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
+            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
+
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = canvasWidth;
+            cardCanvas.height = canvasHeight;
+
+            const ctx = cardCanvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            colors.forEach((hex, idx) => {
+                const colIndex = idx % cols;
+                const rowIndex = Math.floor(idx / cols);
+
+                const x = margin + colIndex * (swatchSize + margin);
+                const y = margin + rowIndex * (swatchSize + margin);
+
+                ctx.fillStyle = hex;
+                ctx.fillRect(x, y, swatchSize, swatchSize);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Minimal Swatch Card!`);
+        }
+
+        /* 2. EXPANDED SPECIFICATION CARD GENERATION */
+        function downloadExpandedPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
+            generateExpandedSpecCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 3;
+            const cardW = 380;
+            const cardH = 140;
+            const gapX = 20;
+            const gapY = 20;
+            const padding = 30;
+            const headerH = 60;
+
+            const rows = Math.ceil(colors.length / cols);
+            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
+            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
+
+            colors.forEach((hex, idx) => {
+                const c = idx % cols;
+                const r = Math.floor(idx / cols);
+
+                const x = padding + c * (cardW + gapX);
+                const y = padding + headerH + r * (cardH + gapY);
+
+                ctx.fillStyle = '#F8FAFC';
+                ctx.strokeStyle = '#E2E8F0';
+                ctx.lineWidth = 2;
+                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
+
+                const swatchS = 96;
+                const swatchX = x + 20;
+                const swatchY = y + 22;
+
+                ctx.fillStyle = hex;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
+
+                const rgbObj = hexToRgb(hex);
+                const rgbR = Math.round(rgbObj.r);
+                const rgbG = Math.round(rgbObj.g);
+                const rgbB = Math.round(rgbObj.b);
+
+                const hsl = rgbToHsl(rgbR, rgbG, rgbB);
+                const hslH = hsl.h;
+                const hslS = hsl.s;
+                const hslL = hsl.l;
+
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                const textX = swatchX + swatchS + 20;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
+        }
+
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
         }
 
         function handleDragStart(e) {
