@@ -561,7 +561,7 @@
     </main>
 
     <!-- ========================================================= -->
-    <!-- GLOBAL COMPARISON PALETTE DRAWER (MATCHING COLOURS4.HTML) -->
+    <!-- GLOBAL COMPARISON PALETTE DRAWER -->
     <!-- ========================================================= -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-xl px-4 py-3">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -584,9 +584,21 @@
             </div>
 
             <!-- Action Controls -->
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-[#9BD6F3] text-[#0369a1] border border-[#22ACEC] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5">
                     <i class="fa-solid fa-copy"></i> Copy All HEX
+                </button>
+
+                <!-- DOWNLOAD MINIMAL JPEG BUTTON -->
+                <button onclick="downloadMinimalPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-download text-xs text-sky-400"></i>
+                    <span>Minimal JPEG</span>
+                </button>
+
+                <!-- DOWNLOAD EXPANDED JPEG BUTTON -->
+                <button onclick="downloadExpandedPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-file-image text-xs text-sky-400"></i>
+                    <span>Expanded JPEG</span>
                 </button>
             </div>
         </div>
@@ -627,6 +639,10 @@
         /* COLOR MATH UTILITIES */
         function getPerceivedValue(r, g, b) {
             return Math.round((0.299 * r + 0.587 * g + 0.114 * b) / 255 * 100);
+        }
+
+        function getPerceivedLuminance(r, g, b) {
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
         }
 
         function getContrastTextColor(r, g, b) {
@@ -701,6 +717,22 @@
                 c1[1] + t * (c2[1] - c1[1]),
                 c1[2] + t * (c2[2] - c1[2])
             ];
+        }
+
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
         }
 
         function copyToClipboard(text) {
@@ -1139,7 +1171,7 @@
         }
 
         /* ========================================================= */
-        /* GLOBAL COMPARISON PALETTE DRAWER (EXACT COLOURS4 STYLING) */
+        /* GLOBAL COMPARISON PALETTE DRAWER & EXPORTERS */
         /* ========================================================= */
         function initPalette() {
             updatePaletteUI();
@@ -1172,6 +1204,156 @@
                 return;
             }
             copyToClipboard(paletteColors.join(', '));
+        }
+
+        /* MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
+        function downloadMinimalPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "line_rockie_palette", colors: paletteColors };
+            generateHighResCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 8;
+            const swatchSize = 400;
+            const margin = 20;
+
+            const totalSwatches = colors.length;
+            const rows = Math.ceil(totalSwatches / cols);
+
+            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
+            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
+
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = canvasWidth;
+            cardCanvas.height = canvasHeight;
+
+            const ctx = cardCanvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            colors.forEach((hex, idx) => {
+                const colIndex = idx % cols;
+                const rowIndex = Math.floor(idx / cols);
+
+                const x = margin + colIndex * (swatchSize + margin);
+                const y = margin + rowIndex * (swatchSize + margin);
+
+                ctx.fillStyle = hex;
+                ctx.fillRect(x, y, swatchSize, swatchSize);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Minimal Swatch Card!`);
+        }
+
+        /* EXPANDED SPECIFICATION CARD GENERATION */
+        function downloadExpandedPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "line_rockie_palette", colors: paletteColors };
+            generateExpandedSpecCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 3;
+            const cardW = 380;
+            const cardH = 140;
+            const gapX = 20;
+            const gapY = 20;
+            const padding = 30;
+            const headerH = 60;
+
+            const rows = Math.ceil(colors.length / cols);
+            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
+            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
+
+            colors.forEach((hex, idx) => {
+                const c = idx % cols;
+                const r = Math.floor(idx / cols);
+
+                const x = padding + c * (cardW + gapX);
+                const y = padding + headerH + r * (cardH + gapY);
+
+                ctx.fillStyle = '#F8FAFC';
+                ctx.strokeStyle = '#E2E8F0';
+                ctx.lineWidth = 2;
+                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
+
+                const swatchS = 96;
+                const swatchX = x + 20;
+                const swatchY = y + 22;
+
+                ctx.fillStyle = hex;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
+
+                const [rgbR, rgbG, rgbB] = hexToRgb(hex);
+                const [hslH, hslS, hslL] = rgbToHsl(rgbR, rgbG, rgbB);
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                const textX = swatchX + swatchS + 20;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
         }
 
         function handleDragStart(e, index) {
