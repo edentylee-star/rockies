@@ -8,6 +8,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -385,10 +388,22 @@
             </div>
 
             <!-- Action Controls -->
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <button onclick="copyAllPaletteHex()" class="px-3.5 py-2 bg-[#B4E3F8] hover:bg-sky-300 text-[#0369a1] text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-[#22ACEC]">
                     <i class="fa-solid fa-copy text-xs"></i>
                     <span>Copy All HEX</span>
+                </button>
+
+                <!-- DOWNLOAD MINIMAL JPEG BUTTON -->
+                <button onclick="downloadMinimalPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-download text-xs text-sky-400"></i>
+                    <span>Minimal JPEG</span>
+                </button>
+
+                <!-- DOWNLOAD EXPANDED JPEG BUTTON -->
+                <button onclick="downloadExpandedPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
+                    <i class="fa-solid fa-file-image text-xs text-sky-400"></i>
+                    <span>Expanded JPEG</span>
                 </button>
             </div>
         </div>
@@ -538,7 +553,7 @@
         }
 
         function rgbToHex(r, g, b) {
-            return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase();
+            return "#" + [r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('').toUpperCase();
         }
 
         function hexToRgb(hex) {
@@ -549,8 +564,30 @@
             return { r: parseInt(match[0], 16) || 0, g: parseInt(match[1], 16) || 0, b: parseInt(match[2], 16) || 0 };
         }
 
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if(max === min) { h = s = 0; } 
+            else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch(max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
         function getPerceivedValue(r, g, b) {
             return Math.round((0.2126 * r + 0.7152 * g + 0.0722 * b) / 2.55);
+        }
+
+        function getPerceivedLuminance(r, g, b) {
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
         }
 
         function getContrastTextColor(hex) {
@@ -802,6 +839,180 @@
                 return;
             }
             copyToClipboard(paletteColors.join(', '));
+        }
+
+        /* MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
+        function downloadMinimalPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "circle_rockies_palette", colors: paletteColors };
+            generateHighResCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 8;
+            const swatchSize = 400;
+            const margin = 20;
+
+            const totalSwatches = colors.length;
+            const rows = Math.ceil(totalSwatches / cols);
+
+            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
+            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
+
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = canvasWidth;
+            cardCanvas.height = canvasHeight;
+
+            const ctx = cardCanvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            colors.forEach((hex, idx) => {
+                const colIndex = idx % cols;
+                const rowIndex = Math.floor(idx / cols);
+
+                const x = margin + colIndex * (swatchSize + margin);
+                const y = margin + rowIndex * (swatchSize + margin);
+
+                ctx.fillStyle = hex;
+                ctx.fillRect(x, y, swatchSize, swatchSize);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Minimal Swatch Card!`);
+        }
+
+        /* EXPANDED SPECIFICATION CARD GENERATION */
+        function downloadExpandedPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "circle_rockies_palette", colors: paletteColors };
+            generateExpandedSpecCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 3;
+            const cardW = 380;
+            const cardH = 140;
+            const gapX = 20;
+            const gapY = 20;
+            const padding = 30;
+            const headerH = 60;
+
+            const rows = Math.ceil(colors.length / cols);
+            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
+            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
+
+            colors.forEach((hex, idx) => {
+                const c = idx % cols;
+                const r = Math.floor(idx / cols);
+
+                const x = padding + c * (cardW + gapX);
+                const y = padding + headerH + r * (cardH + gapY);
+
+                ctx.fillStyle = '#F8FAFC';
+                ctx.strokeStyle = '#E2E8F0';
+                ctx.lineWidth = 2;
+                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
+
+                const swatchS = 96;
+                const swatchX = x + 20;
+                const swatchY = y + 22;
+
+                ctx.fillStyle = hex;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
+
+                const rgbObj = hexToRgb(hex);
+                const rgbR = Math.round(rgbObj.r);
+                const rgbG = Math.round(rgbObj.g);
+                const rgbB = Math.round(rgbObj.b);
+
+                const hsl = rgbToHsl(rgbR, rgbG, rgbB);
+                const hslH = hsl.h;
+                const hslS = hsl.s;
+                const hslL = hsl.l;
+
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                const textX = swatchX + swatchS + 20;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
+        }
+
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
         }
 
         function handleDragStart(e) {
