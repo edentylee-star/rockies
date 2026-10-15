@@ -669,29 +669,23 @@
         <!-- TAB 4: 3D COLOR GRIDS -->
         <section id="tab-3d" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
                     <!-- X-Axis Interval Controls -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">X-Axis Interval Steps (Columns)</label>
-                        <select id="t3d-x-interval" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="0.05">0.05 Interval (21 Columns)</option>
-                            <option value="0.1" selected>0.10 Interval (11 Columns)</option>
-                            <option value="0.125">0.125 Interval (9 Columns)</option>
-                            <option value="0.2">0.20 Interval (6 Columns)</option>
-                            <option value="0.25">0.25 Interval (5 Columns)</option>
-                        </select>
+                        <label class="font-semibold text-slate-600 block">X-Axis Interval Steps</label>
+                        <input type="number" id="t3d-x-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
                     </div>
 
                     <!-- Y-Axis Interval Controls -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Y-Axis Interval Steps (Rows / Slices)</label>
-                        <select id="t3d-y-interval" onchange="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="0.05">0.05 Interval (21 Rows)</option>
-                            <option value="0.1" selected>0.10 Interval (11 Rows)</option>
-                            <option value="0.125">0.125 Interval (9 Rows)</option>
-                            <option value="0.2">0.20 Interval (6 Rows)</option>
-                            <option value="0.25">0.25 Interval (5 Rows)</option>
-                        </select>
+                        <label class="font-semibold text-slate-600 block">Y-Axis Interval Steps</label>
+                        <input type="number" id="t3d-y-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
+                    </div>
+
+                    <!-- Hue Steps Control -->
+                    <div class="space-y-1">
+                        <label class="font-semibold text-slate-600 block">Hue Steps (HSB Grid Rows)</label>
+                        <input type="number" id="t3d-hue-steps" value="10" step="1" min="1" max="360" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
                     </div>
 
                     <div class="space-y-1 flex flex-col justify-center">
@@ -1541,8 +1535,15 @@
             targetRGB.innerHTML = '';
             targetHSB.innerHTML = '';
 
-            const xStepInterval = parseFloat(document.getElementById('t3d-x-interval').value);
-            const yStepInterval = parseFloat(document.getElementById('t3d-y-interval').value);
+            let xStepInterval = parseFloat(document.getElementById('t3d-x-interval').value);
+            if (isNaN(xStepInterval) || xStepInterval <= 0) xStepInterval = 0.1;
+
+            let yStepInterval = parseFloat(document.getElementById('t3d-y-interval').value);
+            if (isNaN(yStepInterval) || yStepInterval <= 0) yStepInterval = 0.1;
+
+            let hueStepsCount = parseInt(document.getElementById('t3d-hue-steps').value);
+            if (isNaN(hueStepsCount) || hueStepsCount < 1) hueStepsCount = 10;
+
             const showVal = document.getElementById('t3d-showval').checked;
             const trackIso = document.getElementById('t3d-isoline').checked;
             const isoVal = parseInt(document.getElementById('t3d-isoval').value);
@@ -1662,9 +1663,16 @@
             const hsbRowsContainer = document.createElement('div');
             hsbRowsContainer.className = 'flex-grow space-y-1.5';
 
-            ySteps.forEach(hVal => {
-                const hLabel = hVal.toFixed(2).replace(/\.?0+\$/, '');
-                const hueDeg = hVal * 360;
+            // DYNAMIC HUE STEPS GENERATION
+            const hueSteps = [];
+            const hueStepIncrement = 360 / hueStepsCount;
+            for (let i = 0; i < hueStepsCount; i++) {
+                hueSteps.push(i * hueStepIncrement);
+            }
+
+            hueSteps.forEach(hueDeg => {
+                const hVal = hueDeg / 360;
+                const hLabel = hueDeg.toFixed(1).replace(/\.0$/, '') + '°';
 
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'flex items-center gap-2';
