@@ -318,16 +318,15 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Mode</label>
                         <select id="t1-mode" onchange="onModeChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="2">2 colours</option>
-                            <option value="3" selected>3 colours</option>
-                            <option value="4">4 colours</option>
+                            <option value="2">2 colours (15 Pairs + W/B)</option>
+                            <option value="3" selected>3 colours (20 Trios + Neutrals)</option>
+                            <option value="4">4 colours (15 Quads)</option>
                         </select>
                     </div>
 
                     <div id="trio-filter-wrapper" class="space-y-1">
                         <label class="font-semibold text-slate-600 block flex items-center justify-between">
-                            <span>Trio Combination</span>
-                            <span class="text-[10px] text-[#0369a1] font-mono">(20 Trios)</span>
+                            <span id="t1-combo-filter-label">Combination Filter</span>
                         </label>
                         <select id="t1-trio-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
                         </select>
@@ -343,15 +342,10 @@
                         </select>
                     </div>
 
+                    <!-- Free Text Input for Matrix Resolution -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Matrix Resolution</label>
-                        <select id="t1-res" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="4">4 × 4</option>
-                            <option value="6">6 × 6</option>
-                            <option value="8" selected>8 × 8</option>
-                            <option value="10">10 × 10</option>
-                            <option value="12">12 × 12</option>
-                        </select>
+                        <label class="font-semibold text-slate-600 block">Resolution (Grid Size)</label>
+                        <input type="number" id="t1-res" value="8" min="2" max="32" step="1" oninput="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 8">
                     </div>
 
                     <div class="space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200">
@@ -415,7 +409,7 @@
             <div class="space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 gap-2">
                     <h3 id="t1-header" class="text-base font-bold text-slate-900">Generated Colour Matrices</h3>
-                    <span id="t1-matrix-count" class="text-xs font-mono text-slate-500 font-bold">Showing 60 matrices</span>
+                    <span id="t1-matrix-count" class="text-xs font-mono text-slate-500 font-bold">Showing matrices</span>
                 </div>
                 <div id="matrices-target" class="flex flex-wrap justify-center gap-6"></div>
             </div>
@@ -511,15 +505,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-slate-100">
+                    <!-- Free Text Input for Tab 2 Matrix Resolution -->
                     <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Resolution</label>
-                        <select id="cc-res" onchange="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-medium">
-                            <option value="4">4 × 4</option>
-                            <option value="6">6 × 6</option>
-                            <option value="8" selected>8 × 8</option>
-                            <option value="10">10 × 10</option>
-                            <option value="12">12 × 12</option>
-                        </select>
+                        <label class="font-semibold text-slate-600 block">Resolution (Grid Size)</label>
+                        <input type="number" id="cc-res" value="8" min="2" max="32" step="1" oninput="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold" placeholder="e.g. 8">
                     </div>
 
                     <div class="space-y-1">
@@ -677,19 +666,16 @@
         <section id="tab-3d" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
-                    <!-- X-Axis Interval Controls -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">X-Axis Interval Steps</label>
                         <input type="number" id="t3d-x-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
                     </div>
 
-                    <!-- Y-Axis Interval Controls -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Y-Axis Interval Steps</label>
                         <input type="number" id="t3d-y-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
                     </div>
 
-                    <!-- Hue Steps Control -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Steps (HSB Grid Rows)</label>
                         <input type="number" id="t3d-hue-steps" value="10" step="1" min="1" max="360" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
@@ -717,9 +703,7 @@
                 </div>
             </div>
 
-            <!-- SIDE BY SIDE CONTAINER -->
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <!-- PANEL 1: RGB SLICES -->
                 <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
                     <div class="border-b pb-2">
                         <h3 class="text-base font-bold text-slate-900">1. RGB Cube Slices</h3>
@@ -728,7 +712,6 @@
                     <div id="t3d-target-rgb" class="min-w-[500px]"></div>
                 </div>
 
-                <!-- PANEL 2: HSB SPECTRUM -->
                 <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
                     <div class="border-b pb-2">
                         <h3 class="text-base font-bold text-slate-900">2. HSB Spectrum Grid</h3>
@@ -796,7 +779,6 @@
                     </div>
                 </div>
 
-                <!-- INDEPENDENT LAYER TOGGLES -->
                 <div class="flex flex-wrap items-center gap-4 pt-3 border-t border-slate-200 text-xs font-semibold text-slate-700">
                     <span class="font-bold text-[#0369a1] flex items-center gap-1.5">
                         <i class="fa-solid fa-layer-group text-sky-500"></i> Active Layers:
@@ -832,7 +814,6 @@
                 </div>
             </div>
 
-            <!-- Canvas Scatter Plot Container -->
             <div class="glass-card rounded-2xl border border-slate-200 shadow-sm overflow-hidden relative">
                 <div class="flex h-[620px] overflow-x-auto relative">
                     <div id="pv-y-axis-sidebar" class="sticky left-0 top-0 bottom-0 w-28 bg-slate-900 text-slate-200 font-mono text-xs font-bold flex flex-col justify-between py-6 px-3 border-r border-slate-800 z-30 flex-shrink-0 shadow-xl select-none">
@@ -869,13 +850,11 @@
                     <span>Copy All HEX</span>
                 </button>
 
-                <!-- DOWNLOAD MINIMAL JPEG BUTTON -->
                 <button onclick="downloadMinimalPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
                     <i class="fa-solid fa-download text-xs text-sky-400"></i>
                     <span>Minimal JPEG</span>
                 </button>
 
-                <!-- DOWNLOAD EXPANDED JPEG BUTTON -->
                 <button onclick="downloadExpandedPaletteCard('jpeg')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 border border-slate-700">
                     <i class="fa-solid fa-file-image text-xs text-sky-400"></i>
                     <span>Expanded JPEG</span>
@@ -931,7 +910,7 @@
             document.getElementById(tabId).classList.remove('hidden');
             document.getElementById(`btn-${tabId}`).classList.add('active');
 
-            if (tabId === 'tab1') renderTab1();
+            if (tabId === 'tab1') { onModeChange(); }
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
             if (tabId === 'tab-3d') { renderTab3D(); }
@@ -1055,6 +1034,28 @@
             setTimeout(() => { toast.style.opacity = '0'; }, 2200);
         }
 
+        /* COMBINATION GENERATORS (15 Pairs, 20 Trios, 15 Quads) */
+        function getAll15Pairs() {
+            const pairs = [];
+            let counter = 1;
+            const n = CHROMATIC_COLORS.length;
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    pairs.push({
+                        id: counter - 1,
+                        c1: CHROMATIC_COLORS[i].hex,
+                        c2: CHROMATIC_COLORS[j].hex,
+                        c1Name: CHROMATIC_COLORS[i].name,
+                        c2Name: CHROMATIC_COLORS[j].name,
+                        title: `Pair ${counter}: ${CHROMATIC_COLORS[i].name} & ${CHROMATIC_COLORS[j].name}`,
+                        shortTitle: `${counter}. ${CHROMATIC_COLORS[i].name} / ${CHROMATIC_COLORS[j].name}`
+                    });
+                    counter++;
+                }
+            }
+            return pairs;
+        }
+
         function getAll20Trios() {
             const trios = [];
             const n = CHROMATIC_COLORS.length;
@@ -1089,38 +1090,165 @@
             return trios;
         }
 
-        function populateTrioFilter() {
+        function getAll15Quads() {
+            const quads = [];
+            let counter = 1;
+            const n = CHROMATIC_COLORS.length;
+            for (let i = 0; i < n - 3; i++) {
+                for (let j = i + 1; j < n - 2; j++) {
+                    for (let k = j + 1; k < n - 1; k++) {
+                        for (let l = k + 1; l < n; l++) {
+                            const c1 = CHROMATIC_COLORS[i];
+                            const c2 = CHROMATIC_COLORS[j];
+                            const c3 = CHROMATIC_COLORS[k];
+                            const c4 = CHROMATIC_COLORS[l];
+                            quads.push({
+                                id: counter - 1,
+                                c1: c1.hex, c2: c2.hex, c3: c3.hex, c4: c4.hex,
+                                c1Name: c1.name, c2Name: c2.name, c3Name: c3.name, c4Name: c4.name,
+                                title: `Quad ${counter}: ${c1.name}, ${c2.name}, ${c3.name}, ${c4.name}`,
+                                shortTitle: `${counter}. ${c1.name}/${c2.name}/${c3.name}/${c4.name}`
+                            });
+                            counter++;
+                        }
+                    }
+                }
+            }
+            return quads;
+        }
+
+        function populateComboFilter() {
+            const mode = document.getElementById('t1-mode').value;
             const filterSelect = document.getElementById('t1-trio-filter');
+            const labelEl = document.getElementById('t1-combo-filter-label');
             if (!filterSelect) return;
             filterSelect.innerHTML = '';
 
-            const allOption = document.createElement('option');
-            allOption.value = 'all';
-            allOption.innerText = 'All 20 Chromatic Trios (60 Matrices)';
-            filterSelect.appendChild(allOption);
+            if (mode === '2') {
+                if (labelEl) labelEl.innerText = "Pair Combination (15 Pairs)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 15 Pair Combinations';
+                filterSelect.appendChild(allOption);
 
-            const trios = getAll20Trios();
-            trios.forEach(trio => {
-                const opt = document.createElement('option');
-                opt.value = trio.id;
-                opt.innerText = trio.title;
-                filterSelect.appendChild(opt);
-            });
+                const pairs = getAll15Pairs();
+                pairs.forEach(pair => {
+                    const opt = document.createElement('option');
+                    opt.value = pair.id;
+                    opt.innerText = pair.title;
+                    filterSelect.appendChild(opt);
+                });
+            } else if (mode === '3') {
+                if (labelEl) labelEl.innerText = "Trio Combination (20 Trios)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 20 Chromatic Trios (60 Matrices)';
+                filterSelect.appendChild(allOption);
+
+                const trios = getAll20Trios();
+                trios.forEach(trio => {
+                    const opt = document.createElement('option');
+                    opt.value = trio.id;
+                    opt.innerText = trio.title;
+                    filterSelect.appendChild(opt);
+                });
+            } else if (mode === '4') {
+                if (labelEl) labelEl.innerText = "Quad Combination (15 Quads)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 15 Four-Colour Combinations';
+                filterSelect.appendChild(allOption);
+
+                const quads = getAll15Quads();
+                quads.forEach(quad => {
+                    const opt = document.createElement('option');
+                    opt.value = quad.id;
+                    opt.innerText = quad.title;
+                    filterSelect.appendChild(opt);
+                });
+            }
         }
 
         function onModeChange() {
             const mode = document.getElementById('t1-mode').value;
-            const trioWrapper = document.getElementById('trio-filter-wrapper');
             const neutralWrapper = document.getElementById('neutral-filter-wrapper');
 
+            populateComboFilter();
+
             if (mode === '3') {
-                if (trioWrapper) trioWrapper.style.display = 'block';
                 if (neutralWrapper) neutralWrapper.style.display = 'block';
             } else {
-                if (trioWrapper) trioWrapper.style.display = 'none';
                 if (neutralWrapper) neutralWrapper.style.display = 'none';
             }
             renderTab1();
+        }
+
+        /* SINGLE MATRIX CANVAS DOWNLOAD FUNCTION */
+        function downloadSingleMatrixCard(tlHex, trHex, blHex, brHex, title, fileType = 'jpeg') {
+            let res = parseInt(document.getElementById('t1-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+
+            const tint = parseInt(document.getElementById('t1-tint').value);
+            const tone = parseInt(document.getElementById('t1-tone').value);
+            const shade = parseInt(document.getElementById('t1-shade').value);
+            const sat = parseInt(document.getElementById('t1-sat').value);
+
+            const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+            const padding = 40;
+            const headerH = 70;
+            const swatchSize = Math.max(80, Math.floor(1200 / res));
+            const margin = 2;
+
+            const canvasWidth = padding * 2 + res * swatchSize + (res - 1) * margin;
+            const canvasHeight = padding * 2 + headerH + res * swatchSize + (res - 1) * margin;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 24px Inter, sans-serif';
+            ctx.fillText(title.toUpperCase(), padding, padding + 28);
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = '14px "JetBrains Mono", monospace';
+            ctx.fillText(`TL: ${tlHex} | TR: ${trHex} | BL: ${blHex} | BR: ${brHex} (${res}x${res})`, padding, padding + 52);
+
+            for (let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for (let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
+                    const top = lerpColorObj(tl, tr, xT);
+                    const bot = lerpColorObj(bl, br, xT);
+                    const baseRGB = lerpColorObj(top, bot, yT);
+                    const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+
+                    const cellX = padding + x * (swatchSize + margin);
+                    const cellY = padding + headerH + y * (swatchSize + margin);
+
+                    ctx.fillStyle = finalColor;
+                    ctx.fillRect(cellX, cellY, swatchSize, swatchSize);
+                }
+            }
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            const fileName = `${safeTitle}_${res}x${res}.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded ${title}!`);
         }
 
         function renderTab1() {
@@ -1129,9 +1257,12 @@
             target.innerHTML = '';
 
             const mode = document.getElementById('t1-mode').value;
-            const trioFilterVal = document.getElementById('t1-trio-filter').value;
+            const comboFilterVal = document.getElementById('t1-trio-filter').value;
             const neutralFilterVal = document.getElementById('t1-neutral-filter').value;
-            const res = parseInt(document.getElementById('t1-res').value);
+            
+            let res = parseInt(document.getElementById('t1-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+
             const tint = parseInt(document.getElementById('t1-tint').value);
             const tone = parseInt(document.getElementById('t1-tone').value);
             const shade = parseInt(document.getElementById('t1-shade').value);
@@ -1146,16 +1277,22 @@
             const neutralNames = ["White", "Grey", "Black"];
 
             if (mode === '2') {
-                document.getElementById('t1-header').innerText = "Groups of 2 (Opposite Corners)";
-                const pairs = [
-                    { c1: "#FF0000", c2: "#0000FF", name: "Red ↔ Blue" },
-                    { c1: "#00FF00", c2: "#FF00FF", name: "Green ↔ Magenta" },
-                    { c1: "#FFFF00", c2: "#00FFFF", name: "Yellow ↔ Cyan" }
-                ];
-                pairs.forEach(pair => {
-                    const mix = rgbToHex(...Object.values(lerpColorObj(hexToRgb(pair.c1), hexToRgb(pair.c2), 0.5)));
-                    neutralCorners.forEach((neutral, idx) => {
-                        matricesData.push({ title: `${pair.name} (${neutralNames[idx]} Top-Right)`, tl: pair.c1, br: pair.c2, tr: neutral, bl: mix });
+                document.getElementById('t1-header').innerText = "Groups of 2 (15 Pair Combinations w/ White & Black Corners)";
+                const allPairs = getAll15Pairs();
+
+                let selectedPairs = allPairs;
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
+                    selectedPairs = allPairs.filter(p => p.id === selectedIdx);
+                }
+
+                selectedPairs.forEach(pair => {
+                    matricesData.push({
+                        title: `${pair.title} (Opposite Corners)`,
+                        tl: pair.c1,
+                        tr: "#FFFFFF",
+                        bl: "#000000",
+                        br: pair.c2
                     });
                 });
             } else if (mode === '3') {
@@ -1163,8 +1300,8 @@
                 const allTrios = getAll20Trios();
 
                 let selectedTrios = allTrios;
-                if (trioFilterVal !== 'all') {
-                    const selectedIdx = parseInt(trioFilterVal);
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
                     selectedTrios = allTrios.filter(t => t.id === selectedIdx);
                 }
 
@@ -1182,22 +1319,51 @@
                     });
                 });
             } else if (mode === '4') {
-                document.getElementById('t1-header').innerText = "Groups of 4 (Corner Gradients)";
-                matricesData.push({ title: "Warm to Cool Flow", tl: "#FF0000", tr: "#FFFF00", bl: "#FF00FF", br: "#0000FF" });
-                matricesData.push({ title: "Nature Flow", tl: "#FFFF00", tr: "#00FF00", bl: "#FF0000", br: "#00FFFF" });
-                matricesData.push({ title: "CMYK Box", tl: "#00FFFF", tr: "#FF00FF", bl: "#FFFF00", br: "#000000" });
+                document.getElementById('t1-header').innerText = "Groups of 4 (All 15 Four-Colour Combinations)";
+                const allQuads = getAll15Quads();
+
+                let selectedQuads = allQuads;
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
+                    selectedQuads = allQuads.filter(q => q.id === selectedIdx);
+                }
+
+                selectedQuads.forEach(quad => {
+                    matricesData.push({
+                        title: quad.title,
+                        tl: quad.c1,
+                        tr: quad.c2,
+                        bl: quad.c3,
+                        br: quad.c4
+                    });
+                });
             }
 
             const countEl = document.getElementById('t1-matrix-count');
-            if (countEl) countEl.innerText = `Showing ${matricesData.length} matrices`;
+            if (countEl) countEl.innerText = `Showing ${matricesData.length} matrices (${res}×${res})`;
 
             matricesData.forEach(data => {
                 const panel = document.createElement('div');
                 panel.className = 'glass-card rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center space-y-3';
-                panel.innerHTML = `<div class="font-bold text-xs text-[#0369a1] text-center font-mono">${data.title}</div>`;
+                
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'w-full flex items-center justify-between gap-2 border-b border-slate-100 pb-2';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'font-bold text-xs text-[#0369a1] font-mono text-left truncate';
+                titleEl.innerText = data.title;
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white text-[10px] font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1 border border-slate-700 shrink-0';
+                downloadBtn.innerHTML = `<i class="fa-solid fa-download text-[9px] text-sky-400"></i><span>JPEG</span>`;
+                downloadBtn.onclick = () => downloadSingleMatrixCard(data.tl, data.tr, data.bl, data.br, data.title, 'jpeg');
+
+                cardHeader.appendChild(titleEl);
+                cardHeader.appendChild(downloadBtn);
+                panel.appendChild(cardHeader);
 
                 const grid = document.createElement('div');
-                const cellSize = Math.max(26, Math.floor(220 / res));
+                const cellSize = Math.max(22, Math.floor(220 / res));
                 grid.style.display = 'grid';
                 grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
                 grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
@@ -1381,7 +1547,9 @@
             const target = document.getElementById('matrices-target-custom');
             if (!target) return;
             target.innerHTML = '';
-            const res = parseInt(document.getElementById('cc-res').value);
+            
+            let res = parseInt(document.getElementById('cc-res').value);
+            if (isNaN(res) || res < 2) res = 8;
             
             const tlHex = document.getElementById('cc-tl-hex').value;
             const trHex = document.getElementById('cc-tr-hex').value;
@@ -1402,7 +1570,7 @@
             panel.innerHTML = `<div class="font-bold text-sm text-[#0369a1] font-mono">Custom Blend Grid (${res} × ${res})</div>`;
             
             const grid = document.createElement('div');
-            const cellSize = Math.max(30, Math.floor(320 / res));
+            const cellSize = Math.max(26, Math.floor(320 / res));
             grid.style.display = 'grid';
             grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
             grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
@@ -1448,7 +1616,8 @@
 
         /* DOWNLOAD FULL CUSTOM MATRIX CARD GENERATOR */
         function downloadCustomMatrixCard(fileType = 'jpeg') {
-            const res = parseInt(document.getElementById('cc-res').value);
+            let res = parseInt(document.getElementById('cc-res').value);
+            if (isNaN(res) || res < 2) res = 8;
             
             const tlHex = document.getElementById('cc-tl-hex').value;
             const trHex = document.getElementById('cc-tr-hex').value;
@@ -1741,7 +1910,6 @@
             const hsbRowsContainer = document.createElement('div');
             hsbRowsContainer.className = 'flex-grow space-y-1.5';
 
-            // DYNAMIC HUE STEPS GENERATION
             const hueSteps = [];
             const hueStepIncrement = 360 / hueStepsCount;
             for (let i = 0; i < hueStepsCount; i++) {
@@ -2086,7 +2254,6 @@
             copyToClipboard(paletteColors.join(', '));
         }
 
-        /* 1. MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
         function downloadMinimalPaletteCard(fileType = 'jpeg') {
             if (!paletteColors || paletteColors.length === 0) {
                 showToast("No active palette colors to download!");
@@ -2144,7 +2311,6 @@
             showToast(`Downloaded Minimal Swatch Card!`);
         }
 
-        /* 2. EXPANDED SPECIFICATION CARD GENERATION */
         function downloadExpandedPaletteCard(fileType = 'jpeg') {
             if (!paletteColors || paletteColors.length === 0) {
                 showToast("No active palette colors to download!");
@@ -2335,7 +2501,6 @@
 
         window.onload = () => {
             initPalette();
-            populateTrioFilter();
             onModeChange();
             renderTab2Custom();
             renderPreSavedPalettes();
