@@ -318,8 +318,8 @@
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Matrix Mode</label>
                         <select id="t1-mode" onchange="onModeChange()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="2">2 colours (15 Pairs + W/B)</option>
-                            <option value="3" selected>3 colours (20 Trios + Neutrals)</option>
+                            <option value="2" selected>2 colours (15 Pairs × 3 Matrices = 45)</option>
+                            <option value="3">3 colours (20 Trios + Neutrals)</option>
                             <option value="4">4 colours (15 Quads)</option>
                         </select>
                     </div>
@@ -333,12 +333,12 @@
                     </div>
 
                     <div id="neutral-filter-wrapper" class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Neutral Corner</label>
+                        <label class="font-semibold text-slate-600 block">Neutral Corner / Variant</label>
                         <select id="t1-neutral-filter" onchange="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="all" selected>All Neutrals (White, Grey, Black)</option>
-                            <option value="0">White Corner Only (#FFFFFF)</option>
-                            <option value="1">Grey Corner Only (#808080)</option>
-                            <option value="2">Black Corner Only (#000000)</option>
+                            <option value="all" selected>All 3 Matrices per Pair</option>
+                            <option value="bw">1. White/Black Corners</option>
+                            <option value="mix_w">2. Mix + White Corner</option>
+                            <option value="mix_b">3. Mix + Black Corner</option>
                         </select>
                     </div>
 
@@ -934,6 +934,12 @@
             return { r: c1.r + t * (c2.r - c1.r), g: c1.g + t * (c2.g - c1.g), b: c1.b + t * (c2.b - c1.b) };
         }
 
+        function getAverageMixHex(hex1, hex2) {
+            const rgb1 = hexToRgb(hex1);
+            const rgb2 = hexToRgb(hex2);
+            return rgbToHex((rgb1.r + rgb2.r) / 2, (rgb1.g + rgb2.g) / 2, (rgb1.b + rgb2.b) / 2);
+        }
+
         function rgbToHsl(r, g, b) {
             r /= 255; g /= 255; b /= 255;
             const max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -1128,7 +1134,7 @@
                 if (labelEl) labelEl.innerText = "Pair Combination (15 Pairs)";
                 const allOption = document.createElement('option');
                 allOption.value = 'all';
-                allOption.innerText = 'All 15 Pair Combinations';
+                allOption.innerText = 'All 15 Pair Combinations (45 Matrices)';
                 filterSelect.appendChild(allOption);
 
                 const pairs = getAll15Pairs();
@@ -1169,13 +1175,36 @@
             }
         }
 
+        function updateNeutralFilterDropdown() {
+            const mode = document.getElementById('t1-mode').value;
+            const filter = document.getElementById('t1-neutral-filter');
+            if (!filter) return;
+
+            if (mode === '2') {
+                filter.innerHTML = `
+                    <option value="all" selected>All 3 Matrices per Pair</option>
+                    <option value="bw">1. White/Black Corners</option>
+                    <option value="mix_w">2. Mix + White Corner</option>
+                    <option value="mix_b">3. Mix + Black Corner</option>
+                `;
+            } else if (mode === '3') {
+                filter.innerHTML = `
+                    <option value="all" selected>All Neutrals (White, Grey, Black)</option>
+                    <option value="0">White Corner Only (#FFFFFF)</option>
+                    <option value="1">Grey Corner Only (#808080)</option>
+                    <option value="2">Black Corner Only (#000000)</option>
+                `;
+            }
+        }
+
         function onModeChange() {
             const mode = document.getElementById('t1-mode').value;
             const neutralWrapper = document.getElementById('neutral-filter-wrapper');
 
             populateComboFilter();
+            updateNeutralFilterDropdown();
 
-            if (mode === '3') {
+            if (mode === '3' || mode === '2') {
                 if (neutralWrapper) neutralWrapper.style.display = 'block';
             } else {
                 if (neutralWrapper) neutralWrapper.style.display = 'none';
@@ -1277,7 +1306,7 @@
             const neutralNames = ["White", "Grey", "Black"];
 
             if (mode === '2') {
-                document.getElementById('t1-header').innerText = "Groups of 2 (15 Pair Combinations w/ White & Black Corners)";
+                document.getElementById('t1-header').innerText = "Groups of 2 (15 Pairs × 3 Corner Matrices = 45 Matrices Total)";
                 const allPairs = getAll15Pairs();
 
                 let selectedPairs = allPairs;
@@ -1287,12 +1316,39 @@
                 }
 
                 selectedPairs.forEach(pair => {
-                    matricesData.push({
-                        title: `${pair.title} (Opposite Corners)`,
-                        tl: pair.c1,
-                        tr: "#FFFFFF",
-                        bl: "#000000",
-                        br: pair.c2
+                    const mixHex = getAverageMixHex(pair.c1, pair.c2);
+
+                    const pairMatrices = [
+                        {
+                            title: `${pair.title} (Opposite Black/White)`,
+                            tl: pair.c1,
+                            tr: "#FFFFFF",
+                            bl: "#000000",
+                            br: pair.c2,
+                            variant: "bw"
+                        },
+                        {
+                            title: `${pair.title} (Mix + White)`,
+                            tl: pair.c1,
+                            tr: mixHex,
+                            bl: "#FFFFFF",
+                            br: pair.c2,
+                            variant: "mix_w"
+                        },
+                        {
+                            title: `${pair.title} (Mix + Black)`,
+                            tl: pair.c1,
+                            tr: mixHex,
+                            bl: "#000000",
+                            br: pair.c2,
+                            variant: "mix_b"
+                        }
+                    ];
+
+                    pairMatrices.forEach(m => {
+                        if (neutralFilterVal === 'all' || neutralFilterVal === m.variant) {
+                            matricesData.push(m);
+                        }
                     });
                 });
             } else if (mode === '3') {
@@ -1884,631 +1940,4 @@
             rgbRightSide.innerHTML = `<span>0.0</span><span>↓</span><span>1.0</span>`;
             rgbMainBox.appendChild(rgbRightSide);
 
-            targetRGB.appendChild(rgbMainBox);
-
-
-            // HSB SPECTRUM
-            const hsbHeader = document.createElement('div');
-            hsbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
-            hsbHeader.innerHTML = `<span>Hue</span><span class="font-bold">Saturation</span><span>Brightness</span>`;
-            targetHSB.appendChild(hsbHeader);
-
-            const hsbTopAxis = document.createElement('div');
-            hsbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
-            const hsbTopColGrid = document.createElement('div');
-            hsbTopColGrid.className = 'grid flex-grow text-center font-mono text-[9px] text-slate-500';
-            hsbTopColGrid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-            xSteps.forEach(val => {
-                hsbTopColGrid.innerHTML += `<span>${val.toFixed(2).replace(/\.?0+$/, '')}</span>`;
-            });
-            hsbTopAxis.appendChild(hsbTopColGrid);
-            targetHSB.appendChild(hsbTopAxis);
-
-            const hsbMainBox = document.createElement('div');
-            hsbMainBox.className = 'relative flex gap-3';
-
-            const hsbRowsContainer = document.createElement('div');
-            hsbRowsContainer.className = 'flex-grow space-y-1.5';
-
-            const hueSteps = [];
-            const hueStepIncrement = 360 / hueStepsCount;
-            for (let i = 0; i < hueStepsCount; i++) {
-                hueSteps.push(i * hueStepIncrement);
-            }
-
-            hueSteps.forEach(hueDeg => {
-                const hVal = hueDeg / 360;
-                const hLabel = hueDeg.toFixed(1).replace(/\.0$/, '') + '°';
-
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex items-center gap-2';
-
-                const leftLabel = document.createElement('div');
-                leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
-                leftLabel.innerText = hLabel;
-                rowDiv.appendChild(leftLabel);
-
-                const grid = document.createElement('div');
-                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
-                grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-
-                ySteps.forEach(vStep => {
-                    const vVal = 1 - vStep;
-                    xSteps.forEach(sVal => {
-                        const rgbObj = hsvToRgbObj(hueDeg, sVal * 100, vVal * 100);
-                        const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
-                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
-
-                        const cell = document.createElement('div');
-                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
-                        cell.style.backgroundColor = hex;
-                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-
-                        if (showVal) {
-                            cell.innerText = pv;
-                            cell.style.color = getContrastTextColor(hex);
-                        }
-
-                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                            cell.classList.add("iso-matched");
-                        }
-
-                        cell.onmouseenter = (e) => showChartTooltip(e, `Hue:${hLabel} Sat:${sVal.toFixed(2)} Brightness:${vVal.toFixed(2)}`, Math.round(sVal*100), Math.round(vVal*100), hex, pv, rgbObj);
-                        cell.onmousemove = (e) => updateChartTooltipPos(e);
-                        cell.onmouseleave = () => hideChartTooltip();
-
-                        grid.appendChild(cell);
-                    });
-                });
-                rowDiv.appendChild(grid);
-                hsbRowsContainer.appendChild(rowDiv);
-            });
-            hsbMainBox.appendChild(hsbRowsContainer);
-
-            const hsbRightSide = document.createElement('div');
-            hsbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
-            hsbRightSide.innerHTML = `<span>1.0</span><span>↓</span><span>0.0</span>`;
-            hsbMainBox.appendChild(hsbRightSide);
-
-            targetHSB.appendChild(hsbMainBox);
-        }
-
-        function createAxisLabel(text, isY = false) {
-            const div = document.createElement('div');
-            div.className = 'flex items-center justify-center font-mono text-[10px] font-bold text-slate-400 py-1';
-            div.innerText = text;
-            if(isY) div.style.color = "#B4E3F8";
-            return div;
-        }
-
-        /* TAB 5: GRAPH ENGINE */
-        function renderTab4() {
-            const target = document.getElementById('pv-plot-target');
-            const sidebar = document.getElementById('pv-y-axis-sidebar');
-            if (!target || !sidebar) return;
-
-            target.innerHTML = '';
-            sidebar.innerHTML = '';
-
-            const res = parseFloat(document.getElementById('t3-res').value);
-            const numLevels = parseInt(document.getElementById('t3-density').value);
-            const sortMode = document.getElementById('t3-sort').value;
-            const showVal = document.getElementById('t3-showval').checked;
-            const trackIso = document.getElementById('t3-isoline').checked;
-            const isoVal = parseInt(document.getElementById('t3-isoval').value);
-
-            const showBase = document.getElementById('t3-show-base') ? document.getElementById('t3-show-base').checked : true;
-            const showTints = document.getElementById('t3-show-tints') ? document.getElementById('t3-show-tints').checked : false;
-            const showTones = document.getElementById('t3-show-tones') ? document.getElementById('t3-show-tones').checked : false;
-            const showShades = document.getElementById('t3-show-shades') ? document.getElementById('t3-show-shades').checked : false;
-
-            const paddingTop = 40;
-            const chartHeight = 540;
-
-            const ySteps = [
-                { name: "Val 10 (100%)", pv: 100, class: "text-sky-300 font-extrabold" },
-                { name: "Val 9 (90%)",   pv: 90,  class: "text-slate-300" },
-                { name: "Val 8 (80%)",   pv: 80,  class: "text-slate-300" },
-                { name: "Val 7 (70%)",   pv: 70,  class: "text-slate-300" },
-                { name: "Val 6 (60%)",   pv: 60,  class: "text-slate-300" },
-                { name: "Val 5 (50%)",   pv: 50,  class: "text-sky-300 font-extrabold" },
-                { name: "Val 4 (40%)",   pv: 40,  class: "text-slate-300" },
-                { name: "Val 3 (30%)",   pv: 30,  class: "text-slate-300" },
-                { name: "Val 2 (20%)",   pv: 20,  class: "text-slate-300" },
-                { name: "Val 1 (10%)",   pv: 10,  class: "text-slate-300" },
-                { name: "Val 0 (0%)",    pv: 0,   class: "text-sky-300 font-extrabold" }
-            ];
-
-            ySteps.forEach(step => {
-                const yPos = paddingTop + ((100 - step.pv) / 100) * chartHeight;
-
-                const lbl = document.createElement('div');
-                lbl.className = `absolute left-2.5 -translate-y-1/2 text-[11px] ${step.class}`;
-                lbl.style.top = yPos + 'px';
-                lbl.innerText = step.name;
-                sidebar.appendChild(lbl);
-
-                const guideLine = document.createElement('div');
-                guideLine.className = step.pv % 50 === 0 
-                    ? 'absolute left-0 right-0 h-[1.5px] bg-sky-500/30 z-10' 
-                    : 'absolute left-0 right-0 h-[1px] bg-slate-800/80 z-10';
-                guideLine.style.top = yPos + 'px';
-                target.appendChild(guideLine);
-            });
-
-            let hues = [];
-            for(let h = 0; h < 360; h += res) hues.push(h);
-
-            if(sortMode === 'value') {
-                hues.sort((a,b) => {
-                    let lumA = getPerceivedValue(...Object.values(hslToRgbObj(a,100,50)));
-                    let lumB = getPerceivedValue(...Object.values(hslToRgbObj(b,100,50)));
-                    return lumA - lumB;
-                });
-            }
-
-            const colWidth = Math.max(55, Math.floor(1700 / hues.length));
-
-            hues.forEach((hue, colIdx) => {
-                const colX = colIdx * colWidth + 50;
-
-                const colLine = document.createElement('div');
-                colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60 z-0';
-                colLine.style.left = colX + 'px';
-                target.appendChild(colLine);
-
-                const label = document.createElement('div');
-                label.className = 'absolute top-2 font-mono text-[10px] font-bold text-sky-400 -translate-x-1/2 z-20';
-                label.style.left = colX + 'px';
-                label.innerText = hue + '°';
-                target.appendChild(label);
-
-                let baseSamples = [];
-                for (let i = 1; i <= numLevels; i++) {
-                    let lightness = Math.round((i / (numLevels + 1)) * 100);
-                    baseSamples.push({ s: 100, l: lightness, label: `${numLevels} levels` });
-                }
-
-                let activeSamples = [];
-
-                if (showBase) {
-                    baseSamples.forEach(bs => {
-                        activeSamples.push({
-                            type: bs.label,
-                            s: bs.s,
-                            l: bs.l,
-                            tint: 0, tone: 0, shade: 0,
-                            group: 'base'
-                        });
-                    });
-                }
-
-                if (showTints) {
-                    baseSamples.forEach(bs => {
-                        for (let pct = 20; pct <= 80; pct += 30) {
-                            activeSamples.push({
-                                type: `Tint ${pct}%`,
-                                s: bs.s,
-                                l: bs.l,
-                                tint: pct, tone: 0, shade: 0,
-                                group: 'tint'
-                            });
-                        }
-                    });
-                }
-
-                if (showTones) {
-                    baseSamples.forEach(bs => {
-                        for (let pct = 20; pct <= 80; pct += 30) {
-                            activeSamples.push({
-                                type: `Tone ${pct}%`,
-                                s: bs.s,
-                                l: bs.l,
-                                tint: 0, tone: pct, shade: 0,
-                                group: 'tone'
-                            });
-                        }
-                    });
-                }
-
-                if (showShades) {
-                    baseSamples.forEach(bs => {
-                        for (let pct = 20; pct <= 80; pct += 30) {
-                            activeSamples.push({
-                                type: `Shade ${pct}%`,
-                                s: bs.s,
-                                l: bs.l,
-                                tint: 0, tone: 0, shade: pct,
-                                group: 'shade'
-                            });
-                        }
-                    });
-                }
-
-                activeSamples.forEach((sample) => {
-                    let baseRgb = hslToRgbObj(hue, sample.s, sample.l);
-                    let colorHex;
-
-                    if (sample.tint > 0 || sample.tone > 0 || sample.shade > 0) {
-                        colorHex = applyAdjustments(baseRgb, sample.tint, sample.tone, sample.shade, 100);
-                    } else {
-                        colorHex = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
-                    }
-
-                    const rgbObj = hexToRgb(colorHex);
-                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
-
-                    const yPos = paddingTop + ((100 - pv) / 100) * chartHeight;
-
-                    let groupOffset = 0;
-                    if (sample.group === 'tint') groupOffset = -14;
-                    else if (sample.group === 'base') groupOffset = -5;
-                    else if (sample.group === 'tone') groupOffset = 5;
-                    else if (sample.group === 'shade') groupOffset = 14;
-
-                    const xPos = colX + groupOffset;
-
-                    const node = document.createElement('div');
-                    node.className = 'absolute w-8 h-5 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/30 shadow-md cursor-pointer -translate-x-1/2 -translate-y-1/2 transition-transform duration-150';
-                    node.style.left = xPos + 'px';
-                    node.style.top = yPos + 'px';
-                    node.style.backgroundColor = colorHex;
-
-                    const textColor = getContrastTextColor(colorHex);
-                    if (showVal) {
-                        node.innerText = pv + '%';
-                        node.style.color = textColor;
-                    }
-
-                    if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                        node.classList.add("iso-matched");
-                    }
-
-                    node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj, sample.type);
-                    node.onmousemove = (e) => updateChartTooltipPos(e);
-                    node.onmouseleave = () => hideChartTooltip();
-
-                    node.onclick = () => {
-                        addToPalette(colorHex);
-                        copyToClipboard(colorHex);
-                    };
-
-                    target.appendChild(node);
-                });
-            });
-        }
-
-        function showChartTooltip(e, hue, s, l, hex, pv, rgb, typeLabel = "") {
-            const tooltip = document.getElementById('chart-tooltip');
-            if (!tooltip) return;
-            tooltip.style.display = 'block';
-            tooltip.innerHTML = `
-                <div class="font-bold text-sky-300">${hue}${typeof hue === 'number' ? '°' : ''} ${typeLabel ? `(${typeLabel})` : ''}</div>
-                <div>HEX: <span class="font-bold text-white">${hex}</span></div>
-                <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
-                <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
-            `;
-            updateChartTooltipPos(e);
-        }
-
-        function updateChartTooltipPos(e) {
-            const tooltip = document.getElementById('chart-tooltip');
-            if (tooltip && tooltip.style.display === 'block') {
-                tooltip.style.left = e.clientX + 'px';
-                tooltip.style.top = e.clientY + 'px';
-            }
-        }
-
-        function hideChartTooltip() {
-            const tooltip = document.getElementById('chart-tooltip');
-            if (tooltip) tooltip.style.display = 'none';
-        }
-
-        function initPalette() {
-            const container = document.getElementById('palette-slots-container');
-            if (!container) return;
-            container.innerHTML = '';
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                let slot = document.createElement('div');
-                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all relative overflow-hidden';
-                slot.id = 'p-slot-' + i;
-                slot.dataset.index = i;
-
-                slot.addEventListener('dragstart', handleDragStart);
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('dragleave', handleDragLeave);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragend', handleDragEnd);
-
-                container.appendChild(slot);
-            }
-            updatePaletteUI();
-        }
-
-        function addToPalette(hex) {
-            if (paletteColors.length < MAX_PALETTE) {
-                paletteColors.push(hex);
-                updatePaletteUI();
-            } else {
-                showToast("Palette Drawer is Full (16/16)");
-            }
-        }
-
-        function removeFromPalette(index, event) {
-            event.stopPropagation();
-            paletteColors.splice(index, 1);
-            updatePaletteUI();
-        }
-
-        function clearPalette() {
-            paletteColors = [];
-            updatePaletteUI();
-            showToast("Palette Cleared");
-        }
-
-        function copyAllPaletteHex() {
-            if (paletteColors.length === 0) {
-                showToast("Palette is empty!");
-                return;
-            }
-            copyToClipboard(paletteColors.join(', '));
-        }
-
-        function downloadMinimalPaletteCard(fileType = 'jpeg') {
-            if (!paletteColors || paletteColors.length === 0) {
-                showToast("No active palette colors to download!");
-                return;
-            }
-            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
-            generateHighResCardDownload(activeExportPalette, fileType);
-        }
-
-        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
-            const colors = paletteObj.colors;
-            if (!colors || colors.length === 0) return;
-
-            const cols = 8;
-            const swatchSize = 400;
-            const margin = 20;
-
-            const totalSwatches = colors.length;
-            const rows = Math.ceil(totalSwatches / cols);
-
-            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
-            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
-
-            const cardCanvas = document.createElement('canvas');
-            cardCanvas.width = canvasWidth;
-            cardCanvas.height = canvasHeight;
-
-            const ctx = cardCanvas.getContext('2d');
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-            colors.forEach((hex, idx) => {
-                const colIndex = idx % cols;
-                const rowIndex = Math.floor(idx / cols);
-
-                const x = margin + colIndex * (swatchSize + margin);
-                const y = margin + rowIndex * (swatchSize + margin);
-
-                ctx.fillStyle = hex;
-                ctx.fillRect(x, y, swatchSize, swatchSize);
-            });
-
-            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
-            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
-
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
-            downloadAnchor.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            showToast(`Downloaded Minimal Swatch Card!`);
-        }
-
-        function downloadExpandedPaletteCard(fileType = 'jpeg') {
-            if (!paletteColors || paletteColors.length === 0) {
-                showToast("No active palette colors to download!");
-                return;
-            }
-            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
-            generateExpandedSpecCardDownload(activeExportPalette, fileType);
-        }
-
-        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
-            const colors = paletteObj.colors;
-            if (!colors || colors.length === 0) return;
-
-            const cols = 3;
-            const cardW = 380;
-            const cardH = 140;
-            const gapX = 20;
-            const gapY = 20;
-            const padding = 30;
-            const headerH = 60;
-
-            const rows = Math.ceil(colors.length / cols);
-            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
-            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = canvasW;
-            canvas.height = canvasH;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvasW, canvasH);
-
-            ctx.fillStyle = '#475569';
-            ctx.font = 'bold 16px Inter, sans-serif';
-            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
-
-            colors.forEach((hex, idx) => {
-                const c = idx % cols;
-                const r = Math.floor(idx / cols);
-
-                const x = padding + c * (cardW + gapX);
-                const y = padding + headerH + r * (cardH + gapY);
-
-                ctx.fillStyle = '#F8FAFC';
-                ctx.strokeStyle = '#E2E8F0';
-                ctx.lineWidth = 2;
-                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
-
-                const swatchS = 96;
-                const swatchX = x + 20;
-                const swatchY = y + 22;
-
-                ctx.fillStyle = hex;
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.lineWidth = 1;
-                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
-
-                const rgbObj = hexToRgb(hex);
-                const rgbR = Math.round(rgbObj.r);
-                const rgbG = Math.round(rgbObj.g);
-                const rgbB = Math.round(rgbObj.b);
-
-                const hsl = rgbToHsl(rgbR, rgbG, rgbB);
-                const hslH = hsl.h;
-                const hslS = hsl.s;
-                const hslL = hsl.l;
-
-                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
-
-                const textX = swatchX + swatchS + 20;
-
-                ctx.fillStyle = '#0F172A';
-                ctx.font = 'bold 22px "JetBrains Mono", monospace';
-                ctx.fillText(hex.toUpperCase(), textX, y + 46);
-
-                ctx.fillStyle = '#64748B';
-                ctx.font = '14px "JetBrains Mono", monospace';
-                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
-
-                ctx.fillStyle = '#94A3B8';
-                ctx.font = '13px "JetBrains Mono", monospace';
-                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
-            });
-
-            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
-            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
-
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
-            downloadAnchor.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            showToast(`Downloaded Expanded Specification Card!`);
-        }
-
-        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + w - radius, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-            ctx.lineTo(x + w, y + h - radius);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-            ctx.lineTo(x + radius, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            if (fill) ctx.fill();
-            if (stroke) ctx.stroke();
-        }
-
-        function handleDragStart(e) {
-            const index = parseInt(this.dataset.index);
-            if (isNaN(index) || index >= paletteColors.length) {
-                e.preventDefault();
-                return;
-            }
-            draggedIndex = index;
-            e.dataTransfer.effectAllowed = 'move';
-            this.classList.add('dragging');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            this.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            this.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            this.classList.remove('drag-over');
-            const targetIndex = parseInt(this.dataset.index);
-            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
-                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
-                paletteColors.splice(targetIndex, 0, movedColor);
-                updatePaletteUI();
-            }
-        }
-
-        function handleDragEnd(e) {
-            document.querySelectorAll('.palette-slot').forEach(slot => {
-                slot.classList.remove('dragging', 'drag-over');
-            });
-            draggedIndex = null;
-        }
-
-        function updatePaletteUI() {
-            const counter = document.getElementById('palette-counter');
-            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
-
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                const slot = document.getElementById('p-slot-' + i);
-                if (!slot) continue;
-                slot.innerHTML = '';
-
-                if (i < paletteColors.length) {
-                    const hex = paletteColors[i];
-                    slot.style.backgroundColor = hex;
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
-                    slot.setAttribute('draggable', 'true');
-
-                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
-
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
-                    removeBtn.innerHTML = '×';
-                    removeBtn.title = 'Remove color';
-                    removeBtn.onclick = (e) => removeFromPalette(i, e);
-                    slot.appendChild(removeBtn);
-
-                    slot.onclick = () => copyToClipboard(hex);
-                } else {
-                    slot.style.backgroundColor = 'transparent';
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all';
-                    slot.removeAttribute('draggable');
-                    slot.onclick = null;
-                }
-            }
-        }
-
-        window.onload = () => {
-            initPalette();
-            onModeChange();
-            renderTab2Custom();
-            renderPreSavedPalettes();
-            updateTab2Controls();
-            renderTab3();
-            renderTab3D();
-            renderTab4();
-        };
-    </script>
-</body>
-</html>
+            targetRGB.
