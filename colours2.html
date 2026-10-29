@@ -353,7 +353,7 @@
 
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Resolution (Grid Size)</label>
-                        <input type="number" id="t1-res" value="8" min="2" max="32" step="1" oninput="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 8">
+                        <input type="text" id="t1-res" value="8" oninput="renderTab1()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 8">
                     </div>
 
                     <div class="space-y-1 bg-slate-50 p-2 rounded-xl border border-slate-200">
@@ -515,7 +515,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs pt-2 border-t border-slate-100">
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Resolution (Grid Size)</label>
-                        <input type="number" id="cc-res" value="8" min="2" max="32" step="1" oninput="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold" placeholder="e.g. 8">
+                        <input type="text" id="cc-res" value="8" oninput="renderTab2Custom()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 8">
                     </div>
 
                     <div class="space-y-1">
@@ -604,15 +604,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Angle Step Resolution</label>
-                        <select id="t2-res" onchange="renderTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium">
-                            <option value="10">10° Intervals (36 Columns)</option>
-                            <option value="15" selected>15° Intervals (24 Columns)</option>
-                            <option value="20">20° Intervals (18 Columns)</option>
-                            <option value="22.5">22.5° Intervals (16 Columns)</option>
-                            <option value="30">30° Intervals (12 Columns)</option>
-                            <option value="45">45° Intervals (8 Columns)</option>
-                            <option value="60">60° Intervals (6 Columns)</option>
-                        </select>
+                        <input type="text" id="t2-res-input" value="15" oninput="renderTab3()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 15">
                     </div>
 
                     <div class="space-y-1">
@@ -668,31 +660,52 @@
             </div>
         </section>
 
-        <!-- TAB 4: CMYK PRINT GUIDE & COLOR CHARTS -->
+        <!-- TAB 4: CMYK PRINT GUIDE & DYNAMIC STEP GRIDS -->
         <section id="tab-3d" class="tab-content hidden space-y-8">
-            <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 bg-white">
+            <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 bg-white">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-print text-sky-500"></i> CMYK Print Reference Guide
+                            <i class="fa-solid fa-print text-sky-500"></i> Dynamic CMYK Step Grids
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">Professional CMYK color formulas optimized for print production. Click any circular swatch to add it to your global palette.</p>
+                        <p class="text-xs text-slate-500 mt-1">Generate complete CMYK print mixtures across all Cyan, Magenta, Yellow, and Key (Black) values using free text box step controls.</p>
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <label class="text-xs font-bold text-slate-600">Filter Section:</label>
+                        <label class="text-xs font-bold text-slate-600">Preset Filter:</label>
                         <select id="cmyk-cat-filter" onchange="renderMixamCmykCharts()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 font-bold focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="all" selected>All Categories</option>
-                            <option value="blues">CMYK Blues</option>
-                            <option value="purples">CMYK Purples</option>
-                            <option value="pinks">CMYK Pinks</option>
-                            <option value="greens">CMYK Yellows & Greens</option>
+                            <option value="all" selected>All Charts & Dynamic Grids</option>
+                            <option value="dynamic">Dynamic CMYK Stepped Grids Only</option>
+                            <option value="blues">CMYK Blues Reference</option>
+                            <option value="purples">CMYK Purples Reference</option>
+                            <option value="pinks">CMYK Pinks Reference</option>
+                            <option value="greens">CMYK Yellows & Greens Reference</option>
                         </select>
+                    </div>
+                </div>
+
+                <!-- FREE TEXT BOX CONTROLS FOR DYNAMIC CMYK STEPPING -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
+                    <div class="space-y-1">
+                        <label class="font-bold text-cyan-600 block">Cyan Steps (C%):</label>
+                        <input type="text" id="cmyk-c-steps" value="0, 10, 25, 50, 70, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 25, 50, 75, 100">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-pink-600 block">Magenta Steps (M%):</label>
+                        <input type="text" id="cmyk-m-steps" value="0, 10, 25, 50, 70, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 25, 50, 75, 100">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-amber-500 block">Yellow Steps (Y%):</label>
+                        <input type="text" id="cmyk-y-steps" value="0, 20, 50, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 50, 100">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-bold text-slate-800 block">Black Steps (K%):</label>
+                        <input type="text" id="cmyk-k-steps" value="0" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 20, 50">
                     </div>
                 </div>
             </div>
 
-            <!-- MIXAM-STYLE CMYK SECTIONS TARGET -->
+            <!-- MIXAM-STYLE CMYK SECTIONS & DYNAMIC STEP TARGET -->
             <div id="cmyk-mixam-container" class="space-y-8"></div>
         </section>
 
@@ -702,26 +715,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Hue Resolution</label>
-                        <select id="t3-res" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="10">10° Intervals (36 Columns)</option>
-                            <option value="15" selected>15° Intervals (24 Columns)</option>
-                            <option value="20">20° Intervals (18 Columns)</option>
-                            <option value="22.5">22.5° Intervals (16 Columns)</option>
-                            <option value="30">30° Intervals (12 Columns)</option>
-                            <option value="45">45° Intervals (8 Columns)</option>
-                            <option value="60">60° Intervals (6 Columns)</option>
-                        </select>
+                        <input type="text" id="t3-res-input" value="15" oninput="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 15">
                     </div>
 
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Spectrum Steps</label>
-                        <select id="t3-density" onchange="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="6">6 Levels</option>
-                            <option value="8" selected>8 Levels</option>
-                            <option value="10">10 Levels</option>
-                            <option value="12">12 Levels</option>
-                            <option value="15">15 Levels</option>
-                        </select>
+                        <input type="text" id="t3-density-input" value="8" oninput="renderTab4()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 8">
                     </div>
 
                     <div class="space-y-1">
@@ -970,6 +969,13 @@
             const g = 255 * (1 - m) * (1 - k);
             const b = 255 * (1 - y) * (1 - k);
             return { r, g, b };
+        }
+
+        function parseStepsInput(strVal, defaultArr = [0, 50, 100]) {
+            if (!strVal || typeof strVal !== 'string') return defaultArr;
+            const parts = strVal.split(',').map(p => parseFloat(p.trim())).filter(p => !isNaN(p));
+            if (parts.length === 0) return defaultArr;
+            return parts.map(v => Math.max(0, Math.min(100, v)));
         }
 
         function lerpColorObj(c1, c2, t) {
@@ -1786,7 +1792,11 @@
             const container = document.getElementById('t2-container');
             if (!container) return;
             container.innerHTML = '';
-            const res = parseInt(document.getElementById('t2-res').value);
+            
+            const resInput = document.getElementById('t2-res-input') ? document.getElementById('t2-res-input').value : '15';
+            let res = parseFloat(resInput);
+            if (isNaN(res) || res <= 0) res = 15;
+
             const format = document.getElementById('t2-format').value;
             const s1Val = parseInt(document.getElementById('t2-s1').value);
             const s2Val = parseInt(document.getElementById('t2-s2').value);
@@ -1795,7 +1805,7 @@
             const isoVal = parseInt(document.getElementById('t2-isoval').value);
 
             const hues = [];
-            for(let h = 0; h < 360; h += res) hues.push(h);
+            for(let h = 0; h < 360; h += res) hues.push(Math.round(h * 10) / 10);
 
             const grid = document.createElement('div');
             grid.className = 'grid gap-1 bg-slate-900 p-2 rounded-xl border border-slate-800';
@@ -1851,7 +1861,7 @@
             container.appendChild(grid);
         }
 
-        /* RENDER MIXAM-STYLE CMYK CHART SECTIONS */
+        /* RENDER MIXAM-STYLE CMYK CHART SECTIONS & DYNAMIC STEP GRIDS */
         function renderMixamCmykCharts() {
             const container = document.getElementById('cmyk-mixam-container');
             if (!container) return;
@@ -1859,17 +1869,86 @@
 
             const selectedCat = document.getElementById('cmyk-cat-filter').value;
 
+            // Render Dynamic Stepped CMYK Grid
+            if (selectedCat === 'all' || selectedCat === 'dynamic') {
+                const cSteps = parseStepsInput(document.getElementById('cmyk-c-steps').value, [0, 10, 25, 50, 70, 100]);
+                const mSteps = parseStepsInput(document.getElementById('cmyk-m-steps').value, [0, 10, 25, 50, 70, 100]);
+                const ySteps = parseStepsInput(document.getElementById('cmyk-y-steps').value, [0, 20, 50, 100]);
+                const kSteps = parseStepsInput(document.getElementById('cmyk-k-steps').value, [0]);
+
+                kSteps.forEach(kVal => {
+                    ySteps.forEach(yVal => {
+                        const sectionCard = document.createElement('div');
+                        sectionCard.className = 'glass-card rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm bg-white space-y-6';
+
+                        const layoutGrid = document.createElement('div');
+                        layoutGrid.className = 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-start';
+
+                        const leftCol = document.createElement('div');
+                        leftCol.className = 'lg:col-span-4 space-y-3';
+                        leftCol.innerHTML = `
+                            <h3 class="text-2xl font-black text-slate-900 tracking-tight">Dynamic CMYK Grid (Y: ${yVal}% | K: ${kVal}%)</h3>
+                            <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">
+                                Dynamic stepped mixtures generated from your custom text inputs across Cyan (rows) and Magenta (columns) with Yellow constant at <b>${yVal}%</b> and Black constant at <b>${kVal}%</b>.
+                            </p>
+                        `;
+
+                        const rightCol = document.createElement('div');
+                        rightCol.className = 'lg:col-span-8 overflow-x-auto';
+
+                        const grid = document.createElement('div');
+                        grid.className = 'grid gap-x-3 gap-y-6 min-w-[500px]';
+                        grid.style.gridTemplateColumns = `repeat(${mSteps.length}, minmax(0, 1fr))`;
+
+                        cSteps.forEach(cVal => {
+                            mSteps.forEach(mVal => {
+                                const rgbObj = cmykToRgbObj(cVal, mVal, yVal, kVal);
+                                const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                                const cellContainer = document.createElement('div');
+                                cellContainer.className = 'flex flex-col items-center text-center space-y-1.5 select-none';
+
+                                const circle = document.createElement('div');
+                                circle.className = 'cmyk-circle-swatch w-12 h-12 rounded-full border border-black/10 shadow-sm flex items-center justify-center';
+                                circle.style.backgroundColor = hex;
+                                circle.title = `Click to add ${hex} to Global Palette`;
+                                circle.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                                const label = document.createElement('div');
+                                label.className = 'font-mono text-[9px] text-slate-500 font-semibold leading-tight text-left space-y-0.5';
+                                label.innerHTML = `
+                                    <div><span class="text-slate-400">C:</span> ${cVal}</div>
+                                    <div><span class="text-slate-400">M:</span> ${mVal}</div>
+                                    <div><span class="text-slate-400">Y:</span> ${yVal}</div>
+                                    <div><span class="text-slate-400">K:</span> ${kVal}</div>
+                                `;
+
+                                cellContainer.appendChild(circle);
+                                cellContainer.appendChild(label);
+                                grid.appendChild(cellContainer);
+                            });
+                        });
+
+                        rightCol.appendChild(grid);
+                        layoutGrid.appendChild(leftCol);
+                        layoutGrid.appendChild(rightCol);
+
+                        sectionCard.appendChild(layoutGrid);
+                        container.appendChild(sectionCard);
+                    });
+                });
+            }
+
+            // Render Standard Curated Charts
             MIXAM_CMYK_DATA.forEach(section => {
                 if (selectedCat !== 'all' && section.id !== selectedCat) return;
 
                 const sectionCard = document.createElement('div');
                 sectionCard.className = 'glass-card rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm bg-white space-y-6';
 
-                // Section Layout Grid: Left Text Column / Right Swatches Grid
                 const layoutGrid = document.createElement('div');
                 layoutGrid.className = 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-start';
 
-                // Left Column: Text Header & Description
                 const leftCol = document.createElement('div');
                 leftCol.className = 'lg:col-span-4 space-y-3';
                 leftCol.innerHTML = `
@@ -1877,7 +1956,6 @@
                     <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">${section.description}</p>
                 `;
 
-                // Right Column: Swatches arranged in 10-column grids
                 const rightCol = document.createElement('div');
                 rightCol.className = 'lg:col-span-8 overflow-x-auto';
 
@@ -1891,14 +1969,12 @@
                     const cellContainer = document.createElement('div');
                     cellContainer.className = 'flex flex-col items-center text-center space-y-1.5 select-none';
 
-                    // Circle Swatch
                     const circle = document.createElement('div');
                     circle.className = 'cmyk-circle-swatch w-12 h-12 rounded-full border border-black/10 shadow-sm flex items-center justify-center';
                     circle.style.backgroundColor = hex;
                     circle.title = `Click to add ${hex} to Global Palette`;
                     circle.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
 
-                    // CMYK Numerical Breakdown Label
                     const label = document.createElement('div');
                     label.className = 'font-mono text-[9px] text-slate-500 font-semibold leading-tight text-left space-y-0.5';
                     label.innerHTML = `
@@ -1939,8 +2015,14 @@
             target.innerHTML = '';
             sidebar.innerHTML = '';
 
-            const res = parseFloat(document.getElementById('t3-res').value);
-            const numLevels = parseInt(document.getElementById('t3-density').value);
+            const resInput = document.getElementById('t3-res-input') ? document.getElementById('t3-res-input').value : '15';
+            let res = parseFloat(resInput);
+            if (isNaN(res) || res <= 0) res = 15;
+
+            const densityInput = document.getElementById('t3-density-input') ? document.getElementById('t3-density-input').value : '8';
+            let numLevels = parseInt(densityInput);
+            if (isNaN(numLevels) || numLevels < 1) numLevels = 8;
+
             const sortMode = document.getElementById('t3-sort').value;
             const showVal = document.getElementById('t3-showval').checked;
             const trackIso = document.getElementById('t3-isoline').checked;
@@ -1986,7 +2068,7 @@
             });
 
             let hues = [];
-            for(let h = 0; h < 360; h += res) hues.push(h);
+            for(let h = 0; h < 360; h += res) hues.push(Math.round(h * 10) / 10);
 
             if(sortMode === 'value') {
                 hues.sort((a,b) => {
@@ -2342,7 +2424,7 @@
             ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
             ctx.lineTo(x + w, y + h - radius);
             ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-            ctx.lineTo(x + radius, y);
+            ctx.lineTo(x + radius, y + h);
             ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
             ctx.lineTo(x, y + radius);
             ctx.quadraticCurveTo(x, y, x + radius, y);
