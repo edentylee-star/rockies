@@ -116,6 +116,15 @@
             z-index: 50 !important;
         }
 
+        .cmyk-circle-swatch {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .cmyk-circle-swatch:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 18px -3px rgba(0,0,0,0.25);
+        }
+
         /* Iso-line Highlighting with Cyan Glow */
         .iso-matched {
             outline: 2px solid #00f0ff !important;
@@ -296,8 +305,8 @@
                         <span>3. Hue Constants</span>
                     </button>
                     <button onclick="switchTab('tab-3d')" id="btn-tab-3d" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
-                        <i class="fa-solid fa-cubes text-xs"></i>
-                        <span>4. 3D & CMYK Color Grids</span>
+                        <i class="fa-solid fa-print text-xs"></i>
+                        <span>4. CMYK Print Guide</span>
                     </button>
                     <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-chart-line text-xs"></i>
@@ -659,87 +668,32 @@
             </div>
         </section>
 
-        <!-- TAB 4: 3D & CMYK COLOR GRIDS -->
-        <section id="tab-3d" class="tab-content hidden space-y-6">
-            <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 text-xs">
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">X-Axis Step Interval</label>
-                        <input type="number" id="t3d-x-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
+        <!-- TAB 4: CMYK PRINT GUIDE & COLOR CHARTS -->
+        <section id="tab-3d" class="tab-content hidden space-y-8">
+            <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3 bg-white">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-print text-sky-500"></i> CMYK Print Reference Guide
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Professional CMYK color formulas optimized for print production. Click any circular swatch to add it to your global palette.</p>
                     </div>
 
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Y-Axis Step Interval</label>
-                        <input type="number" id="t3d-y-interval" value="0.10" step="0.01" min="0.01" max="1.0" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
-                    </div>
-
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Hue Steps (HSB Rows)</label>
-                        <input type="number" id="t3d-hue-steps" value="10" step="1" min="1" max="360" oninput="renderTab3D()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
-                    </div>
-
-                    <!-- CMYK Key (Black) Tint Level Slider -->
-                    <div class="space-y-1">
-                        <div class="flex justify-between font-semibold text-slate-600">
-                            <span>CMYK Key (K%):</span>
-                            <span id="val-t3d-k" class="text-[#0369a1] font-mono font-bold">0%</span>
-                        </div>
-                        <input type="range" id="t3d-k-val" value="0" min="0" max="100" oninput="updateVal('val-t3d-k', this.value); renderTab3D()">
-                    </div>
-
-                    <div class="space-y-1 flex flex-col justify-center">
-                        <label class="inline-flex items-center cursor-pointer space-x-2">
-                            <input type="checkbox" id="t3d-showval" onchange="renderTab3D()" class="sr-only peer">
-                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
-                            <span class="text-xs font-semibold text-slate-700">Show Perceived Val (%)</span>
-                        </label>
-                    </div>
-
-                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="inline-flex items-center cursor-pointer space-x-1.5">
-                                <input type="checkbox" id="t3d-isoline" onchange="renderTab3D()" class="sr-only peer">
-                                <div class="w-7 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
-                                <span class="text-xs font-semibold text-slate-700">Track Iso-Line</span>
-                            </label>
-                            <span id="val-t3d-iso" class="font-mono font-bold text-[#0369a1]">50%</span>
-                        </div>
-                        <input type="range" id="t3d-isoval" value="50" min="0" max="100" oninput="updateVal('val-t3d-iso', this.value); renderTab3D()">
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-600">Filter Section:</label>
+                        <select id="cmyk-cat-filter" onchange="renderMixamCmykCharts()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 font-bold focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="all" selected>All Categories</option>
+                            <option value="blues">CMYK Blues</option>
+                            <option value="purples">CMYK Purples</option>
+                            <option value="pinks">CMYK Pinks</option>
+                            <option value="greens">CMYK Yellows & Greens</option>
+                        </select>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <!-- 1. RGB CUBE SLICES -->
-                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
-                    <div class="border-b pb-2">
-                        <h3 class="text-base font-bold text-slate-900">1. RGB Cube Slices</h3>
-                        <p class="text-xs text-slate-500">Red (Rows) × Green (Cols) sliced across Blue levels</p>
-                    </div>
-                    <div id="t3d-target-rgb" class="min-w-[400px]"></div>
-                </div>
-
-                <!-- 2. HSB SPECTRUM GRID -->
-                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
-                    <div class="border-b pb-2">
-                        <h3 class="text-base font-bold text-slate-900">2. HSB Spectrum Grid</h3>
-                        <p class="text-xs text-slate-500">Hue (Rows) × Saturation (Cols) sliced across Brightness levels</p>
-                    </div>
-                    <div id="t3d-target-hsb" class="min-w-[400px]"></div>
-                </div>
-
-                <!-- 3. CMYK PRINT SPECTRUM GRID -->
-                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm overflow-x-auto space-y-4 bg-white">
-                    <div class="border-b pb-2">
-                        <h3 class="text-base font-bold text-slate-900 flex items-center justify-between">
-                            <span>3. CMYK Grid Slices</span>
-                            <span class="text-xs text-sky-600 font-mono">Cyan × Magenta × Yellow</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">Cyan (Rows) × Magenta (Cols) sliced across Yellow &amp; Key (Black) levels</p>
-                    </div>
-                    <div id="t3d-target-cmyk" class="min-w-[400px]"></div>
-                </div>
-            </div>
+            <!-- MIXAM-STYLE CMYK SECTIONS TARGET -->
+            <div id="cmyk-mixam-container" class="space-y-8"></div>
         </section>
 
         <!-- TAB 5: PERCEIVED VALUE GRAPH -->
@@ -905,6 +859,66 @@
             { name: "Magenta", hex: "#FF00FF" }
         ];
 
+        /* MIXAM CMYK PRINT DATASETS */
+        const MIXAM_CMYK_DATA = [
+            {
+                id: "blues",
+                title: "CMYK Blues",
+                description: "In CMYK, blue is one of the most challenging colours to reproduce accurately. We suggest you use even and balanced mixtures, like 100-50-0-0. Otherwise, the result will be a purple or green colour.",
+                swatches: [
+                    { c: 100, m: 0,  y: 30, k: 0 }, { c: 70, m: 0,  y: 20, k: 0 }, { c: 50, m: 0,  y: 15, k: 0 }, { c: 30, m: 0,  y: 10, k: 0 }, { c: 10, m: 0,  y: 3,  k: 0 },
+                    { c: 100, m: 50, y: 0,  k: 0 }, { c: 70, m: 35, y: 0,  k: 0 }, { c: 50, m: 25, y: 0,  k: 0 }, { c: 35, m: 15, y: 0,  k: 0 }, { c: 10, m: 5,  y: 0,  k: 0 },
+                    { c: 100, m: 20, y: 30, k: 0 }, { c: 70, m: 15, y: 20, k: 0 }, { c: 50, m: 10, y: 15, k: 0 }, { c: 35, m: 10, y: 10, k: 0 }, { c: 10, m: 2,  y: 3,  k: 0 },
+                    { c: 100, m: 50, y: 20, k: 0 }, { c: 70, m: 35, y: 20, k: 0 }, { c: 50, m: 25, y: 5,  k: 0 }, { c: 30, m: 15, y: 5,  k: 0 }, { c: 10, m: 5,  y: 2,  k: 0 },
+                    { c: 100, m: 50, y: 30, k: 0 }, { c: 70, m: 35, y: 20, k: 0 }, { c: 50, m: 25, y: 15, k: 0 }, { c: 30, m: 15, y: 10, k: 0 }, { c: 10, m: 5,  y: 5,  k: 0 },
+                    { c: 100, m: 50, y: 50, k: 0 }, { c: 70, m: 35, y: 35, k: 0 }, { c: 50, m: 25, y: 25, k: 0 }, { c: 30, m: 15, y: 15, k: 0 }, { c: 10, m: 5,  y: 5,  k: 0 },
+                    { c: 100, m: 70, y: 30, k: 0 }, { c: 70, m: 50, y: 20, k: 0 }, { c: 50, m: 35, y: 15, k: 0 }, { c: 30, m: 20, y: 10, k: 0 }, { c: 10, m: 5,  y: 3,  k: 0 },
+                    { c: 100, m: 70, y: 70, k: 0 }, { c: 70, m: 50, y: 50, k: 0 }, { c: 50, m: 35, y: 35, k: 0 }, { c: 30, m: 20, y: 20, k: 0 }, { c: 10, m: 5,  y: 5,  k: 0 }
+                ]
+            },
+            {
+                id: "purples",
+                title: "CMYK Purples",
+                description: "Regal purple tones are CMYK friendly. A 3:2 magenta to cyan ratio is an excellent place to start (79-100-0-0).",
+                swatches: [
+                    { c: 70, m: 100, y: 0, k: 0 },  { c: 50, m: 70,  y: 0, k: 0 },  { c: 40, m: 50,  y: 0, k: 0 },  { c: 25, m: 35,  y: 0, k: 0 },  { c: 5,  m: 10,  y: 0, k: 0 },
+                    { c: 75, m: 100, y: 50, k: 0 }, { c: 50, m: 70,  y: 35, k: 0 }, { c: 40, m: 50,  y: 25, k: 0 }, { c: 25, m: 35,  y: 15, k: 0 }, { c: 10, m: 10,  y: 5, k: 0 },
+                    { c: 75, m: 100, y: 20, k: 0 }, { c: 50, m: 70,  y: 15, k: 0 }, { c: 40, m: 50,  y: 10, k: 0 }, { c: 25, m: 35,  y: 5, k: 0 },  { c: 10, m: 10,  y: 3, k: 0 },
+                    { c: 75, m: 100, y: 70, k: 0 }, { c: 50, m: 70,  y: 50, k: 0 }, { c: 40, m: 50,  y: 40, k: 0 }, { c: 20, m: 30,  y: 20, k: 0 }, { c: 10, m: 10,  y: 10, k: 0 }
+                ]
+            },
+            {
+                id: "pinks",
+                title: "CMYK Pinks",
+                description: "Pinks in CMYK printing are all about the magenta. For stand out pink colours - the magenta levels should be high, and the yellow, cyan, and black low. If you add too much yellow, you will get more red hues, but with too much cyan, it will turn purple.",
+                swatches: [
+                    { c: 10, m: 100, y: 0, k: 0 },  { c: 10, m: 70,  y: 0, k: 0 },  { c: 5,  m: 50,  y: 0, k: 0 },  { c: 3,  m: 30,  y: 0, k: 0 },  { c: 0,  m: 10,  y: 0, k: 0 },
+                    { c: 10, m: 100, y: 50, k: 0 }, { c: 7,  m: 100, y: 35, k: 0 }, { c: 5,  m: 50,  y: 25, k: 0 }, { c: 3,  m: 30,  y: 15, k: 0 }, { c: 0,  m: 10,  y: 5, k: 0 },
+                    { c: 10, m: 100, y: 0, k: 0 },  { c: 15, m: 70,  y: 20, k: 0 }, { c: 5,  m: 50,  y: 10, k: 0 }, { c: 3,  m: 30,  y: 5, k: 0 },  { c: 0,  m: 10,  y: 2, k: 0 },
+                    { c: 10, m: 100, y: 70, k: 0 }, { c: 7,  m: 70,  y: 50, k: 0 }, { c: 5,  m: 50,  y: 35, k: 0 }, { c: 3,  m: 30,  y: 20, k: 0 }, { c: 0,  m: 10,  y: 10, k: 0 }
+                ]
+            },
+            {
+                id: "greens",
+                title: "CMYK Yellows and Greens",
+                description: "Cyan and yellow will produce a green colour. Set the values to equal parts and make them dense for vibrant results. As for yellow, be careful when making it darker. It can become easily more of a sage or mustard colour. For a much denser mixture, it can become more orange or green.",
+                swatches: [
+                    { c: 0,  m: 30, y: 100, k: 0 }, { c: 0,  m: 20, y: 70,  k: 0 }, { c: 0,  m: 15, y: 50,  k: 0 }, { c: 0,  m: 10, y: 30,  k: 0 }, { c: 0,  m: 2,  y: 10,  k: 0 },
+                    { c: 20, m: 30, y: 100, k: 0 }, { c: 15, m: 20, y: 70,  k: 0 }, { c: 10, m: 15, y: 50,  k: 0 }, { c: 5,  m: 10, y: 30,  k: 0 }, { c: 2,  m: 5,  y: 10,  k: 0 },
+                    { c: 50, m: 30, y: 100, k: 0 }, { c: 35, m: 20, y: 70,  k: 0 }, { c: 25, m: 15, y: 50,  k: 0 }, { c: 15, m: 10, y: 30,  k: 0 }, { c: 5,  m: 3,  y: 10,  k: 0 },
+                    { c: 70, m: 30, y: 100, k: 0 }, { c: 50, m: 20, y: 70,  k: 0 }, { c: 35, m: 15, y: 50,  k: 0 }, { c: 20, m: 10, y: 30,  k: 0 }, { c: 10, m: 5,  y: 10,  k: 0 },
+                    { c: 50, m: 10, y: 100, k: 0 }, { c: 35, m: 5,  y: 70,  k: 0 }, { c: 25, m: 7,  y: 50,  k: 0 }, { c: 15, m: 3,  y: 30,  k: 0 }, { c: 5,  m: 0,  y: 10,  k: 0 },
+                    { c: 70, m: 10, y: 100, k: 0 }, { c: 50, m: 5,  y: 70,  k: 0 }, { c: 35, m: 5,  y: 50,  k: 0 }, { c: 20, m: 3,  y: 30,  k: 0 }, { c: 7,  m: 0,  y: 10,  k: 0 },
+                    { c: 80, m: 0,  y: 80,  k: 0 }, { c: 55, m: 0,  y: 55,  k: 0 }, { c: 40, m: 0,  y: 40,  k: 0 }, { c: 25, m: 0,  y: 25,  k: 0 }, { c: 10, m: 0,  y: 10,  k: 0 },
+                    { c: 80, m: 20, y: 80,  k: 0 }, { c: 55, m: 15, y: 55,  k: 0 }, { c: 40, m: 10, y: 40,  k: 0 }, { c: 25, m: 5,  y: 25,  k: 0 }, { c: 10, m: 2,  y: 10,  k: 0 },
+                    { c: 80, m: 50, y: 80,  k: 0 }, { c: 55, m: 35, y: 55,  k: 0 }, { c: 40, m: 25, y: 40,  k: 0 }, { c: 25, m: 15, y: 25,  k: 0 }, { c: 10, m: 5,  y: 10,  k: 0 },
+                    { c: 80, m: 70, y: 80,  k: 0 }, { c: 55, m: 50, y: 55,  k: 0 }, { c: 40, m: 35, y: 40,  k: 0 }, { c: 25, m: 20, y: 25,  k: 0 }, { c: 10, m: 10, y: 10,  k: 0 },
+                    { c: 20, m: 10, y: 100, k: 0 }, { c: 15, m: 5,  y: 70,  k: 0 }, { c: 10, m: 5,  y: 50,  k: 0 }, { c: 5,  m: 3,  y: 30,  k: 0 }, { c: 2,  m: 0,  y: 15,  k: 0 },
+                    { c: 0,  m: 10, y: 100, k: 0 }, { c: 0,  m: 5,  y: 70,  k: 0 }, { c: 0,  m: 5,  y: 50,  k: 0 }, { c: 0,  m: 3,  y: 30,  k: 0 }, { c: 0,  m: 0,  y: 10,  k: 0 }
+                ]
+            }
+        ];
+
         function toggleNavDropdown(event) {
             event.stopPropagation();
             const container = document.getElementById('nav-dropdown-container');
@@ -933,7 +947,7 @@
             if (tabId === 'tab1') { onModeChange(); }
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
-            if (tabId === 'tab-3d') { renderTab3D(); }
+            if (tabId === 'tab-3d') { renderMixamCmykCharts(); }
             if (tabId === 'tab4') { renderTab4(); }
         }
 
@@ -1004,24 +1018,6 @@
                 r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
             }
             return { r: r * 255, g: g * 255, b: b * 255 };
-        }
-
-        function hsvToRgbObj(h, s, v) {
-            h = (h % 360 + 360) % 360;
-            s /= 100; v /= 100;
-            let c = v * s;
-            let x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            let m = v - c;
-            let r = 0, g = 0, b = 0;
-
-            if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
-            else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
-            else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
-            else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
-            else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
-            else if (h >= 300 && h < 360) { r = c; g = 0; b = x; }
-
-            return { r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 };
         }
 
         function getPerceivedValue(r, g, b) {
@@ -1855,289 +1851,75 @@
             container.appendChild(grid);
         }
 
-        function renderTab3D() {
-            const targetRGB = document.getElementById('t3d-target-rgb');
-            const targetHSB = document.getElementById('t3d-target-hsb');
-            const targetCMYK = document.getElementById('t3d-target-cmyk');
-            if (!targetRGB || !targetHSB || !targetCMYK) return;
+        /* RENDER MIXAM-STYLE CMYK CHART SECTIONS */
+        function renderMixamCmykCharts() {
+            const container = document.getElementById('cmyk-mixam-container');
+            if (!container) return;
+            container.innerHTML = '';
 
-            targetRGB.innerHTML = '';
-            targetHSB.innerHTML = '';
-            targetCMYK.innerHTML = '';
+            const selectedCat = document.getElementById('cmyk-cat-filter').value;
 
-            let xStepInterval = parseFloat(document.getElementById('t3d-x-interval').value);
-            if (isNaN(xStepInterval) || xStepInterval <= 0) xStepInterval = 0.1;
+            MIXAM_CMYK_DATA.forEach(section => {
+                if (selectedCat !== 'all' && section.id !== selectedCat) return;
 
-            let yStepInterval = parseFloat(document.getElementById('t3d-y-interval').value);
-            if (isNaN(yStepInterval) || yStepInterval <= 0) yStepInterval = 0.1;
+                const sectionCard = document.createElement('div');
+                sectionCard.className = 'glass-card rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm bg-white space-y-6';
 
-            let hueStepsCount = parseInt(document.getElementById('t3d-hue-steps').value);
-            if (isNaN(hueStepsCount) || hueStepsCount < 1) hueStepsCount = 10;
+                // Section Layout Grid: Left Text Column / Right Swatches Grid
+                const layoutGrid = document.createElement('div');
+                layoutGrid.className = 'grid grid-cols-1 lg:grid-cols-12 gap-8 items-start';
 
-            let kVal = parseInt(document.getElementById('t3d-k-val').value);
-            if (isNaN(kVal)) kVal = 0;
+                // Left Column: Text Header & Description
+                const leftCol = document.createElement('div');
+                leftCol.className = 'lg:col-span-4 space-y-3';
+                leftCol.innerHTML = `
+                    <h3 class="text-2xl font-black text-slate-900 tracking-tight">${section.title}</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal">${section.description}</p>
+                `;
 
-            const showVal = document.getElementById('t3d-showval').checked;
-            const trackIso = document.getElementById('t3d-isoline').checked;
-            const isoVal = parseInt(document.getElementById('t3d-isoval').value);
-
-            const getStepsArray = (interval) => {
-                const arr = [];
-                for (let val = 0; val <= 1.0001; val += interval) {
-                    arr.push(Math.min(1.0, Math.round(val * 1000) / 1000));
-                }
-                return arr;
-            };
-
-            const xSteps = getStepsArray(xStepInterval);
-            const ySteps = getStepsArray(yStepInterval);
-
-            // 1. RGB SLICES
-            const rgbHeader = document.createElement('div');
-            rgbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
-            rgbHeader.innerHTML = `<span>Red</span><span class="font-bold">Green</span><span>Blue</span>`;
-            targetRGB.appendChild(rgbHeader);
-
-            const rgbTopAxis = document.createElement('div');
-            rgbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
-            const rgbTopColGrid = document.createElement('div');
-            rgbTopColGrid.className = 'grid flex-grow text-center font-mono text-[9px] text-slate-500';
-            rgbTopColGrid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-            xSteps.forEach(val => {
-                rgbTopColGrid.innerHTML += `<span>${val.toFixed(2).replace(/\.?0+$/, '')}</span>`;
-            });
-            rgbTopAxis.appendChild(rgbTopColGrid);
-            targetRGB.appendChild(rgbTopAxis);
-
-            const rgbMainBox = document.createElement('div');
-            rgbMainBox.className = 'relative flex gap-3';
-
-            const rgbRowsContainer = document.createElement('div');
-            rgbRowsContainer.className = 'flex-grow space-y-1.5';
-
-            ySteps.forEach(rVal => {
-                const rLabel = rVal.toFixed(2).replace(/\.?0+$/, '');
-
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex items-center gap-2';
-
-                const leftLabel = document.createElement('div');
-                leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
-                leftLabel.innerText = rLabel;
-                rowDiv.appendChild(leftLabel);
+                // Right Column: Swatches arranged in 10-column grids
+                const rightCol = document.createElement('div');
+                rightCol.className = 'lg:col-span-8 overflow-x-auto';
 
                 const grid = document.createElement('div');
-                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
-                grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
+                grid.className = 'grid grid-cols-5 sm:grid-cols-10 gap-x-3 gap-y-6 min-w-[580px]';
 
-                ySteps.forEach(bVal => {
-                    xSteps.forEach(gVal => {
-                        const r255 = Math.round(rVal * 255);
-                        const g255 = Math.round(gVal * 255);
-                        const b255 = Math.round(bVal * 255);
+                section.swatches.forEach(s => {
+                    const rgbObj = cmykToRgbObj(s.c, s.m, s.y, s.k);
+                    const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
 
-                        const hex = rgbToHex(r255, g255, b255);
-                        const pv = getPerceivedValue(r255, g255, b255);
+                    const cellContainer = document.createElement('div');
+                    cellContainer.className = 'flex flex-col items-center text-center space-y-1.5 select-none';
 
-                        const cell = document.createElement('div');
-                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
-                        cell.style.backgroundColor = hex;
-                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+                    // Circle Swatch
+                    const circle = document.createElement('div');
+                    circle.className = 'cmyk-circle-swatch w-12 h-12 rounded-full border border-black/10 shadow-sm flex items-center justify-center';
+                    circle.style.backgroundColor = hex;
+                    circle.title = `Click to add ${hex} to Global Palette`;
+                    circle.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
 
-                        if (showVal) {
-                            cell.innerText = pv;
-                            cell.style.color = getContrastTextColor(hex);
-                        }
+                    // CMYK Numerical Breakdown Label
+                    const label = document.createElement('div');
+                    label.className = 'font-mono text-[9px] text-slate-500 font-semibold leading-tight text-left space-y-0.5';
+                    label.innerHTML = `
+                        <div><span class="text-slate-400">C:</span> ${s.c}</div>
+                        <div><span class="text-slate-400">M:</span> ${s.m}</div>
+                        <div><span class="text-slate-400">Y:</span> ${s.y}</div>
+                        <div><span class="text-slate-400">K:</span> ${s.k}</div>
+                    `;
 
-                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                            cell.classList.add("iso-matched");
-                        }
-
-                        cell.onmouseenter = (e) => showChartTooltip(e, `Red:${rLabel} Green:${gVal.toFixed(2)} Blue:${bVal.toFixed(2)}`, 100, 50, hex, pv, {r: r255, g: g255, b: b255});
-                        cell.onmousemove = (e) => updateChartTooltipPos(e);
-                        cell.onmouseleave = () => hideChartTooltip();
-
-                        grid.appendChild(cell);
-                    });
+                    cellContainer.appendChild(circle);
+                    cellContainer.appendChild(label);
+                    grid.appendChild(cellContainer);
                 });
-                rowDiv.appendChild(grid);
-                rgbRowsContainer.appendChild(rowDiv);
+
+                rightCol.appendChild(grid);
+                layoutGrid.appendChild(leftCol);
+                layoutGrid.appendChild(rightCol);
+
+                sectionCard.appendChild(layoutGrid);
+                container.appendChild(sectionCard);
             });
-            rgbMainBox.appendChild(rgbRowsContainer);
-
-            const rgbRightSide = document.createElement('div');
-            rgbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
-            rgbRightSide.innerHTML = `<span>0.0</span><span>↓</span><span>1.0</span>`;
-            rgbMainBox.appendChild(rgbRightSide);
-
-            targetRGB.appendChild(rgbMainBox);
-
-
-            // 2. HSB SPECTRUM
-            const hsbHeader = document.createElement('div');
-            hsbHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
-            hsbHeader.innerHTML = `<span>Hue</span><span class="font-bold">Saturation</span><span>Brightness</span>`;
-            targetHSB.appendChild(hsbHeader);
-
-            const hsbTopAxis = document.createElement('div');
-            hsbTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
-            const hsbTopColGrid = document.createElement('div');
-            hsbTopColGrid.className = 'grid flex-grow text-center font-mono text-[9px] text-slate-500';
-            hsbTopColGrid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-            xSteps.forEach(val => {
-                hsbTopColGrid.innerHTML += `<span>${val.toFixed(2).replace(/\.?0+$/, '')}</span>`;
-            });
-            hsbTopAxis.appendChild(hsbTopColGrid);
-            targetHSB.appendChild(hsbTopAxis);
-
-            const hsbMainBox = document.createElement('div');
-            hsbMainBox.className = 'relative flex gap-3';
-
-            const hsbRowsContainer = document.createElement('div');
-            hsbRowsContainer.className = 'flex-grow space-y-1.5';
-
-            const hueSteps = [];
-            const hueStepIncrement = 360 / hueStepsCount;
-            for (let i = 0; i < hueStepsCount; i++) {
-                hueSteps.push(i * hueStepIncrement);
-            }
-
-            hueSteps.forEach(hueDeg => {
-                const hLabel = hueDeg.toFixed(1).replace(/\.0$/, '') + '°';
-
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex items-center gap-2';
-
-                const leftLabel = document.createElement('div');
-                leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
-                leftLabel.innerText = hLabel;
-                rowDiv.appendChild(leftLabel);
-
-                const grid = document.createElement('div');
-                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
-                grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-
-                ySteps.forEach(vStep => {
-                    const vVal = 1 - vStep;
-                    xSteps.forEach(sVal => {
-                        const rgbObj = hsvToRgbObj(hueDeg, sVal * 100, vVal * 100);
-                        const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
-                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
-
-                        const cell = document.createElement('div');
-                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
-                        cell.style.backgroundColor = hex;
-                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-
-                        if (showVal) {
-                            cell.innerText = pv;
-                            cell.style.color = getContrastTextColor(hex);
-                        }
-
-                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                            cell.classList.add("iso-matched");
-                        }
-
-                        cell.onmouseenter = (e) => showChartTooltip(e, `Hue:${hLabel} Sat:${sVal.toFixed(2)} Brightness:${vVal.toFixed(2)}`, Math.round(sVal*100), Math.round(vVal*100), hex, pv, rgbObj);
-                        cell.onmousemove = (e) => updateChartTooltipPos(e);
-                        cell.onmouseleave = () => hideChartTooltip();
-
-                        grid.appendChild(cell);
-                    });
-                });
-                rowDiv.appendChild(grid);
-                hsbRowsContainer.appendChild(rowDiv);
-            });
-            hsbMainBox.appendChild(hsbRowsContainer);
-
-            const hsbRightSide = document.createElement('div');
-            hsbRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
-            hsbRightSide.innerHTML = `<span>1.0</span><span>↓</span><span>0.0</span>`;
-            hsbMainBox.appendChild(hsbRightSide);
-
-            targetHSB.appendChild(hsbMainBox);
-
-
-            // 3. CMYK PRINT SPECTRUM GRID
-            const cmykHeader = document.createElement('div');
-            cmykHeader.className = 'flex items-center justify-between font-sans text-xs text-slate-700 font-semibold mb-2 px-10';
-            cmykHeader.innerHTML = `<span>Cyan</span><span class="font-bold">Magenta</span><span>Yellow</span>`;
-            targetCMYK.appendChild(cmykHeader);
-
-            const cmykTopAxis = document.createElement('div');
-            cmykTopAxis.className = 'flex items-center gap-2 mb-2 pl-10 pr-10';
-            const cmykTopColGrid = document.createElement('div');
-            cmykTopColGrid.className = 'grid flex-grow text-center font-mono text-[9px] text-slate-500';
-            cmykTopColGrid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-            xSteps.forEach(val => {
-                cmykTopColGrid.innerHTML += `<span>${Math.round(val * 100)}%</span>`;
-            });
-            cmykTopAxis.appendChild(cmykTopColGrid);
-            targetCMYK.appendChild(cmykTopAxis);
-
-            const cmykMainBox = document.createElement('div');
-            cmykMainBox.className = 'relative flex gap-3';
-
-            const cmykRowsContainer = document.createElement('div');
-            cmykRowsContainer.className = 'flex-grow space-y-1.5';
-
-            ySteps.forEach(cVal => {
-                const cLabel = Math.round(cVal * 100) + '%';
-
-                const rowDiv = document.createElement('div');
-                rowDiv.className = 'flex items-center gap-2';
-
-                const leftLabel = document.createElement('div');
-                leftLabel.className = 'w-8 font-mono text-[9px] font-semibold text-slate-600 text-left shrink-0';
-                leftLabel.innerText = cLabel;
-                rowDiv.appendChild(leftLabel);
-
-                const grid = document.createElement('div');
-                grid.className = 'grid gap-px flex-grow bg-white border border-slate-200 shadow-sm p-0.5 rounded';
-                grid.style.gridTemplateColumns = `repeat(${xSteps.length}, minmax(0, 1fr))`;
-
-                ySteps.forEach(yVal => {
-                    xSteps.forEach(mVal => {
-                        const cPct = cVal * 100;
-                        const mPct = mVal * 100;
-                        const yPct = yVal * 100;
-
-                        const rgbObj = cmykToRgbObj(cPct, mPct, yPct, kVal);
-                        const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
-                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
-
-                        const cell = document.createElement('div');
-                        cell.className = 'h-2.5 sm:h-3 swatch flex items-center justify-center font-mono text-[6px] font-bold select-none';
-                        cell.style.backgroundColor = hex;
-                        cell.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
-
-                        if (showVal) {
-                            cell.innerText = pv;
-                            cell.style.color = getContrastTextColor(hex);
-                        }
-
-                        if (trackIso && Math.abs(pv - isoVal) <= 3) {
-                            cell.classList.add("iso-matched");
-                        }
-
-                        cell.onmouseenter = (e) => showChartTooltip(e, `CMYK(${Math.round(cPct)}%,${Math.round(mPct)}%,${Math.round(yPct)}%,${kVal}%)`, Math.round(mPct), Math.round(yPct), hex, pv, rgbObj, "CMYK");
-                        cell.onmousemove = (e) => updateChartTooltipPos(e);
-                        cell.onmouseleave = () => hideChartTooltip();
-
-                        grid.appendChild(cell);
-                    });
-                });
-                rowDiv.appendChild(grid);
-                cmykRowsContainer.appendChild(rowDiv);
-            });
-            cmykMainBox.appendChild(cmykRowsContainer);
-
-            const cmykRightSide = document.createElement('div');
-            cmykRightSide.className = 'w-6 flex flex-col justify-between items-center font-mono text-[10px] text-slate-500 py-1 shrink-0';
-            cmykRightSide.innerHTML = `<span>0%</span><span>↓</span><span>100%</span>`;
-            cmykMainBox.appendChild(cmykRightSide);
-
-            targetCMYK.appendChild(cmykMainBox);
         }
 
         function createAxisLabel(text, isY = false) {
@@ -2560,7 +2342,7 @@
             ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
             ctx.lineTo(x + w, y + h - radius);
             ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-            ctx.lineTo(x + radius, y + h);
+            ctx.lineTo(x + radius, y);
             ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
             ctx.lineTo(x, y + radius);
             ctx.quadraticCurveTo(x, y, x + radius, y);
@@ -2651,7 +2433,7 @@
             renderPreSavedPalettes();
             updateTab2Controls();
             renderTab3();
-            renderTab3D();
+            renderMixamCmykCharts();
             renderTab4();
         };
     </script>
