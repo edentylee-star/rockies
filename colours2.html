@@ -1126,3 +1126,1366 @@
                                 title: `Quad ${counter}: ${c1.name}, ${c2.name}, ${c3.name}, ${c4.name}`,
                                 shortTitle: `${counter}. ${c1.name}/${c2.name}/${c3.name}/${c4.name}`
                             });
+                            counter++;
+                        }
+                    }
+                }
+            }
+            return quads;
+        }
+
+        function populateComboFilter() {
+            const mode = document.getElementById('t1-mode').value;
+            const filterSelect = document.getElementById('t1-trio-filter');
+            const labelEl = document.getElementById('t1-combo-filter-label');
+            if (!filterSelect) return;
+            filterSelect.innerHTML = '';
+
+            if (mode === '2') {
+                if (labelEl) labelEl.innerText = "Pair Combination (15 Pairs)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 15 Pair Combinations (45 Matrices)';
+                filterSelect.appendChild(allOption);
+
+                const pairs = getAll15Pairs();
+                pairs.forEach(pair => {
+                    const opt = document.createElement('option');
+                    opt.value = pair.id;
+                    opt.innerText = pair.title;
+                    filterSelect.appendChild(opt);
+                });
+            } else if (mode === '3') {
+                if (labelEl) labelEl.innerText = "Trio Combination (20 Trios)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 20 Chromatic Trios (60 Matrices)';
+                filterSelect.appendChild(allOption);
+
+                const trios = getAll20Trios();
+                trios.forEach(trio => {
+                    const opt = document.createElement('option');
+                    opt.value = trio.id;
+                    opt.innerText = trio.title;
+                    filterSelect.appendChild(opt);
+                });
+            } else if (mode === '4') {
+                if (labelEl) labelEl.innerText = "Quad Combination (15 Quads)";
+                const allOption = document.createElement('option');
+                allOption.value = 'all';
+                allOption.innerText = 'All 15 Four-Colour Combinations';
+                filterSelect.appendChild(allOption);
+
+                const quads = getAll15Quads();
+                quads.forEach(quad => {
+                    const opt = document.createElement('option');
+                    opt.value = quad.id;
+                    opt.innerText = quad.title;
+                    filterSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function updateNeutralFilterDropdown() {
+            const mode = document.getElementById('t1-mode').value;
+            const filter = document.getElementById('t1-neutral-filter');
+            if (!filter) return;
+
+            if (mode === '2') {
+                filter.innerHTML = `
+                    <option value="all" selected>All 3 Matrices per Pair</option>
+                    <option value="bw">1. White/Black Corners</option>
+                    <option value="mix_w">2. Mix + White Corner</option>
+                    <option value="mix_b">3. Mix + Black Corner</option>
+                `;
+            } else if (mode === '3') {
+                filter.innerHTML = `
+                    <option value="all" selected>All Neutrals (White, Grey, Black)</option>
+                    <option value="0">White Corner Only (#FFFFFF)</option>
+                    <option value="1">Grey Corner Only (#808080)</option>
+                    <option value="2">Black Corner Only (#000000)</option>
+                `;
+            }
+        }
+
+        function onModeChange() {
+            const mode = document.getElementById('t1-mode').value;
+            const neutralWrapper = document.getElementById('neutral-filter-wrapper');
+
+            populateComboFilter();
+            updateNeutralFilterDropdown();
+
+            if (mode === '3' || mode === '2') {
+                if (neutralWrapper) neutralWrapper.style.display = 'block';
+            } else {
+                if (neutralWrapper) neutralWrapper.style.display = 'none';
+            }
+            renderTab1();
+        }
+
+        function downloadSingleMatrixCard(tlHex, trHex, blHex, brHex, title, fileType = 'jpeg') {
+            let res = parseInt(document.getElementById('t1-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+
+            const tint = parseInt(document.getElementById('t1-tint').value);
+            const tone = parseInt(document.getElementById('t1-tone').value);
+            const shade = parseInt(document.getElementById('t1-shade').value);
+            const sat = parseInt(document.getElementById('t1-sat').value);
+
+            const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+            const padding = 40;
+            const headerH = 70;
+            const swatchSize = Math.max(80, Math.floor(1200 / res));
+            const margin = 2;
+
+            const canvasWidth = padding * 2 + res * swatchSize + (res - 1) * margin;
+            const canvasHeight = padding * 2 + headerH + res * swatchSize + (res - 1) * margin;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 24px Inter, sans-serif';
+            ctx.fillText(title.toUpperCase(), padding, padding + 28);
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = '14px "JetBrains Mono", monospace';
+            ctx.fillText(`TL: ${tlHex} | TR: ${trHex} | BL: ${blHex} | BR: ${brHex} (${res}x${res})`, padding, padding + 52);
+
+            for (let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for (let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
+                    const top = lerpColorObj(tl, tr, xT);
+                    const bot = lerpColorObj(bl, br, xT);
+                    const baseRGB = lerpColorObj(top, bot, yT);
+                    const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+
+                    const cellX = padding + x * (swatchSize + margin);
+                    const cellY = padding + headerH + y * (swatchSize + margin);
+
+                    ctx.fillStyle = finalColor;
+                    ctx.fillRect(cellX, cellY, swatchSize, swatchSize);
+                }
+            }
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const safeTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            const fileName = `${safeTitle}_${res}x${res}.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded ${title}!`);
+        }
+
+        function renderTab1() {
+            const target = document.getElementById('matrices-target');
+            if (!target) return;
+            target.innerHTML = '';
+
+            const mode = document.getElementById('t1-mode').value;
+            const comboFilterVal = document.getElementById('t1-trio-filter').value;
+            const neutralFilterVal = document.getElementById('t1-neutral-filter').value;
+            
+            let res = parseInt(document.getElementById('t1-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+
+            const tint = parseInt(document.getElementById('t1-tint').value);
+            const tone = parseInt(document.getElementById('t1-tone').value);
+            const shade = parseInt(document.getElementById('t1-shade').value);
+            const sat = parseInt(document.getElementById('t1-sat').value);
+            const showVal = document.getElementById('t1-showval').checked;
+            const showFormats = document.getElementById('t1-showformats').checked;
+            const trackIso = document.getElementById('t1-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t1-isoval').value);
+
+            let matricesData = [];
+            const neutralCorners = ["#FFFFFF", "#808080", "#000000"];
+            const neutralNames = ["White", "Grey", "Black"];
+
+            if (mode === '2') {
+                document.getElementById('t1-header').innerText = "Groups of 2 (15 Pairs × 3 Corner Matrices = 45 Matrices Total)";
+                const allPairs = getAll15Pairs();
+
+                let selectedPairs = allPairs;
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
+                    selectedPairs = allPairs.filter(p => p.id === selectedIdx);
+                }
+
+                selectedPairs.forEach(pair => {
+                    const mixHex = getAverageMixHex(pair.c1, pair.c2);
+
+                    const pairMatrices = [
+                        {
+                            title: `${pair.title} (Opposite Black/White)`,
+                            tl: pair.c1,
+                            tr: "#FFFFFF",
+                            bl: "#000000",
+                            br: pair.c2,
+                            variant: "bw"
+                        },
+                        {
+                            title: `${pair.title} (Mix + White)`,
+                            tl: pair.c1,
+                            tr: mixHex,
+                            bl: "#FFFFFF",
+                            br: pair.c2,
+                            variant: "mix_w"
+                        },
+                        {
+                            title: `${pair.title} (Mix + Black)`,
+                            tl: pair.c1,
+                            tr: mixHex,
+                            bl: "#000000",
+                            br: pair.c2,
+                            variant: "mix_b"
+                        }
+                    ];
+
+                    pairMatrices.forEach(m => {
+                        if (neutralFilterVal === 'all' || neutralFilterVal === m.variant) {
+                            matricesData.push(m);
+                        }
+                    });
+                });
+            } else if (mode === '3') {
+                document.getElementById('t1-header').innerText = "Groups of 3 (20 Chromatic Trios + Neutral Corner Variations)";
+                const allTrios = getAll20Trios();
+
+                let selectedTrios = allTrios;
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
+                    selectedTrios = allTrios.filter(t => t.id === selectedIdx);
+                }
+
+                selectedTrios.forEach(trio => {
+                    neutralCorners.forEach((neutralHex, idx) => {
+                        if (neutralFilterVal === 'all' || neutralFilterVal === idx.toString()) {
+                            matricesData.push({
+                                title: `${trio.title} w/ ${neutralNames[idx]} Corner`,
+                                tl: trio.c1,
+                                tr: trio.c2,
+                                bl: trio.c3,
+                                br: neutralHex
+                            });
+                        }
+                    });
+                });
+            } else if (mode === '4') {
+                document.getElementById('t1-header').innerText = "Groups of 4 (All 15 Four-Colour Combinations)";
+                const allQuads = getAll15Quads();
+
+                let selectedQuads = allQuads;
+                if (comboFilterVal !== 'all' && comboFilterVal !== '') {
+                    const selectedIdx = parseInt(comboFilterVal);
+                    selectedQuads = allQuads.filter(q => q.id === selectedIdx);
+                }
+
+                selectedQuads.forEach(quad => {
+                    matricesData.push({
+                        title: quad.title,
+                        tl: quad.c1,
+                        tr: quad.c2,
+                        bl: quad.c3,
+                        br: quad.c4
+                    });
+                });
+            }
+
+            const countEl = document.getElementById('t1-matrix-count');
+            if (countEl) countEl.innerText = `Showing ${matricesData.length} matrices (${res}×${res})`;
+
+            matricesData.forEach(data => {
+                const panel = document.createElement('div');
+                panel.className = 'glass-card rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center space-y-3';
+                
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'w-full flex items-center justify-between gap-2 border-b border-slate-100 pb-2';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'font-bold text-xs text-[#0369a1] font-mono text-left truncate';
+                titleEl.innerText = data.title;
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'px-2 py-1 bg-slate-800 hover:bg-slate-900 text-white text-[10px] font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1 border border-slate-700 shrink-0';
+                downloadBtn.innerHTML = `<i class="fa-solid fa-download text-[9px] text-sky-400"></i><span>JPEG</span>`;
+                downloadBtn.onclick = () => downloadSingleMatrixCard(data.tl, data.tr, data.bl, data.br, data.title, 'jpeg');
+
+                cardHeader.appendChild(titleEl);
+                cardHeader.appendChild(downloadBtn);
+                panel.appendChild(cardHeader);
+
+                const grid = document.createElement('div');
+                const cellSize = Math.max(22, Math.floor(220 / res));
+                grid.style.display = 'grid';
+                grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+                grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
+                grid.className = 'rounded-xl overflow-hidden border border-black/10';
+
+                const tl = hexToRgb(data.tl), tr = hexToRgb(data.tr), bl = hexToRgb(data.bl), br = hexToRgb(data.br);
+
+                for(let y = 0; y < res; y++) {
+                    const yT = y / (res - 1 || 1);
+                    for(let x = 0; x < res; x++) {
+                        const xT = x / (res - 1 || 1);
+                        const top = lerpColorObj(tl, tr, xT);
+                        const bot = lerpColorObj(bl, br, xT);
+                        const baseRGB = lerpColorObj(top, bot, yT);
+                        const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                        const rgbObj = hexToRgb(finalColor);
+                        const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                        const textColor = getContrastTextColor(finalColor);
+                        
+                        const cell = document.createElement('div');
+                        cell.className = 'swatch flex flex-col items-center justify-center font-mono text-[9px] font-bold p-0.5 leading-none select-none';
+                        cell.style.backgroundColor = finalColor;
+                        cell.onclick = () => { addToPalette(finalColor); copyToClipboard(finalColor); };
+
+                        let innerHtml = '';
+                        if (showVal) {
+                            innerHtml += `<div style="color:${textColor};">${pv}%</div>`;
+                        }
+                        if (showFormats) {
+                            innerHtml += `<div style="font-size:7px; opacity:0.85; color:${textColor}; text-align:center;">` +
+                                         `${finalColor}<br>${rgbObj.r},${rgbObj.g},${rgbObj.b}` +
+                                         `</div>`;
+                        }
+                        cell.innerHTML = innerHtml;
+
+                        if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                        grid.appendChild(cell);
+                    }
+                }
+                panel.appendChild(grid);
+                target.appendChild(panel);
+            });
+        }
+
+        function updateAllFieldsForCorner(pos, rgb, hex, hsl) {
+            document.getElementById(`cc-${pos}-picker`).value = hex;
+            document.getElementById(`cc-${pos}-hex`).value = hex;
+            document.getElementById(`cc-${pos}-r`).value = Math.round(rgb.r);
+            document.getElementById(`cc-${pos}-g`).value = Math.round(rgb.g);
+            document.getElementById(`cc-${pos}-b`).value = Math.round(rgb.b);
+            document.getElementById(`cc-${pos}-h`).value = hsl.h;
+            document.getElementById(`cc-${pos}-s`).value = hsl.s;
+            document.getElementById(`cc-${pos}-l`).value = hsl.l;
+        }
+
+        function syncPickerToText(pos) {
+            const hex = document.getElementById(`cc-${pos}-picker`).value.toUpperCase();
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            updateAllFieldsForCorner(pos, rgb, hex, hsl);
+            renderTab2Custom();
+        }
+
+        function syncTextToPicker(pos, source) {
+            let rgb, hex, hsl;
+            if (source === 'hex') {
+                let val = document.getElementById(`cc-${pos}-hex`).value;
+                if(!val.startsWith('#')) val = '#' + val;
+                if(val.length !== 7) return;
+                hex = val.toUpperCase();
+                rgb = hexToRgb(hex);
+                hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            } else if (source === 'rgb') {
+                let r = parseFloat(document.getElementById(`cc-${pos}-r`).value) || 0;
+                let g = parseFloat(document.getElementById(`cc-${pos}-g`).value) || 0;
+                let b = parseFloat(document.getElementById(`cc-${pos}-b`).value) || 0;
+                rgb = { r, g, b };
+                hex = rgbToHex(r, g, b);
+                hsl = rgbToHsl(r, g, b);
+            } else if (source === 'hsl') {
+                let h = parseFloat(document.getElementById(`cc-${pos}-h`).value) || 0;
+                let s = parseFloat(document.getElementById(`cc-${pos}-s`).value) || 0;
+                let l = parseFloat(document.getElementById(`cc-${pos}-l`).value) || 0;
+                hsl = { h, s, l };
+                let rgbObj = hslToRgbObj(h, s, l);
+                rgb = { r: rgbObj.r, g: rgbObj.g, b: rgbObj.b };
+                hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+            }
+            updateAllFieldsForCorner(pos, rgb, hex, hsl);
+            renderTab2Custom();
+        }
+
+        const preSavedPalettes = [
+            ["#FFFFFF", "#00A0E9", "#1D2099", "#E4007F"],
+            ["#FFFFFF", "#E4007F", "#E60012", "#FFF100"],
+            ["#FFFFFF", "#1D2088", "#1D2088", "#E4007F"],
+            ["#FFFFFF", "#E60012", "#1F3134", "#00A0E9"],
+            ["#FFFFFF", "#009944", "#009944", "#00A0E9"],
+            ["#FFFFFF", "#1D2088", "#1D2088", "#00A0E9"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#009944"],
+            ["#FFFFFF", "#E60012", "#1F3134", "#009944"],
+            ["#FFFFFF", "#00A0E9", "#009944", "#FFF100"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#E60012"],
+            ["#FFFFFF", "#E60012", "#E60012", "#FFF100"],
+            ["#FFFFFF", "#009944", "#1F3134", "#E4007F"],
+            ["#FFFFFF", "#009944", "#009944", "#FFF100"],
+            ["#FFF799", "#009E96", "#1E2C5C", "#E5004F"],
+            ["#FFF100", "#009944", "#1F3134", "#E60012"],
+            ["#FFFFFF", "#E60012", "#E60012", "#E4007F"],
+            ["#FFFFFF", "#1D2088", "#1F3134", "#FFF100"],
+            ["#FFFFFF", "#E4007F", "#1E0001", "#231815"],
+            ["#FFFFFF", "#920783", "#000000", "#231815"],
+            ["#FFFFFF", "#1D2088", "#000005", "#231815"],
+            ["#FFFFFF", "#955629", "#000000", "#231815"],
+            ["#FFFFFF", "#E5004F", "#200001", "#231815"],
+            ["#FFFFFF", "#00A0E9", "#000122", "#231815"],
+            ["#FFFFFF", "#0068B7", "#000114", "#231815"],
+            ["#FFFFFF", "#009944", "#000300", "#231815"],
+            ["#FFFFFF", "#009E96", "#000006", "#231815"],
+            ["#FFFFFF", "#FFF100", "#221B00", "#231815"],
+            ["#FFFFFF", "#F39800", "#230000", "#231815"]
+        ];
+
+        function applyPreSavedToCorners(palette) {
+            const positions = [
+                { pos: 'tl', hex: palette[0] },
+                { pos: 'tr', hex: palette[1] },
+                { pos: 'br', hex: palette[2] },
+                { pos: 'bl', hex: palette[3] }
+            ];
+
+            positions.forEach(item => {
+                const rgb = hexToRgb(item.hex);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                updateAllFieldsForCorner(item.pos, rgb, item.hex.toUpperCase(), hsl);
+            });
+
+            renderTab2Custom();
+            showToast("Loaded Corner Palette");
+        }
+
+        function renderPreSavedPalettes() {
+            const target = document.getElementById('presaved-target');
+            if (!target) return;
+            target.innerHTML = '';
+
+            preSavedPalettes.forEach((pal, idx) => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-xl p-2 cursor-pointer hover:border-[#0284c7] transition-all hover:-translate-y-0.5 space-y-1.5 shadow-sm';
+                card.onclick = () => applyPreSavedToCorners(pal);
+
+                const title = document.createElement('div');
+                title.className = 'text-[10px] font-bold text-slate-700 text-center font-mono';
+                title.innerText = `Option ${idx + 1}`;
+
+                const preview = document.createElement('div');
+                preview.className = 'grid grid-cols-2 grid-rows-2 gap-0.5 w-full h-12 rounded-lg overflow-hidden border border-black/10';
+
+                const cells = [
+                    { hex: pal[0], title: `TL: ${pal[0]}` },
+                    { hex: pal[1], title: `TR: ${pal[1]}` },
+                    { hex: pal[3], title: `BL: ${pal[3]}` },
+                    { hex: pal[2], title: `BR: ${pal[2]}` }
+                ];
+
+                cells.forEach(c => {
+                    const cell = document.createElement('div');
+                    cell.className = 'w-full h-full';
+                    cell.style.backgroundColor = c.hex;
+                    cell.title = c.title;
+                    preview.appendChild(cell);
+                });
+
+                card.appendChild(title);
+                card.appendChild(preview);
+                target.appendChild(card);
+            });
+        }
+
+        function renderTab2Custom() {
+            const target = document.getElementById('matrices-target-custom');
+            if (!target) return;
+            target.innerHTML = '';
+            
+            let res = parseInt(document.getElementById('cc-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+            
+            const tlHex = document.getElementById('cc-tl-hex').value;
+            const trHex = document.getElementById('cc-tr-hex').value;
+            const blHex = document.getElementById('cc-bl-hex').value;
+            const brHex = document.getElementById('cc-br-hex').value;
+
+            const tint = parseInt(document.getElementById('cc-tint').value);
+            const tone = parseInt(document.getElementById('cc-tone').value);
+            const shade = parseInt(document.getElementById('cc-shade').value);
+            const sat = parseInt(document.getElementById('cc-sat').value);
+            const showVal = document.getElementById('cc-showval').checked;
+            const showFormats = document.getElementById('cc-showformats').checked;
+            const trackIso = document.getElementById('cc-isoline').checked;
+            const isoVal = parseInt(document.getElementById('cc-isoval').value);
+
+            const panel = document.createElement('div');
+            panel.className = 'glass-card rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col items-center space-y-3';
+            panel.innerHTML = `<div class="font-bold text-sm text-[#0369a1] font-mono">Custom Blend Grid (${res} × ${res})</div>`;
+            
+            const grid = document.createElement('div');
+            const cellSize = Math.max(26, Math.floor(320 / res));
+            grid.style.display = 'grid';
+            grid.style.gridTemplateColumns = `repeat(${res}, ${cellSize}px)`;
+            grid.style.gridTemplateRows = `repeat(${res}, ${cellSize}px)`;
+            grid.className = 'rounded-xl overflow-hidden border border-black/10';
+
+            const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+            for(let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for(let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
+                    const top = lerpColorObj(tl, tr, xT);
+                    const bot = lerpColorObj(bl, br, xT);
+                    const baseRGB = lerpColorObj(top, bot, yT);
+                    const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+                    const rgbObj = hexToRgb(finalColor);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+                    const textColor = getContrastTextColor(finalColor);
+                    
+                    const cell = document.createElement('div');
+                    cell.className = 'swatch flex flex-col items-center justify-center font-mono text-[9px] font-bold p-0.5 leading-none select-none';
+                    cell.style.backgroundColor = finalColor;
+                    cell.onclick = () => { addToPalette(finalColor); copyToClipboard(finalColor); };
+
+                    let innerHtml = '';
+                    if (showVal) {
+                        innerHtml += `<div style="color:${textColor};">${pv}%</div>`;
+                    }
+                    if (showFormats) {
+                        innerHtml += `<div style="font-size:7px; opacity:0.85; color:${textColor}; text-align:center;">` +
+                                     `${finalColor}<br>${rgbObj.r},${rgbObj.g},${rgbObj.b}` +
+                                     `</div>`;
+                    }
+                    cell.innerHTML = innerHtml;
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                    grid.appendChild(cell);
+                }
+            }
+            panel.appendChild(grid);
+            target.appendChild(panel);
+        }
+
+        function downloadCustomMatrixCard(fileType = 'jpeg') {
+            let res = parseInt(document.getElementById('cc-res').value);
+            if (isNaN(res) || res < 2) res = 8;
+            
+            const tlHex = document.getElementById('cc-tl-hex').value;
+            const trHex = document.getElementById('cc-tr-hex').value;
+            const blHex = document.getElementById('cc-bl-hex').value;
+            const brHex = document.getElementById('cc-br-hex').value;
+
+            const tint = parseInt(document.getElementById('cc-tint').value);
+            const tone = parseInt(document.getElementById('cc-tone').value);
+            const shade = parseInt(document.getElementById('cc-shade').value);
+            const sat = parseInt(document.getElementById('cc-sat').value);
+
+            const tl = hexToRgb(tlHex), tr = hexToRgb(trHex), bl = hexToRgb(blHex), br = hexToRgb(brHex);
+
+            const padding = 40;
+            const headerH = 70;
+            const swatchSize = Math.max(80, Math.floor(1200 / res));
+            const margin = 2;
+
+            const canvasWidth = padding * 2 + res * swatchSize + (res - 1) * margin;
+            const canvasHeight = padding * 2 + headerH + res * swatchSize + (res - 1) * margin;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 24px Inter, sans-serif';
+            ctx.fillText(`CUSTOM MATRIX (${res} × ${res})`, padding, padding + 28);
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = '14px "JetBrains Mono", monospace';
+            ctx.fillText(`Corners: TL ${tlHex} | TR ${trHex} | BL ${blHex} | BR ${brHex}`, padding, padding + 52);
+
+            for (let y = 0; y < res; y++) {
+                const yT = y / (res - 1 || 1);
+                for (let x = 0; x < res; x++) {
+                    const xT = x / (res - 1 || 1);
+                    const top = lerpColorObj(tl, tr, xT);
+                    const bot = lerpColorObj(bl, br, xT);
+                    const baseRGB = lerpColorObj(top, bot, yT);
+                    const finalColor = applyAdjustments(baseRGB, tint, tone, shade, sat);
+
+                    const cellX = padding + x * (swatchSize + margin);
+                    const cellY = padding + headerH + y * (swatchSize + margin);
+
+                    ctx.fillStyle = finalColor;
+                    ctx.fillRect(cellX, cellY, swatchSize, swatchSize);
+                }
+            }
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `custom_matrix_${res}x${res}.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Custom Matrix (${res}x${res})!`);
+        }
+
+        function updateTab2Controls() {
+            const format = document.getElementById('t2-format').value;
+            const s2Container = document.getElementById('slider2-container');
+            const lblS1 = document.getElementById('lbl-s1');
+            const lblS2 = document.getElementById('lbl-s2');
+
+            if(format === "1" || format === "2") {
+                s2Container.classList.add("hidden");
+                lblS1.innerText = format === "1" ? "Lightness:" : "Saturation:";
+            } else {
+                s2Container.classList.remove("hidden");
+                if(format === "3") { lblS1.innerText = "Tone:"; lblS2.innerText = "Shade:"; }
+                else if(format === "4") { lblS1.innerText = "Shade:"; lblS2.innerText = "Tone:"; }
+                else if(format === "5") { lblS1.innerText = "Brightness:"; lblS2.innerText = "Shade:"; }
+                else if(format === "6") { lblS1.innerText = "Brightness:"; lblS2.innerText = "Tone:"; }
+            }
+        }
+
+        function renderTab3() {
+            const container = document.getElementById('t2-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const resInput = document.getElementById('t2-res-input') ? document.getElementById('t2-res-input').value : '15';
+            let res = parseFloat(resInput);
+            if (isNaN(res) || res <= 0) res = 15;
+
+            const format = document.getElementById('t2-format').value;
+            const s1Val = parseInt(document.getElementById('t2-s1').value);
+            const s2Val = parseInt(document.getElementById('t2-s2').value);
+            const showVal = document.getElementById('t2-showval').checked;
+            const trackIso = document.getElementById('t2-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t2-isoval').value);
+
+            const hues = [];
+            for(let h = 0; h < 360; h += res) hues.push(Math.round(h * 10) / 10);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-1 bg-slate-900 p-2 rounded-xl border border-slate-800';
+            grid.style.gridTemplateColumns = `50px repeat(${hues.length}, minmax(32px, 1fr))`;
+
+            grid.appendChild(createAxisLabel(""));
+            hues.forEach(h => grid.appendChild(createAxisLabel(h + "°")));
+
+            for(let row = 10; row >= 0; row--) {
+                const rowPct = row * 10;
+                grid.appendChild(createAxisLabel(rowPct + "%", true));
+
+                hues.forEach(h => {
+                    let color = "#000";
+                    let rgb = hslToRgbObj(h, 100, 50);
+
+                    if(format === "1") {
+                        rgb = hslToRgbObj(h, rowPct, s1Val);
+                        color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    } else if(format === "2") {
+                        rgb = hslToRgbObj(h, s1Val, rowPct);
+                        color = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    } else if(format === "3") {
+                        rgb = hslToRgbObj(h, 100, rowPct);
+                        color = applyAdjustments(rgb, 0, s1Val, s2Val, 100);
+                    } else if(format === "4") {
+                        rgb = hslToRgbObj(h, 100, rowPct);
+                        color = applyAdjustments(rgb, 0, s2Val, s1Val, 100);
+                    } else if(format === "5") {
+                        rgb = hslToRgbObj(h, 100, s1Val);
+                        color = applyAdjustments(rgb, 0, rowPct, s2Val, 100);
+                    } else if(format === "6") {
+                        rgb = hslToRgbObj(h, 100, s1Val);
+                        color = applyAdjustments(rgb, 0, s2Val, rowPct, 100);
+                    }
+
+                    const rgbObj = hexToRgb(color);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                    const cell = document.createElement('div');
+                    cell.className = 'h-8 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/10';
+                    cell.style.backgroundColor = color;
+                    cell.onclick = () => { addToPalette(color); copyToClipboard(color); };
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) cell.classList.add("iso-matched");
+                    if (showVal) {
+                        cell.innerText = pv + '%';
+                        cell.style.color = getContrastTextColor(color);
+                    }
+                    grid.appendChild(cell);
+                });
+            }
+            container.appendChild(grid);
+        }
+
+        /* HELPER: RENDER A RECTANGULAR CMYK GRID CARD */
+        function createCmykGridCard(title, description, swatches, cols = 5) {
+            const sectionCard = document.createElement('div');
+            sectionCard.className = 'glass-card rounded-2xl p-5 border border-slate-200 shadow-sm bg-white space-y-4';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'border-b border-slate-100 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+            cardHeader.innerHTML = `
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-mono">${title}</h3>
+                    ${description ? `<p class="text-xs text-slate-500">${description}</p>` : ''}
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-400 shrink-0">${swatches.length} Swatches</span>
+            `;
+            sectionCard.appendChild(cardHeader);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-2 overflow-x-auto p-1';
+            grid.style.gridTemplateColumns = `repeat(${cols}, minmax(80px, 1fr))`;
+
+            swatches.forEach(s => {
+                const rgbObj = cmykToRgbObj(s.c, s.m, s.y, s.k);
+                const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                const textColor = getContrastTextColor(hex);
+
+                const swatch = document.createElement('div');
+                swatch.className = 'swatch h-20 rounded-xl p-2 flex flex-col justify-between border border-black/10 font-mono select-none shadow-sm';
+                swatch.style.backgroundColor = hex;
+                swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                swatch.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-extrabold" style="color: ${textColor}">
+                        <span>${hex}</span>
+                        <span class="text-[8px] opacity-75">RGB: ${Math.round(rgbObj.r)},${Math.round(rgbObj.g)},${Math.round(rgbObj.b)}</span>
+                    </div>
+                    <div class="text-[9px] font-bold leading-tight" style="color: ${textColor}">
+                        C:${s.c} M:${s.m} Y:${s.y} K:${s.k}
+                    </div>
+                `;
+                grid.appendChild(swatch);
+            });
+
+            sectionCard.appendChild(grid);
+            return sectionCard;
+        }
+
+        /* RENDER CMYK CHARTS & MASTER C-M-Y GRID (NO CIRCLES) */
+        function renderMixamCmykCharts() {
+            const container = document.getElementById('cmyk-mixam-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const selectedCat = document.getElementById('cmyk-cat-filter').value;
+
+            // 1. REINSTATE MASTER C, M, Y GRID WITH FREE TEXT K % INPUT
+            if (selectedCat === 'all' || selectedCat === 'master_cmy') {
+                const kInput = document.getElementById('cmyk-master-k') ? document.getElementById('cmyk-master-k').value : '0';
+                let masterK = parseFloat(kInput);
+                if (isNaN(masterK)) masterK = 0;
+                masterK = Math.max(0, Math.min(100, masterK));
+
+                const cVals = [0, 10, 25, 40, 50, 70, 85, 100];
+                const mVals = [0, 10, 25, 40, 50, 70, 85, 100];
+                const yVals = [0, 20, 50, 80, 100];
+
+                yVals.forEach(yVal => {
+                    const masterSwatches = [];
+                    cVals.forEach(cVal => {
+                        mVals.forEach(mVal => {
+                            masterSwatches.push({ c: cVal, m: mVal, y: yVal, k: masterK });
+                        });
+                    });
+
+                    const card = createCmykGridCard(
+                        `Master C, M, Y Grid — Yellow (Y): ${yVal}% | Key (Black K): ${masterK}%`,
+                        `Interactive full rectangular grid across Cyan and Magenta gradients at constant Yellow (${yVal}%) and custom Black (${masterK}%).`,
+                        masterSwatches,
+                        mVals.length
+                    );
+                    container.appendChild(card);
+                });
+            }
+
+            // 2. DYNAMIC STEPPED CMYK GRIDS
+            if (selectedCat === 'all' || selectedCat === 'dynamic') {
+                const cSteps = parseStepsInput(document.getElementById('cmyk-c-steps').value, [0, 10, 25, 50, 70, 100]);
+                const mSteps = parseStepsInput(document.getElementById('cmyk-m-steps').value, [0, 10, 25, 50, 70, 100]);
+                const ySteps = parseStepsInput(document.getElementById('cmyk-y-steps').value, [0, 20, 50, 100]);
+                const kSteps = parseStepsInput(document.getElementById('cmyk-k-steps').value, [0]);
+
+                kSteps.forEach(kVal => {
+                    ySteps.forEach(yVal => {
+                        const dynamicSwatches = [];
+                        cSteps.forEach(cVal => {
+                            mSteps.forEach(mVal => {
+                                dynamicSwatches.push({ c: cVal, m: mVal, y: yVal, k: kVal });
+                            });
+                        });
+
+                        const card = createCmykGridCard(
+                            `Dynamic Stepped Grid — Yellow (Y): ${yVal}% | Key (K): ${kVal}%`,
+                            `Custom stepped mixtures from user text inputs.`,
+                            dynamicSwatches,
+                            mSteps.length
+                        );
+                        container.appendChild(card);
+                    });
+                });
+            }
+
+            // 3. CURATED CMYK REFERENCE GRIDS
+            MIXAM_CMYK_DATA.forEach(section => {
+                if (selectedCat !== 'all' && section.id !== selectedCat) return;
+
+                const card = createCmykGridCard(
+                    section.title,
+                    section.description,
+                    section.swatches,
+                    5
+                );
+                container.appendChild(card);
+            });
+        }
+
+        function createAxisLabel(text, isY = false) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-center font-mono text-[10px] font-bold text-slate-400 py-1';
+            div.innerText = text;
+            if(isY) div.style.color = "#B4E3F8";
+            return div;
+        }
+
+        /* TAB 5: GRAPH ENGINE */
+        function renderTab4() {
+            const target = document.getElementById('pv-plot-target');
+            const sidebar = document.getElementById('pv-y-axis-sidebar');
+            if (!target || !sidebar) return;
+
+            target.innerHTML = '';
+            sidebar.innerHTML = '';
+
+            const resInput = document.getElementById('t3-res-input') ? document.getElementById('t3-res-input').value : '15';
+            let res = parseFloat(resInput);
+            if (isNaN(res) || res <= 0) res = 15;
+
+            const densityInput = document.getElementById('t3-density-input') ? document.getElementById('t3-density-input').value : '8';
+            let numLevels = parseInt(densityInput);
+            if (isNaN(numLevels) || numLevels < 1) numLevels = 8;
+
+            const sortMode = document.getElementById('t3-sort').value;
+            const showVal = document.getElementById('t3-showval').checked;
+            const trackIso = document.getElementById('t3-isoline').checked;
+            const isoVal = parseInt(document.getElementById('t3-isoval').value);
+
+            const showBase = document.getElementById('t3-show-base') ? document.getElementById('t3-show-base').checked : true;
+            const showTints = document.getElementById('t3-show-tints') ? document.getElementById('t3-show-tints').checked : false;
+            const showTones = document.getElementById('t3-show-tones') ? document.getElementById('t3-show-tones').checked : false;
+            const showShades = document.getElementById('t3-show-shades') ? document.getElementById('t3-show-shades').checked : false;
+
+            const paddingTop = 40;
+            const chartHeight = 540;
+
+            const ySteps = [
+                { name: "Val 10 (100%)", pv: 100, class: "text-sky-300 font-extrabold" },
+                { name: "Val 9 (90%)",   pv: 90,  class: "text-slate-300" },
+                { name: "Val 8 (80%)",   pv: 80,  class: "text-slate-300" },
+                { name: "Val 7 (70%)",   pv: 70,  class: "text-slate-300" },
+                { name: "Val 6 (60%)",   pv: 60,  class: "text-slate-300" },
+                { name: "Val 5 (50%)",   pv: 50,  class: "text-sky-300 font-extrabold" },
+                { name: "Val 4 (40%)",   pv: 40,  class: "text-slate-300" },
+                { name: "Val 3 (30%)",   pv: 30,  class: "text-slate-300" },
+                { name: "Val 2 (20%)",   pv: 20,  class: "text-slate-300" },
+                { name: "Val 1 (10%)",   pv: 10,  class: "text-slate-300" },
+                { name: "Val 0 (0%)",    pv: 0,   class: "text-sky-300 font-extrabold" }
+            ];
+
+            ySteps.forEach(step => {
+                const yPos = paddingTop + ((100 - step.pv) / 100) * chartHeight;
+
+                const lbl = document.createElement('div');
+                lbl.className = `absolute left-2.5 -translate-y-1/2 text-[11px] ${step.class}`;
+                lbl.style.top = yPos + 'px';
+                lbl.innerText = step.name;
+                sidebar.appendChild(lbl);
+
+                const guideLine = document.createElement('div');
+                guideLine.className = step.pv % 50 === 0 
+                    ? 'absolute left-0 right-0 h-[1.5px] bg-sky-500/30 z-10' 
+                    : 'absolute left-0 right-0 h-[1px] bg-slate-800/80 z-10';
+                guideLine.style.top = yPos + 'px';
+                target.appendChild(guideLine);
+            });
+
+            let hues = [];
+            for(let h = 0; h < 360; h += res) hues.push(Math.round(h * 10) / 10);
+
+            if(sortMode === 'value') {
+                hues.sort((a,b) => {
+                    let lumA = getPerceivedValue(...Object.values(hslToRgbObj(a,100,50)));
+                    let lumB = getPerceivedValue(...Object.values(hslToRgbObj(b,100,50)));
+                    return lumA - lumB;
+                });
+            }
+
+            const colWidth = Math.max(55, Math.floor(1700 / hues.length));
+
+            hues.forEach((hue, colIdx) => {
+                const colX = colIdx * colWidth + 50;
+
+                const colLine = document.createElement('div');
+                colLine.className = 'absolute top-0 bottom-0 w-[1px] bg-slate-800/60 z-0';
+                colLine.style.left = colX + 'px';
+                target.appendChild(colLine);
+
+                const label = document.createElement('div');
+                label.className = 'absolute top-2 font-mono text-[10px] font-bold text-sky-400 -translate-x-1/2 z-20';
+                label.style.left = colX + 'px';
+                label.innerText = hue + '°';
+                target.appendChild(label);
+
+                let baseSamples = [];
+                for (let i = 1; i <= numLevels; i++) {
+                    let lightness = Math.round((i / (numLevels + 1)) * 100);
+                    baseSamples.push({ s: 100, l: lightness, label: `${numLevels} levels` });
+                }
+
+                let activeSamples = [];
+
+                if (showBase) {
+                    baseSamples.forEach(bs => {
+                        activeSamples.push({
+                            type: bs.label,
+                            s: bs.s,
+                            l: bs.l,
+                            tint: 0, tone: 0, shade: 0,
+                            group: 'base'
+                        });
+                    });
+                }
+
+                if (showTints) {
+                    baseSamples.forEach(bs => {
+                        for (let pct = 20; pct <= 80; pct += 30) {
+                            activeSamples.push({
+                                type: `Tint ${pct}%`,
+                                s: bs.s,
+                                l: bs.l,
+                                tint: pct, tone: 0, shade: 0,
+                                group: 'tint'
+                            });
+                        }
+                    });
+                }
+
+                if (showTones) {
+                    baseSamples.forEach(bs => {
+                        for (let pct = 20; pct <= 80; pct += 30) {
+                            activeSamples.push({
+                                type: `Tone ${pct}%`,
+                                s: bs.s,
+                                l: bs.l,
+                                tint: 0, tone: pct, shade: 0,
+                                group: 'tone'
+                            });
+                        }
+                    });
+                }
+
+                if (showShades) {
+                    baseSamples.forEach(bs => {
+                        for (let pct = 20; pct <= 80; pct += 30) {
+                            activeSamples.push({
+                                type: `Shade ${pct}%`,
+                                s: bs.s,
+                                l: bs.l,
+                                tint: 0, tone: 0, shade: pct,
+                                group: 'shade'
+                            });
+                        }
+                    });
+                }
+
+                activeSamples.forEach((sample) => {
+                    let baseRgb = hslToRgbObj(hue, sample.s, sample.l);
+                    let colorHex;
+
+                    if (sample.tint > 0 || sample.tone > 0 || sample.shade > 0) {
+                        colorHex = applyAdjustments(baseRgb, sample.tint, sample.tone, sample.shade, 100);
+                    } else {
+                        colorHex = rgbToHex(baseRgb.r, baseRgb.g, baseRgb.b);
+                    }
+
+                    const rgbObj = hexToRgb(colorHex);
+                    const pv = getPerceivedValue(rgbObj.r, rgbObj.g, rgbObj.b);
+
+                    const yPos = paddingTop + ((100 - pv) / 100) * chartHeight;
+
+                    let groupOffset = 0;
+                    if (sample.group === 'tint') groupOffset = -14;
+                    else if (sample.group === 'base') groupOffset = -5;
+                    else if (sample.group === 'tone') groupOffset = 5;
+                    else if (sample.group === 'shade') groupOffset = 14;
+
+                    const xPos = colX + groupOffset;
+
+                    const node = document.createElement('div');
+                    node.className = 'absolute w-8 h-5 rounded swatch flex items-center justify-center font-mono text-[8px] font-bold select-none border border-black/30 shadow-md cursor-pointer -translate-x-1/2 -translate-y-1/2 transition-transform duration-150';
+                    node.style.left = xPos + 'px';
+                    node.style.top = yPos + 'px';
+                    node.style.backgroundColor = colorHex;
+
+                    const textColor = getContrastTextColor(colorHex);
+                    if (showVal) {
+                        node.innerText = pv + '%';
+                        node.style.color = textColor;
+                    }
+
+                    if (trackIso && Math.abs(pv - isoVal) <= 3) {
+                        node.classList.add("iso-matched");
+                    }
+
+                    node.onmouseenter = (e) => showChartTooltip(e, hue, sample.s, sample.l, colorHex, pv, rgbObj, sample.type);
+                    node.onmousemove = (e) => updateChartTooltipPos(e);
+                    node.onmouseleave = () => hideChartTooltip();
+
+                    node.onclick = () => {
+                        addToPalette(colorHex);
+                        copyToClipboard(colorHex);
+                    };
+
+                    target.appendChild(node);
+                });
+            });
+        }
+
+        function showChartTooltip(e, hue, s, l, hex, pv, rgb, typeLabel = "") {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (!tooltip) return;
+            tooltip.style.display = 'block';
+            tooltip.innerHTML = `
+                <div class="font-bold text-sky-300">${hue}${typeof hue === 'number' ? '°' : ''} ${typeLabel ? `(${typeLabel})` : ''}</div>
+                <div>HEX: <span class="font-bold text-white">${hex}</span></div>
+                <div>RGB: (${Math.round(rgb.r)}, ${Math.round(rgb.g)}, ${Math.round(rgb.b)})</div>
+                <div class="text-amber-300 font-bold">Perceived Value: ${pv}%</div>
+            `;
+            updateChartTooltipPos(e);
+        }
+
+        function updateChartTooltipPos(e) {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (tooltip && tooltip.style.display === 'block') {
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = e.clientY + 'px';
+            }
+        }
+
+        function hideChartTooltip() {
+            const tooltip = document.getElementById('chart-tooltip');
+            if (tooltip) tooltip.style.display = 'none';
+        }
+
+        /* UNLIMITED GLOBAL COMPARISON PALETTE LOGIC */
+        function addToPalette(hex) {
+            paletteColors.push(hex);
+            updatePaletteUI();
+        }
+
+        function removeFromPalette(index, event) {
+            event.stopPropagation();
+            paletteColors.splice(index, 1);
+            updatePaletteUI();
+        }
+
+        function clearPalette() {
+            paletteColors = [];
+            updatePaletteUI();
+            showToast("Palette Cleared");
+        }
+
+        function copyAllPaletteHex() {
+            if (paletteColors.length === 0) {
+                showToast("Palette is empty!");
+                return;
+            }
+            copyToClipboard(paletteColors.join(', '));
+        }
+
+        function downloadMinimalPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
+            generateHighResCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateHighResCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 8;
+            const swatchSize = 400;
+            const margin = 20;
+
+            const totalSwatches = colors.length;
+            const rows = Math.ceil(totalSwatches / cols);
+
+            const canvasWidth = cols * swatchSize + (cols + 1) * margin;
+            const canvasHeight = rows * swatchSize + (rows + 1) * margin;
+
+            const cardCanvas = document.createElement('canvas');
+            cardCanvas.width = canvasWidth;
+            cardCanvas.height = canvasHeight;
+
+            const ctx = cardCanvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            colors.forEach((hex, idx) => {
+                const colIndex = idx % cols;
+                const rowIndex = Math.floor(idx / cols);
+
+                const x = margin + colIndex * (swatchSize + margin);
+                const y = margin + rowIndex * (swatchSize + margin);
+
+                ctx.fillStyle = hex;
+                ctx.fillRect(x, y, swatchSize, swatchSize);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Minimal Swatch Card!`);
+        }
+
+        function downloadExpandedPaletteCard(fileType = 'jpeg') {
+            if (!paletteColors || paletteColors.length === 0) {
+                showToast("No active palette colors to download!");
+                return;
+            }
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
+            generateExpandedSpecCardDownload(activeExportPalette, fileType);
+        }
+
+        function generateExpandedSpecCardDownload(paletteObj, fileType = 'jpeg') {
+            const colors = paletteObj.colors;
+            if (!colors || colors.length === 0) return;
+
+            const cols = 3;
+            const cardW = 380;
+            const cardH = 140;
+            const gapX = 20;
+            const gapY = 20;
+            const padding = 30;
+            const headerH = 60;
+
+            const rows = Math.ceil(colors.length / cols);
+            const canvasW = padding * 2 + cols * cardW + (cols - 1) * gapX;
+            const canvasH = padding * 2 + headerH + rows * cardH + (rows - 1) * gapY;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.fillText('FULL SWATCH SPECIFICATIONS', padding, padding + 24);
+
+            colors.forEach((hex, idx) => {
+                const c = idx % cols;
+                const r = Math.floor(idx / cols);
+
+                const x = padding + c * (cardW + gapX);
+                const y = padding + headerH + r * (cardH + gapY);
+
+                ctx.fillStyle = '#F8FAFC';
+                ctx.strokeStyle = '#E2E8F0';
+                ctx.lineWidth = 2;
+                roundRect(ctx, x, y, cardW, cardH, 20, true, true);
+
+                const swatchS = 96;
+                const swatchX = x + 20;
+                const swatchY = y + 22;
+
+                ctx.fillStyle = hex;
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                roundRect(ctx, swatchX, swatchY, swatchS, swatchS, 16, true, true);
+
+                const rgbObj = hexToRgb(hex);
+                const rgbR = Math.round(rgbObj.r);
+                const rgbG = Math.round(rgbObj.g);
+                const rgbB = Math.round(rgbObj.b);
+
+                const hsl = rgbToHsl(rgbR, rgbG, rgbB);
+                const hslH = hsl.h;
+                const hslS = hsl.s;
+                const hslL = hsl.l;
+
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                const textX = swatchX + swatchS + 20;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
+        }
+
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
+        }
+
+        function handleDragStart(e) {
+            const index = parseInt(this.dataset.index);
+            if (isNaN(index) || index >= paletteColors.length) {
+                e.preventDefault();
+                return;
+            }
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, movedColor);
+                updatePaletteUI();
+            }
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.palette-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            draggedIndex = null;
+        }
+
+        function updatePaletteUI() {
+            const counter = document.getElementById('palette-counter');
+            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length})`;
+
+            const container = document.getElementById('palette-slots-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            paletteColors.forEach((hex, i) => {
+                const slot = document.createElement('div');
+                slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+                slot.style.backgroundColor = hex;
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group shrink-0';
+                slot.setAttribute('draggable', 'true');
+
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+
+                slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                removeBtn.innerHTML = '×';
+                removeBtn.title = 'Remove color';
+                removeBtn.onclick = (e) => removeFromPalette(i, e);
+                slot.appendChild(removeBtn);
+
+                slot.onclick = () => copyToClipboard(hex);
+                container.appendChild(slot);
+            });
+        }
+
+        window.onload = () => {
+            updatePaletteUI();
+            onModeChange();
+            renderTab2Custom();
+            renderPreSavedPalettes();
+            updateTab2Controls();
+            renderTab3();
+            renderMixamCmykCharts();
+            renderTab4();
+        };
+    </script>
+</body>
+</html>
