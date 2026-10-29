@@ -295,13 +295,17 @@
                         <i class="fa-solid fa-palette text-xs"></i>
                         <span>3. Hue Constants</span>
                     </button>
+                    <button onclick="switchTab('tab-hs-rgb')" id="btn-tab-hs-rgb" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
+                        <i class="fa-solid fa-layer-group text-xs"></i>
+                        <span>4. Hue/Sat & RGB Grids</span>
+                    </button>
                     <button onclick="switchTab('tab-3d')" id="btn-tab-3d" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-print text-xs"></i>
-                        <span>4. CMYK & Dynamic Step Grids</span>
+                        <span>5. CMYK & Dynamic Step Grids</span>
                     </button>
                     <button onclick="switchTab('tab4')" id="btn-tab4" class="tab-btn px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 text-slate-700 hover:text-slate-900 border border-transparent whitespace-nowrap">
                         <i class="fa-solid fa-chart-line text-xs"></i>
-                        <span>5. Perceived Value Graph</span>
+                        <span>6. Perceived Value Graph</span>
                     </button>
                 </nav>
             </div>
@@ -651,7 +655,60 @@
             </div>
         </section>
 
-        <!-- TAB 4: CMYK PRINT GUIDE & DYNAMIC STEP GRIDS -->
+        <!-- NEW TAB 4: HUE/SATURATION & RGB GRADIENT GRIDS -->
+        <section id="tab-hs-rgb" class="tab-content hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 bg-white">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-sky-500"></i> Hue/Saturation & RGB Step Grids
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Fully customizable stepped matrix charts. Adjust the number of hue/color blocks, step intervals, and range scaling.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-bold text-slate-600">Grid Mode:</label>
+                        <select id="hs-rgb-mode" onchange="renderHsRgbGrids()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 font-bold focus:ring-2 focus:ring-[#B4E3F8]">
+                            <option value="hs" selected>Hue vs Saturation (HSB/HSV)</option>
+                            <option value="rgb">Red vs Green / Blue Steps (RGB)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CONTROL CONTROLS PANEL FOR INTERVALS & HUE COUNT -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-3 border-t border-slate-100 text-xs">
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <label class="font-bold text-slate-700 block" id="hs-lbl-count">Number of Hues (Rows):</label>
+                        <input type="text" id="hs-hue-count" value="11" oninput="renderHsRgbGrids()" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg p-2 font-mono font-bold text-center focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 11">
+                    </div>
+
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <label class="font-bold text-slate-700 block" id="hs-lbl-interval">Horizontal Steps (Interval):</label>
+                        <input type="text" id="hs-step-interval" value="0.1" oninput="renderHsRgbGrids()" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg p-2 font-mono font-bold text-center focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0.1 or 10%">
+                    </div>
+
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                        <label class="font-bold text-slate-700 block">Sub-Rows per Hue (Brightness / Blue):</label>
+                        <input type="text" id="hs-sub-rows" value="2" oninput="renderHsRgbGrids()" class="w-full bg-white border border-slate-300 text-slate-900 rounded-lg p-2 font-mono font-bold text-center focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 2">
+                    </div>
+
+                    <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex flex-col justify-center">
+                        <label class="inline-flex items-center cursor-pointer space-x-2">
+                            <input type="checkbox" id="hs-show-values" onchange="renderHsRgbGrids()" class="sr-only peer" checked>
+                            <div class="w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-[#0284c7] relative"></div>
+                            <span class="text-xs font-semibold text-slate-700">Show Format Text Overlay</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARGET CONTAINER FOR GENERATED HUE/SAT OR RGB GRIDS -->
+            <div id="hs-rgb-target" class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm overflow-x-auto bg-white"></div>
+        </section>
+
+        <!-- TAB 5: CMYK PRINT GUIDE & DYNAMIC STEP GRIDS -->
         <section id="tab-3d" class="tab-content hidden space-y-8">
             <!-- REINSTATED CMYK STEP GRIDS CONTROL PANEL -->
             <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 bg-white">
@@ -708,7 +765,7 @@
             <div id="cmyk-mixam-container" class="space-y-8"></div>
         </section>
 
-        <!-- TAB 5: PERCEIVED VALUE GRAPH -->
+        <!-- TAB 6: PERCEIVED VALUE GRAPH -->
         <section id="tab4" class="tab-content hidden space-y-6">
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
@@ -927,6 +984,7 @@
             if (tabId === 'tab1') { onModeChange(); }
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
+            if (tabId === 'tab-hs-rgb') { renderHsRgbGrids(); }
             if (tabId === 'tab-3d') { renderMixamCmykCharts(); }
             if (tabId === 'tab4') { renderTab4(); }
         }
@@ -942,6 +1000,24 @@
         function rgbToHex(r, g, b) {
             const clamp = v => Math.max(0, Math.min(255, Math.round(v)));
             return "#" + [r, g, b].map(x => clamp(x).toString(16).padStart(2, '0')).join('').toUpperCase();
+        }
+
+        function hsvToRgb(h, s, v) {
+            let r = 0, g = 0, b = 0;
+            let i = Math.floor(h * 6);
+            let f = h * 6 - i;
+            let p = v * (1 - s);
+            let q = v * (1 - f * s);
+            let t = v * (1 - (1 - f) * s);
+            switch (i % 6) {
+                case 0: r = v; g = t; b = p; break;
+                case 1: r = q; g = v; b = p; break;
+                case 2: r = p; g = v; b = t; break;
+                case 3: r = p; g = q; b = v; break;
+                case 4: r = t; g = p; b = v; break;
+                case 5: r = v; g = p; b = q; break;
+            }
+            return { r: r * 255, g: g * 255, b: b * 255 };
         }
 
         function cmykToRgbObj(c, m, y, k) {
@@ -1842,6 +1918,206 @@
             container.appendChild(grid);
         }
 
+        /* RENDER TAB 4: HUE/SATURATION & RGB STEP GRIDS FROM IMAGE REFERENCES */
+        function renderHsRgbGrids() {
+            const container = document.getElementById('hs-rgb-target');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const mode = document.getElementById('hs-rgb-mode').value;
+            const countInput = parseFloat(document.getElementById('hs-hue-count').value) || (mode === 'hs' ? 11 : 11);
+            const intervalInput = parseFloat(document.getElementById('hs-step-interval').value) || 0.1;
+            const subRowsInput = parseInt(document.getElementById('hs-sub-rows').value) || 2;
+            const showOverlay = document.getElementById('hs-show-values').checked;
+
+            const lblCount = document.getElementById('hs-lbl-count');
+            const lblInterval = document.getElementById('hs-lbl-interval');
+
+            // Generate horizontal step values based on interval (e.g. 0.0, 0.1, 0.2 ... 1.0)
+            let steps = [];
+            let currentStep = 0;
+            while (currentStep <= 1.0001) {
+                steps.push(Math.round(currentStep * 1000) / 1000);
+                currentStep += intervalInput;
+            }
+            if (steps.length === 0) steps = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+
+            if (mode === 'hs') {
+                if (lblCount) lblCount.innerText = "Number of Hues (Rows):";
+                if (lblInterval) lblInterval.innerText = "Saturation Steps (Interval):";
+
+                // Generate Hues evenly spaced from 0.0 to 1.0
+                const numHues = Math.max(2, Math.round(countInput));
+                const gridWrapper = document.createElement('div');
+                gridWrapper.className = 'space-y-4';
+
+                // Header Labels
+                const headerRow = document.createElement('div');
+                headerRow.className = 'flex items-center gap-2 border-b pb-2 mb-2 font-mono text-xs font-bold text-slate-500 min-w-[900px]';
+                headerRow.innerHTML = `<div class="w-16 shrink-0">Hue</div>`;
+                
+                const stepsHeader = document.createElement('div');
+                stepsHeader.className = 'flex-grow grid gap-1 text-center';
+                stepsHeader.style.gridTemplateColumns = `repeat(${steps.length}, minmax(40px, 1fr))`;
+                steps.forEach(s => {
+                    const cell = document.createElement('div');
+                    cell.innerText = s.toFixed(1);
+                    stepsHeader.appendChild(cell);
+                });
+
+                headerRow.appendChild(stepsHeader);
+                headerRow.innerHTML += `<div class="w-20 shrink-0 text-right">Brightness</div>`;
+                gridWrapper.appendChild(headerRow);
+
+                for (let hIdx = 0; hIdx < numHues; hIdx++) {
+                    const hVal = hIdx / (numHues - 1 || 1);
+                    
+                    const hueBlock = document.createElement('div');
+                    hueBlock.className = 'flex items-center gap-2 border-b border-slate-100 pb-2 min-w-[900px]';
+
+                    // Left Label: Hue Value
+                    const labelEl = document.createElement('div');
+                    labelEl.className = 'w-16 shrink-0 font-mono text-xs font-extrabold text-slate-800';
+                    labelEl.innerText = hVal.toFixed(1);
+                    hueBlock.appendChild(labelEl);
+
+                    // Grid Columns: Saturation
+                    const matrixGrid = document.createElement('div');
+                    matrixGrid.className = 'flex-grow grid gap-1';
+                    matrixGrid.style.gridTemplateColumns = `repeat(${steps.length}, minmax(40px, 1fr))`;
+
+                    // Generate Sub-Rows for Brightness (Value) e.g., 1.0 down to 0.5
+                    const bLevels = [];
+                    for (let b = 0; b < subRowsInput; b++) {
+                        const bVal = 1.0 - (b * (0.5 / Math.max(1, subRowsInput - 1)));
+                        bLevels.push(bVal);
+                    }
+
+                    steps.forEach(sVal => {
+                        const colCell = document.createElement('div');
+                        colCell.className = 'flex flex-col gap-0.5 rounded overflow-hidden shadow-sm';
+
+                        bLevels.forEach(bVal => {
+                            const rgb = hsvToRgb(hVal, sVal, bVal);
+                            const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                            const textColor = getContrastTextColor(hex);
+
+                            const swatch = document.createElement('div');
+                            swatch.className = 'swatch h-5 flex items-center justify-center font-mono text-[8px] font-bold select-none cursor-pointer';
+                            swatch.style.backgroundColor = hex;
+                            swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                            if (showOverlay) {
+                                swatch.innerText = hex;
+                                swatch.style.color = textColor;
+                            }
+                            colCell.appendChild(swatch);
+                        });
+
+                        matrixGrid.appendChild(colCell);
+                    });
+
+                    hueBlock.appendChild(matrixGrid);
+
+                    // Right Label: Brightness Levels Indicator
+                    const rightEl = document.createElement('div');
+                    rightEl.className = 'w-20 shrink-0 font-mono text-[10px] text-slate-500 text-right flex flex-col justify-between h-full py-0.5 font-bold';
+                    rightEl.innerHTML = bLevels.map(b => `<div>${b.toFixed(1)}</div>`).join('');
+                    hueBlock.appendChild(rightEl);
+
+                    gridWrapper.appendChild(hueBlock);
+                }
+
+                container.appendChild(gridWrapper);
+            } else {
+                // RGB GRID MODE (Red vs Green with Blue steps)
+                if (lblCount) lblCount.innerText = "Red Steps (Rows):";
+                if (lblInterval) lblInterval.innerText = "Green Steps (Interval):";
+
+                const numReds = Math.max(2, Math.round(countInput));
+                const gridWrapper = document.createElement('div');
+                gridWrapper.className = 'space-y-4';
+
+                // Header
+                const headerRow = document.createElement('div');
+                headerRow.className = 'flex items-center gap-2 border-b pb-2 mb-2 font-mono text-xs font-bold text-slate-500 min-w-[900px]';
+                headerRow.innerHTML = `<div class="w-16 shrink-0">Red</div>`;
+                
+                const stepsHeader = document.createElement('div');
+                stepsHeader.className = 'flex-grow grid gap-1 text-center';
+                stepsHeader.style.gridTemplateColumns = `repeat(${steps.length}, minmax(40px, 1fr))`;
+                steps.forEach(s => {
+                    const cell = document.createElement('div');
+                    cell.innerText = s.toFixed(1);
+                    stepsHeader.appendChild(cell);
+                });
+
+                headerRow.appendChild(stepsHeader);
+                headerRow.innerHTML += `<div class="w-20 shrink-0 text-right">Blue</div>`;
+                gridWrapper.appendChild(headerRow);
+
+                for (let rIdx = 0; rIdx < numReds; rIdx++) {
+                    const rVal = rIdx / (numReds - 1 || 1);
+                    
+                    const rowBlock = document.createElement('div');
+                    rowBlock.className = 'flex items-center gap-2 border-b border-slate-100 pb-2 min-w-[900px]';
+
+                    // Left Label: Red Value
+                    const labelEl = document.createElement('div');
+                    labelEl.className = 'w-16 shrink-0 font-mono text-xs font-extrabold text-slate-800';
+                    labelEl.innerText = rVal.toFixed(1);
+                    rowBlock.appendChild(labelEl);
+
+                    // Grid Columns: Green Steps
+                    const matrixGrid = document.createElement('div');
+                    matrixGrid.className = 'flex-grow grid gap-1';
+                    matrixGrid.style.gridTemplateColumns = `repeat(${steps.length}, minmax(40px, 1fr))`;
+
+                    // Generate Sub-Rows for Blue Levels e.g., 0.0 to 1.0
+                    const blueLevels = [];
+                    for (let b = 0; b < subRowsInput; b++) {
+                        const bVal = b / (Math.max(1, subRowsInput - 1));
+                        blueLevels.push(bVal);
+                    }
+
+                    steps.forEach(gVal => {
+                        const colCell = document.createElement('div');
+                        colCell.className = 'flex flex-col gap-0.5 rounded overflow-hidden shadow-sm';
+
+                        blueLevels.forEach(bVal => {
+                            const hex = rgbToHex(rVal * 255, gVal * 255, bVal * 255);
+                            const textColor = getContrastTextColor(hex);
+
+                            const swatch = document.createElement('div');
+                            swatch.className = 'swatch h-5 flex items-center justify-center font-mono text-[8px] font-bold select-none cursor-pointer';
+                            swatch.style.backgroundColor = hex;
+                            swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                            if (showOverlay) {
+                                swatch.innerText = hex;
+                                swatch.style.color = textColor;
+                            }
+                            colCell.appendChild(swatch);
+                        });
+
+                        matrixGrid.appendChild(colCell);
+                    });
+
+                    rowBlock.appendChild(matrixGrid);
+
+                    // Right Label: Blue Levels Indicator
+                    const rightEl = document.createElement('div');
+                    rightEl.className = 'w-20 shrink-0 font-mono text-[10px] text-slate-500 text-right flex flex-col justify-between h-full py-0.5 font-bold';
+                    rightEl.innerHTML = blueLevels.map(b => `<div>${b.toFixed(1)}</div>`).join('');
+                    rowBlock.appendChild(rightEl);
+
+                    gridWrapper.appendChild(rowBlock);
+                }
+
+                container.appendChild(gridWrapper);
+            }
+        }
+
         /* HELPER: RENDER A RECTANGULAR CMYK GRID CARD */
         function createCmykGridCard(title, description, swatches, cols = 5) {
             const sectionCard = document.createElement('div');
@@ -1974,7 +2250,7 @@
             return div;
         }
 
-        /* TAB 5: GRAPH ENGINE */
+        /* TAB 6: GRAPH ENGINE */
         function renderTab4() {
             const target = document.getElementById('pv-plot-target');
             const sidebar = document.getElementById('pv-y-axis-sidebar');
@@ -2277,7 +2553,7 @@
             const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_minimal.${fileExt}`;
 
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
             downloadAnchor.setAttribute("download", fileName);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
@@ -2483,6 +2759,7 @@
             renderPreSavedPalettes();
             updateTab2Controls();
             renderTab3();
+            renderHsRgbGrids();
             renderMixamCmykCharts();
             renderTab4();
         };
