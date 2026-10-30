@@ -661,18 +661,15 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-sky-500"></i> Hue/Saturation & RGB Step Grids
+                            <i class="fa-solid fa-layer-group text-sky-500"></i> Hue/Saturation & RGB Grids
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">
-                            Fully customizable stepped matrix charts. Adjust the number of hue/color blocks, step intervals, and range scaling.
-                        </p>
                     </div>
 
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-bold text-slate-600">Grid Mode:</label>
                         <select id="hs-rgb-mode" onchange="renderHsRgbGrids()" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-xl px-3 py-2 font-bold focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="hs" selected>Hue vs Saturation (HSB/HSV)</option>
-                            <option value="rgb">Red vs Green / Blue Steps (RGB)</option>
+                            <option value="hs" selected>HSV</option>
+                            <option value="rgb">RGB</option>
                         </select>
                     </div>
                 </div>
