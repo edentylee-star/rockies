@@ -710,7 +710,7 @@
 
         <!-- TAB 5: CMYK PRINT GUIDE & DYNAMIC STEP GRIDS -->
         <section id="tab-3d" class="tab-content hidden space-y-8">
-            <!-- CMYK CONTROL PANEL WITH STEP INTERVAL NUMERIC INPUTS -->
+            <!-- CMYK CONTROL PANEL WITH SPECIFIC % TEXT INPUTS -->
             <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 bg-white">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -721,23 +721,23 @@
                     </div>
                 </div>
 
-                <!-- DYNAMIC STEP INTERVAL INPUTS (1, 2, 3, 5, 10, 20 etc.) -->
+                <!-- FREE TEXT INPUTS FOR SPECIFIC PERCENTAGES (comma-separated) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
                     <div class="space-y-1">
-                        <label class="font-bold text-cyan-600 block">Cyan Step Interval (1/2/5/10):</label>
-                        <input type="text" id="cmyk-c-interval" value="20" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8] text-center" placeholder="e.g. 1, 2, 5, 10, 20">
+                        <label class="font-bold text-cyan-600 block">Cyan Steps (%s):</label>
+                        <input type="text" id="cmyk-c-steps" value="0, 20, 40, 60, 80, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 20, 40, 60, 80, 100">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-pink-600 block">Magenta Step Interval (1/2/5/10):</label>
-                        <input type="text" id="cmyk-m-interval" value="20" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8] text-center" placeholder="e.g. 1, 2, 5, 10, 20">
+                        <label class="font-bold text-pink-600 block">Magenta Steps (%s):</label>
+                        <input type="text" id="cmyk-m-steps" value="0, 20, 40, 60, 80, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 20, 40, 60, 80, 100">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-amber-500 block">Yellow Step Interval (1/2/5/10):</label>
-                        <input type="text" id="cmyk-y-interval" value="33.3" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8] text-center" placeholder="e.g. 1, 2, 5, 10, 25">
+                        <label class="font-bold text-amber-500 block">Yellow Steps (%s):</label>
+                        <input type="text" id="cmyk-y-steps" value="0, 33.3, 66.6, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 33.3, 66.6, 100">
                     </div>
                     <div class="space-y-1">
-                        <label class="font-bold text-slate-800 block">Black Step Interval (1/2/5/10):</label>
-                        <input type="text" id="cmyk-k-interval" value="100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8] text-center" placeholder="e.g. 10, 25, 50, 100">
+                        <label class="font-bold text-slate-800 block">Black Steps (%s):</label>
+                        <input type="text" id="cmyk-k-steps" value="0, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 100">
                     </div>
                 </div>
             </div>
@@ -967,19 +967,11 @@
             return { r, g, b };
         }
 
-        // HELPER TO GENERATE EQUALLY SPACED STEPS BASED ON A SINGLE NUMERIC INTERVAL (e.g. 10, 20, 25, 50)
-        function generateStepsFromInterval(strVal, defaultInterval = 20) {
-            let stepSize = parseFloat(strVal);
-            if (isNaN(stepSize) || stepSize <= 0) stepSize = defaultInterval;
-            
-            const steps = [];
-            for (let v = 0; v <= 100.0001; v += stepSize) {
-                steps.push(Math.round(v * 10) / 10);
-            }
-            if (steps[steps.length - 1] < 100 && (100 - steps[steps.length - 1]) > 0.01) {
-                steps.push(100);
-            }
-            return steps;
+        // HELPER TO PARSE COMMA-SEPARATED PERCENTAGES FROM FREE TEXT INPUTS
+        function parsePercentSteps(strVal, defaultArr = [0, 20, 40, 60, 80, 100]) {
+            if (!strVal || !strVal.trim()) return defaultArr;
+            const parts = strVal.split(',').map(p => parseFloat(p.trim())).filter(n => !isNaN(n));
+            return parts.length > 0 ? parts : defaultArr;
         }
 
         function lerpColorObj(c1, c2, t) {
@@ -1304,7 +1296,7 @@
             const fileName = `${safeTitle}_${res}x${res}.${fileExt}`;
 
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
             downloadAnchor.setAttribute("download", fileName);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
@@ -2111,16 +2103,16 @@
             return sectionCard;
         }
 
-        /* RENDER DYNAMIC STEPPED CMYK GRIDS EXCLUSIVELY */
+        /* RENDER DYNAMIC STEPPED CMYK GRIDS FROM FREE TEXT PERCENTAGE ARRAYS */
         function renderMixamCmykCharts() {
             const container = document.getElementById('cmyk-mixam-container');
             if (!container) return;
             container.innerHTML = '';
 
-            const cSteps = generateStepsFromInterval(document.getElementById('cmyk-c-interval').value, 20);
-            const mSteps = generateStepsFromInterval(document.getElementById('cmyk-m-interval').value, 20);
-            const ySteps = generateStepsFromInterval(document.getElementById('cmyk-y-interval').value, 33.3);
-            const kSteps = generateStepsFromInterval(document.getElementById('cmyk-k-interval').value, 100);
+            const cSteps = parsePercentSteps(document.getElementById('cmyk-c-steps').value, [0, 20, 40, 60, 80, 100]);
+            const mSteps = parsePercentSteps(document.getElementById('cmyk-m-steps').value, [0, 20, 40, 60, 80, 100]);
+            const ySteps = parsePercentSteps(document.getElementById('cmyk-y-steps').value, [0, 33.3, 66.6, 100]);
+            const kSteps = parsePercentSteps(document.getElementById('cmyk-k-steps').value, [0, 100]);
 
             kSteps.forEach(kVal => {
                 ySteps.forEach(yVal => {
@@ -2132,8 +2124,8 @@
                     });
 
                     const card = createCmykGridCard(
-                        `Dynamic Stepped Grid — Yellow (Y): ${Math.round(yVal)}% | Key (K): ${Math.round(kVal)}%`,
-                        `Custom stepped mixtures calculated directly from interval inputs (Cyan: ${document.getElementById('cmyk-c-interval').value}, Magenta: ${document.getElementById('cmyk-m-interval').value}).`,
+                        `Dynamic Stepped Grid — Yellow (Y): ${Math.round(yVal * 10) / 10}% | Key (K): ${Math.round(kVal * 10) / 10}%`,
+                        `Custom stepped mixtures calculated directly from percentage inputs.`,
                         dynamicSwatches,
                         mSteps.length
                     );
