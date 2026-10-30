@@ -1304,7 +1304,7 @@
             const fileName = `${safeTitle}_${res}x${res}.${fileExt}`;
 
             const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("href", cardCanvas.toDataURL(mimeType, 0.95));
             downloadAnchor.setAttribute("download", fileName);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
