@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rockies in a square - Complete CMYK Reference Chart</title>
+    <title>rockies in a square - Complete CMYK Reference & Dynamic Grids</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -708,16 +708,16 @@
             <div id="hs-rgb-target" class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm overflow-x-auto bg-white"></div>
         </section>
 
-        <!-- TAB 5: CMYK PRINT GUIDE & DYNAMIC STEP GRIDS -->
+        <!-- TAB 5: CMYK DYNAMIC STEP GRIDS & COMPLETE FGDC REFERENCE CHART -->
         <section id="tab-3d" class="tab-content space-y-8">
-            <!-- CMYK CONTROL PANEL WITH SPECIFIC % TEXT INPUTS -->
+            <!-- 1. DYNAMIC STEP GRIDS (TOP) -->
             <div class="glass-card rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 bg-white">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-print text-sky-500"></i> Standard FGDC CMYK Reference Chart
+                            <i class="fa-solid fa-sliders text-sky-500"></i> Dynamic CMYK Step Grids
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">Full 12-matrix CMYK reference chart matching standard FGDC/USGS digital cartographic color chart specifications (13%, 20%, 30%, 40%, 50%, 60%, 70%, 100% Cyan plates, plus two-color combinations and neutrals).</p>
+                        <p class="text-xs text-slate-500 mt-1">Generate custom rectangular grid matrices by entering specific comma-separated percentage steps for Cyan, Magenta, Yellow, and Key (Black).</p>
                     </div>
                 </div>
 
@@ -725,25 +725,40 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
                     <div class="space-y-1">
                         <label class="font-bold text-cyan-600 block">Cyan Steps (%s):</label>
-                        <input type="text" id="cmyk-c-steps" value="0, 13, 20, 30, 40, 50, 60, 70, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 13, 20, 30, 40, 50, 60, 70, 100">
+                        <input type="text" id="cmyk-c-steps" value="0, 20, 40, 60, 80, 100" oninput="renderDynamicCmykGrids()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 20, 40, 60, 80, 100">
                     </div>
                     <div class="space-y-1">
                         <label class="font-bold text-pink-600 block">Magenta Steps (%s):</label>
-                        <input type="text" id="cmyk-m-steps" value="0, 8, 13, 20, 30, 40, 50, 60, 70, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 8, 13, 20, 30, 40, 50, 60, 70, 100">
+                        <input type="text" id="cmyk-m-steps" value="0, 20, 40, 60, 80, 100" oninput="renderDynamicCmykGrids()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 20, 40, 60, 80, 100">
                     </div>
                     <div class="space-y-1">
                         <label class="font-bold text-amber-500 block">Yellow Steps (%s):</label>
-                        <input type="text" id="cmyk-y-steps" value="0, 8, 13, 20, 30, 40, 50, 60, 70, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 8, 13, 20, 30, 40, 50, 60, 70, 100">
+                        <input type="text" id="cmyk-y-steps" value="0, 33.3, 66.6, 100" oninput="renderDynamicCmykGrids()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 33.3, 66.6, 100">
                     </div>
                     <div class="space-y-1">
                         <label class="font-bold text-slate-800 block">Black Steps (%s):</label>
-                        <input type="text" id="cmyk-k-steps" value="0, 100" oninput="renderMixamCmykCharts()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 100">
+                        <input type="text" id="cmyk-k-steps" value="0, 100" oninput="renderDynamicCmykGrids()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]" placeholder="e.g. 0, 100">
                     </div>
                 </div>
             </div>
 
-            <!-- CMYK SECTIONS TARGET CONTAINER -->
-            <div id="cmyk-fgdc-full-container" class="space-y-8"></div>
+            <!-- DYNAMIC CMYK SECTIONS TARGET CONTAINER -->
+            <div id="cmyk-dynamic-container" class="space-y-8"></div>
+
+            <hr class="border-slate-200 my-8">
+
+            <!-- 2. FGDC REFERENCE COLOR CHART (BOTTOM) -->
+            <div class="space-y-4">
+                <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm bg-white">
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                        <i class="fa-solid fa-print text-sky-500"></i> Standard FGDC/USGS CMYK Reference Chart
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Complete 12-matrix standard cartographic reference chart matching official FGDC percentage breakdowns (13%, 20%, 30%, 40%, 50%, 60%, 70%, 100% Cyan plates, two-color overlays, and neutral bases).</p>
+                </div>
+
+                <!-- FGDC REFERENCE CMYK TARGET CONTAINER -->
+                <div id="cmyk-fgdc-full-container" class="space-y-8"></div>
+            </div>
         </section>
 
         <!-- TAB 6: PERCEIVED VALUE GRAPH -->
@@ -942,7 +957,7 @@
             if (tabId === 'tab2') { renderTab2Custom(); renderPreSavedPalettes(); }
             if (tabId === 'tab3') { updateTab2Controls(); renderTab3(); }
             if (tabId === 'tab-hs-rgb') { renderHsRgbGrids(); }
-            if (tabId === 'tab-3d') { renderMixamCmykCharts(); }
+            if (tabId === 'tab-3d') { renderDynamicCmykGrids(); renderFgdcReferenceChart(); }
             if (tabId === 'tab4') { renderTab4(); }
         }
 
@@ -1993,8 +2008,85 @@
             }
         }
 
-        /* RENDER COMPLETE FGDC 12-MATRIX CMYK REFERENCE CHART */
-        function renderMixamCmykCharts() {
+        /* HELPER: RENDER RECTANGULAR CMYK GRID CARD */
+        function createCmykGridCard(title, description, swatches, cols = 5) {
+            const sectionCard = document.createElement('div');
+            sectionCard.className = 'glass-card rounded-2xl p-5 border border-slate-200 shadow-sm bg-white space-y-4';
+
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'border-b border-slate-100 pb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+            cardHeader.innerHTML = `
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 font-mono">${title}</h3>
+                    ${description ? `<p class="text-xs text-slate-500">${description}</p>` : ''}
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-400 shrink-0">${swatches.length} Swatches</span>
+            `;
+            sectionCard.appendChild(cardHeader);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid gap-2 overflow-x-auto p-1';
+            grid.style.gridTemplateColumns = `repeat(${cols}, minmax(80px, 1fr))`;
+
+            swatches.forEach(s => {
+                const rgbObj = cmykToRgbObj(s.c, s.m, s.y, s.k);
+                const hex = rgbToHex(rgbObj.r, rgbObj.g, rgbObj.b);
+                const textColor = getContrastTextColor(hex);
+
+                const swatch = document.createElement('div');
+                swatch.className = 'swatch h-20 rounded-xl p-2 flex flex-col justify-between border border-black/10 font-mono select-none shadow-sm';
+                swatch.style.backgroundColor = hex;
+                swatch.onclick = () => { addToPalette(hex); copyToClipboard(hex); };
+
+                swatch.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-extrabold" style="color: ${textColor}">
+                        <span>${hex}</span>
+                        <span class="text-[8px] opacity-75">RGB: ${Math.round(rgbObj.r)},${Math.round(rgbObj.g)},${Math.round(rgbObj.b)}</span>
+                    </div>
+                    <div class="text-[9px] font-bold leading-tight" style="color: ${textColor}">
+                        C:${Math.round(s.c)} M:${Math.round(s.m)} Y:${Math.round(s.y)} K:${Math.round(s.k)}
+                    </div>
+                `;
+                grid.appendChild(swatch);
+            });
+
+            sectionCard.appendChild(grid);
+            return sectionCard;
+        }
+
+        /* 1. RENDER DYNAMIC STEPPED CMYK GRIDS (TOP) */
+        function renderDynamicCmykGrids() {
+            const container = document.getElementById('cmyk-dynamic-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const cSteps = parsePercentSteps(document.getElementById('cmyk-c-steps').value, [0, 20, 40, 60, 80, 100]);
+            const mSteps = parsePercentSteps(document.getElementById('cmyk-m-steps').value, [0, 20, 40, 60, 80, 100]);
+            const ySteps = parsePercentSteps(document.getElementById('cmyk-y-steps').value, [0, 33.3, 66.6, 100]);
+            const kSteps = parsePercentSteps(document.getElementById('cmyk-k-steps').value, [0, 100]);
+
+            kSteps.forEach(kVal => {
+                ySteps.forEach(yVal => {
+                    const dynamicSwatches = [];
+                    cSteps.forEach(cVal => {
+                        mSteps.forEach(mVal => {
+                            dynamicSwatches.push({ c: cVal, m: mVal, y: yVal, k: kVal });
+                        });
+                    });
+
+                    const card = createCmykGridCard(
+                        `Dynamic Stepped Grid — Yellow (Y): ${Math.round(yVal * 10) / 10}% | Key (K): ${Math.round(kVal * 10) / 10}%`,
+                        `Custom stepped mixtures calculated directly from inputs above.`,
+                        dynamicSwatches,
+                        mSteps.length
+                    );
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        /* 2. RENDER COMPLETE FGDC 12-MATRIX CMYK REFERENCE CHART (BOTTOM) */
+        function renderFgdcReferenceChart() {
             const container = document.getElementById('cmyk-fgdc-full-container');
             if (!container) return;
             container.innerHTML = '';
@@ -2449,139 +2541,4 @@
                 const hslS = hsl.s;
                 const hslL = hsl.l;
 
-                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
-
-                const textX = swatchX + swatchS + 20;
-
-                ctx.fillStyle = '#0F172A';
-                ctx.font = 'bold 22px "JetBrains Mono", monospace';
-                ctx.fillText(hex.toUpperCase(), textX, y + 46);
-
-                ctx.fillStyle = '#64748B';
-                ctx.font = '14px "JetBrains Mono", monospace';
-                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
-
-                ctx.fillStyle = '#94A3B8';
-                ctx.font = '13px "JetBrains Mono", monospace';
-                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
-            });
-
-            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
-            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
-            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
-
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
-            downloadAnchor.setAttribute("download", fileName);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-
-            showToast(`Downloaded Expanded Specification Card!`);
-        }
-
-        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + w - radius, y);
-            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
-            ctx.lineTo(x + w, y + h - radius);
-            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
-            ctx.lineTo(x + radius, y + h);
-            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            if (fill) ctx.fill();
-            if (stroke) ctx.stroke();
-        }
-
-        function handleDragStart(e) {
-            const index = parseInt(this.dataset.index);
-            if (isNaN(index) || index >= paletteColors.length) {
-                e.preventDefault();
-                return;
-            }
-            draggedIndex = index;
-            e.dataTransfer.effectAllowed = 'move';
-            this.classList.add('dragging');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            this.classList.add('drag-over');
-        }
-
-        function handleDragLeave(e) {
-            this.classList.remove('drag-over');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            this.classList.remove('drag-over');
-            const targetIndex = parseInt(this.dataset.index);
-            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
-                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
-                paletteColors.splice(targetIndex, 0, movedColor);
-                updatePaletteUI();
-            }
-        }
-
-        function handleDragEnd(e) {
-            document.querySelectorAll('.palette-slot').forEach(slot => {
-                slot.classList.remove('dragging', 'drag-over');
-            });
-            draggedIndex = null;
-        }
-
-        function updatePaletteUI() {
-            const counter = document.getElementById('palette-counter');
-            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length})`;
-
-            const container = document.getElementById('palette-slots-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            paletteColors.forEach((hex, i) => {
-                const slot = document.createElement('div');
-                slot.id = 'p-slot-' + i;
-                slot.dataset.index = i;
-                slot.style.backgroundColor = hex;
-                slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group shrink-0';
-                slot.setAttribute('draggable', 'true');
-
-                slot.addEventListener('dragstart', handleDragStart);
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('dragleave', handleDragLeave);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragend', handleDragEnd);
-
-                slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
-
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
-                removeBtn.innerHTML = '×';
-                removeBtn.title = 'Remove color';
-                removeBtn.onclick = (e) => removeFromPalette(i, e);
-                slot.appendChild(removeBtn);
-
-                slot.onclick = () => copyToClipboard(hex);
-                container.appendChild(slot);
-            });
-        }
-
-        window.onload = () => {
-            updatePaletteUI();
-            onModeChange();
-            renderTab2Custom();
-            renderPreSavedPalettes();
-            updateTab2Controls();
-            renderTab3();
-            renderHsRgbGrids();
-            renderMixamCmykCharts();
-            renderTab4();
-        };
-    </script>
-</body>
-</html>
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1
