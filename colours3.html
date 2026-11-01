@@ -342,7 +342,7 @@
                         <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel
                     </button>
                     <button id="tab-graph-btn" onclick="switchMainTab('graph')" class="view-tab-btn">
-                        <i class="fa-solid fa-diagram-project mr-1.5"></i> Color Opponency Graph & Intervals
+                        <i class="fa-solid fa-diagram-project mr-1.5"></i> CIE L*a*b* & Intervals
                     </button>
                 </div>
 
@@ -363,17 +363,23 @@
         <!-- TAB 2: COLOR OPPONENCY GRAPH & INTERVALS -->
         <div id="tab-graph-content" class="w-full max-w-5xl space-y-8 hidden">
             
-            <!-- Graph Visual Card -->
+            <!-- Graph Visual Card: Standardized CIE L*a*b* Space Plane -->
             <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md flex flex-col items-center">
-                <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-nodes text-sky-600"></i> Opponency & Color Space Geometry Diagram
-                </h2>
-                <p class="text-xs text-slate-500 mb-6 text-center max-w-xl">
-                    Interactive geometry showing chromatic opponency vectors, barycentric triad intersections, and projection planes.
-                </p>
+                <div class="w-full text-center mb-4">
+                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight font-serif">
+                        CIE L*a*b* color space
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Canon Lucia & CMYK Gamut Cornerstones Plane Projection
+                    </p>
+                </div>
 
-                <div class="w-full max-w-[850px] bg-slate-900/5 rounded-2xl p-4 border border-slate-200/80 flex justify-center">
-                    <svg id="opponency-graph-svg" viewBox="0 0 850 620" class="w-full h-auto select-none"></svg>
+                <div class="w-full max-w-[720px] bg-white rounded-2xl p-2 sm:p-4 border border-slate-200 flex justify-center shadow-inner">
+                    <svg id="opponency-graph-svg" viewBox="0 0 800 800" class="w-full h-auto select-none"></svg>
+                </div>
+
+                <div class="w-full flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 italic mt-4 pt-3 border-t border-slate-100">
+                    <span>The six corner stones of the cmyk color space: Cyan, magenta, yellow, red, green and blue.</span>
                 </div>
             </div>
 
@@ -519,7 +525,7 @@
                 graphContent.classList.remove('hidden');
                 wheelContent.classList.add('hidden');
                 
-                renderOpponencyGraph();
+                renderCieLabGraph();
                 renderIntervalRows();
             }
         }
@@ -643,121 +649,136 @@
             svg.innerHTML = html;
         }
 
-        /* OPPONENCY GRAPH GRAPHIC RENDERER */
-        function renderOpponencyGraph() {
+        /* STANDARDIZED CIE L*a*b* COLOR SPACE PLANE RENDERER */
+        function renderCieLabGraph() {
             const svg = document.getElementById('opponency-graph-svg');
             if (!svg) return;
 
-            let html = '';
+            const cx = 400, cy = 400;
+            const rCircle = 340;
+            const scale = 3.2; // 100 units = 320px
 
-            // Vector helper
-            const circleNode = (cx, cy, r, fill, label, sublabel, tx, ty) => {
-                let s = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="#334155" stroke-width="1.5" />`;
-                if (label) {
-                    s += `<text x="${tx || cx}" y="${ty || cy}" text-anchor="middle" dominant-baseline="central" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#0f172a">${label}</text>`;
-                }
-                if (sublabel) {
-                    s += `<text x="${tx || cx}" y="${(ty || cy) + 16}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono, monospace" font-style="italic" font-weight="600" font-size="11" fill="#475569">${sublabel}</text>`;
-                }
-                return s;
-            };
+            let html = `
+            <defs>
+                <!-- Chromatic Circle Smooth Conic Gradient Emulation via SVG Radial Mesh -->
+                <radialGradient id="lab-bg-gradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#ffffff" />
+                    <stop offset="70%" stop-color="#f1f5f9" stop-opacity="0.2" />
+                    <stop offset="100%" stop-color="#e2e8f0" stop-opacity="0.8" />
+                </radialGradient>
+            </defs>`;
 
-            // Top Left Circle Diagram (Triangle Y-C-M and K center)
-            const c1 = { x: 200, y: 170, r: 120 };
-            html += `<circle cx="${c1.x}" cy="${c1.y}" r="${c1.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
+            // Outer Colorful Ring / Disc Base
+            html += `<circle cx="${cx}" cy="${cy}" r="${rCircle}" fill="url(#lab-bg-gradient)" stroke="#0f172a" stroke-width="1.5" />`;
+
+            // Draw smooth background gradient slices representing the CIE L*a*b* hue wheel plane
+            const totalSlices = 120;
+            for (let i = 0; i < totalSlices; i++) {
+                const a1 = (i * 360 / totalSlices) * Math.PI / 180;
+                const a2 = ((i + 1) * 360 / totalSlices) * Math.PI / 180;
+
+                const x1 = cx + rCircle * Math.cos(a1);
+                const y1 = cy - rCircle * Math.sin(a1);
+                const x2 = cx + rCircle * Math.cos(a2);
+                const y2 = cy - rCircle * Math.sin(a2);
+
+                // Convert angle to RGB color for standard CIE L*a*b* plane perimeter
+                const deg = i * 360 / totalSlices;
+                let color = `hsl(${deg}, 85%, 52%)`;
+
+                html += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${rCircle} ${rCircle} 0 0 0 ${x2} ${y2} Z" fill="${color}" opacity="0.85" />`;
+            }
+
+            // Center White overlay disc for clarity
+            html += `<circle cx="${cx}" cy="${cy}" r="${rCircle - 8}" fill="none" stroke="#ffffff" stroke-width="2" />`;
+
+            // Axes: Horizontal (a*) and Vertical (b*)
+            html += `<line x1="40" y1="${cy}" x2="760" y2="${cy}" stroke="#0f172a" stroke-width="1.5" />`;
+            html += `<line x1="${cx}" y1="40" x2="${cx}" y2="760" stroke="#0f172a" stroke-width="1.5" />`;
+
+            // Axis Ticks and Numeric Labels (-90 to +90)
+            const tickVals = [-90, -80, -70, -60, -50, -40, -30, -20, -10, 10, 20, 30, 40, 50, 60, 70, 80, 90];
             
-            // Triangle Vertices (Y, C, M)
-            const Y1 = { x: c1.x, y: c1.y - c1.r };
-            const C1 = { x: c1.x - c1.r * 0.866, y: c1.y + c1.r * 0.5 };
-            const M1 = { x: c1.x + c1.r * 0.866, y: c1.y + c1.r * 0.5 };
+            tickVals.forEach(v => {
+                // a* axis (Horizontal)
+                const tx = cx + v * scale;
+                html += `<line x1="${tx}" y1="${cy - 4}" x2="${tx}" y2="${cy + 4}" stroke="#0f172a" stroke-width="1.2" />`;
+                html += `<text x="${tx}" y="${cy + 15}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">${v}</text>`;
 
-            html += `<polygon points="${Y1.x},${Y1.y} ${C1.x},${C1.y} ${M1.x},${M1.y}" fill="none" stroke="#334155" stroke-width="1.5" />`;
+                // b* axis (Vertical, flipped Y coordinates)
+                const ty = cy - v * scale;
+                html += `<line x1="${cx - 4}" y1="${ty}" x2="${cx + 4}" y2="${ty}" stroke="#0f172a" stroke-width="1.2" />`;
+                html += `<text x="${cx - 14}" y="${ty + 3}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0f172a" text-anchor="end">${v}</text>`;
+            });
 
-            // Axis line passing through K
-            const ym_point = { x: (Y1.x + M1.x)/2 + 20, y: (Y1.y + M1.y)/2 };
-            const opp_point = { x: c1.x - c1.r * 0.7, y: c1.y + c1.r * 0.7 };
-            html += `<line x1="${c1.x - 70}" y1="${c1.y + 70}" x2="${c1.x + 95}" y2="${c1.y - 65}" stroke="#818cf8" stroke-width="1.5" />`;
+            // Axis End Titles
+            html += `<text x="778" y="${cy + 4}" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="start">a*</text>`;
+            html += `<text x="22" y="${cy + 4}" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="end">-a*</text>`;
+            html += `<text x="${cx}" y="24" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">b*</text>`;
+            html += `<text x="${cx}" y="785" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">-b*</text>`;
 
-            // Nodes for Diagram 1
-            html += circleNode(Y1.x, Y1.y, 11, '#ffeb3b', 'Y');
-            html += circleNode(C1.x, C1.y, 11, '#00e5ff', 'C');
-            html += circleNode(M1.x, M1.y, 11, '#e91e63', 'M');
-            html += circleNode(c1.x, c1.y, 12, '#475569', 'K', null, c1.x + 18, c1.y);
+            // Key CMYK/Canon Lucia Color Points Data
+            const labPoints = [
+                { name: "Yellow", l: 89, a: -5, b: 93, color: "#FFE600", textColor: "#0f172a", align: "left", offsetX: 18, offsetY: -10 },
+                { name: "Red", l: 47, a: 68, b: 48, color: "#E30022", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0 },
+                { name: "Magenta", l: 48, a: 74, b: -3, color: "#E91E63", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 18 },
+                { name: "Canon Lucia Blue", l: 35, a: 27, b: -43, color: "#4d53b7", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0, isCanon: true },
+                { name: "Blue", l: 24, a: 17, b: -46, color: "#1a237e", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+                { name: "Canon Cyan", l: 43, a: -19, b: -53, color: "#0083c9", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: -15, isCanon: true },
+                { name: "Cyan", l: 55, a: -37, b: -50, color: "#00a3e0", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+                { name: "Green", l: 50, a: -68, b: 25, color: "#009e60", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 0 }
+            ];
 
-            // Intersections and opp dots
-            html += `<circle cx="${c1.x + 52}" cy="${c1.y - 36}" r="4" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
-            html += `<text x="${c1.x + 72}" y="${c1.y - 36}" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#0f172a">y,m</text>`;
+            // Helper to map (a*, b*) to SVG Canvas coordinates
+            const getLabPos = (a, b) => ({
+                x: cx + a * scale,
+                y: cy - b * scale
+            });
 
-            html += `<circle cx="${c1.x - 42}" cy="${c1.y + 42}" r="4" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
-            html += `<text x="${c1.x - 30}" y="${c1.y + 58}" font-family="JetBrains Mono, monospace" font-size="14" font-weight="800" fill="#0f172a">?</text>`;
+            // Draw Gamut Polygon Outline connecting main cornerstones: Yellow -> Red -> Magenta -> Blue -> Cyan -> Green -> Yellow
+            const polygonOrder = ["Yellow", "Red", "Magenta", "Blue", "Cyan", "Green"];
+            const polyPoints = polygonOrder.map(pName => {
+                const pt = labPoints.find(p => p.name === pName);
+                const pos = getLabPos(pt.a, pt.b);
+                return `${pos.x},${pos.y}`;
+            }).join(" ");
 
-            html += circleNode(c1.x + 90, c1.y - 62, 9, '#ff9800');
-            html += circleNode(c1.x - 65, c1.y + 65, 9, '#00b0ff');
+            html += `<polygon points="${polyPoints}" fill="none" stroke="#ffffff" stroke-width="3.5" opacity="0.9" />`;
+            html += `<polygon points="${polyPoints}" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="6,4" />`;
 
+            // Draw Connection line between Cyan & Canon Cyan, Blue & Canon Lucia Blue
+            const bluePt = getLabPos(17, -46);
+            const luciaBluePt = getLabPos(27, -43);
+            const cyanPt = getLabPos(-37, -50);
+            const canonCyanPt = getLabPos(-19, -53);
 
-            // Top Right Circle Diagram (Opponency Axes y,o <-> v,c)
-            const c2 = { x: 600, y: 170, r: 120 };
-            html += `<circle cx="${c2.x}" cy="${c2.y}" r="${c2.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
+            html += `<line x1="${bluePt.x}" y1="${bluePt.y}" x2="${luciaBluePt.x}" y2="${luciaBluePt.y}" stroke="#ffffff" stroke-width="2.5" />`;
+            html += `<line x1="${cyanPt.x}" y1="${cyanPt.y}" x2="${canonCyanPt.x}" y2="${canonCyanPt.y}" stroke="#ffffff" stroke-width="2.5" />`;
 
-            // Opponency Axis line
-            html += `<line x1="${c2.x - c2.r * 0.7}" y1="${c2.y + c2.r * 0.7}" x2="${c2.x + c2.r * 0.8}" y2="${c2.y - c2.r * 0.8}" stroke="#818cf8" stroke-width="1.5" />`;
+            // Render Nodes and Text Overlays
+            labPoints.forEach(p => {
+                const pos = getLabPos(p.a, p.b);
+                const rNode = p.isCanon ? 14 : 16;
 
-            html += circleNode(c2.x, c2.y - c2.r, 11, '#ffeb3b', 'Y');
-            html += circleNode(c2.x - c2.r * 0.866, c2.y - c2.r * 0.1, 11, '#00e676', 'G');
-            html += circleNode(c2.x - c2.r * 0.866, c2.y + c2.r * 0.5, 11, '#00e5ff', 'C');
-            html += circleNode(c2.x + c2.r * 0.866, c2.y + c2.r * 0.5, 11, '#e91e63', 'M');
-            html += circleNode(c2.x + c2.r * 0.2, c2.y + c2.r * 0.98, 11, '#651fff', 'V');
-            html += circleNode(c2.x, c2.y, 12, '#475569', 'K', null, c2.x + 18, c2.y);
+                // Node Circle
+                html += `<circle cx="${pos.x}" cy="${pos.y}" r="${rNode + 2}" fill="#ffffff" />`;
+                html += `<circle cx="${pos.x}" cy="${pos.y}" r="${rNode}" fill="${p.color}" stroke="#0f172a" stroke-width="1.5" />`;
 
-            // Orange & Cyan opponency points
-            html += circleNode(c2.x + c2.r * 0.82, c2.y - c2.r * 0.82, 9, '#ff9800', null, null);
-            html += `<text x="${c2.x + c2.r * 0.82 + 18}" y="${c2.y - c2.r * 0.82 - 2}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">y,o</text>`;
+                // Text Annotation Box
+                const textX = pos.x + p.offsetX;
+                const textY = pos.y + p.offsetY;
+                const textAnchor = p.align === "right" ? "end" : "start";
 
-            html += circleNode(c2.x + c2.r * 0.96, c2.y - c2.r * 0.4, 9, '#ff5722', 'O');
-
-            html += circleNode(c2.x - c2.r * 0.7, c2.y + c2.r * 0.7, 9, '#00b0ff');
-            html += `<text x="${c2.x - c2.r * 0.7 - 50}" y="${c2.y + c2.r * 0.7 + 22}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">-y,-o = v,c</text>`;
-
-
-            // Bottom Center Diagram (Cartesian Opponency Coordinates)
-            const c3 = { x: 425, y: 460, r: 135 };
-            html += `<circle cx="${c3.x}" cy="${c3.y}" r="${c3.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
-
-            // Axes
-            html += `<line x1="${c3.x}" y1="${c3.y - c3.r - 10}" x2="${c3.x}" y2="${c3.y + c3.r + 10}" stroke="#334155" stroke-width="2" />`;
-            html += `<line x1="${c3.x - c3.r - 10}" y1="${c3.y}" x2="${c3.x + c3.r + 10}" y2="${c3.y}" stroke="#334155" stroke-width="2" />`;
-
-            // Projection Lines
-            const pt1 = { x: c3.x + c3.r * 0.7, y: c3.y - c3.r * 0.7 };
-            const pt2 = { x: c3.x - c3.r * 0.45, y: c3.y + c3.r * 0.88 };
-
-            html += `<line x1="${c3.x}" y1="${c3.y}" x2="${pt1.x}" y2="${pt1.y}" stroke="#818cf8" stroke-width="1.2" />`;
-            html += `<line x1="${pt1.x}" y1="${pt1.y}" x2="${c3.x}" y2="${pt1.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
-            html += `<line x1="${pt1.x}" y1="${pt1.y}" x2="${pt1.x}" y2="${c3.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
-
-            html += `<line x1="${c3.x}" y1="${c3.y}" x2="${pt2.x}" y2="${pt2.y}" stroke="#818cf8" stroke-width="1.2" />`;
-            html += `<line x1="${pt2.x}" y1="${pt2.y}" x2="${c3.x}" y2="${pt2.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
-            html += `<line x1="${pt2.x}" y1="${pt2.y}" x2="${pt2.x}" y2="${c3.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
-
-            // Nodes
-            html += circleNode(c3.x, c3.y - c3.r, 11, '#ffeb3b', 'Y');
-            html += circleNode(c3.x + c3.r, c3.y, 11, '#e91e63', 'R');
-            html += circleNode(c3.x, c3.y + c3.r, 11, '#651fff', 'V');
-            html += circleNode(c3.x - c3.r, c3.y, 11, '#00e676', 'G');
-            html += circleNode(c3.x, c3.y, 12, '#475569', 'K');
-
-            // Projection Axis ticks
-            html += `<circle cx="${c3.x}" cy="${pt1.y}" r="3.5" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
-            html += `<text x="${c3.x - 18}" y="${pt1.y}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="800" fill="#0f172a">q_y</text>`;
-
-            html += `<circle cx="${pt1.x}" cy="${c3.y}" r="3.5" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
-            html += `<text x="${pt1.x}" y="${c3.y + 16}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="800" fill="#0f172a">q_r</text>`;
-
-            html += circleNode(pt1.x, pt1.y, 9, '#ff9800');
-            html += `<text x="${pt1.x + 16}" y="${pt1.y - 2}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">y,r</text>`;
-
-            html += circleNode(pt2.x, pt2.y, 9, '#00b0ff');
-            html += `<text x="${pt2.x - 85}" y="${pt2.y + 16}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">-y,-r = v,g</text>`;
+                if (p.isCanon) {
+                    html += `<text x="${textX}" y="${textY}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">${p.name}</text>`;
+                    html += `<text x="${textX}" y="${textY + 15}" font-family="Serif, Times New Roman" font-size="12" fill="#ffffff" text-anchor="${textAnchor}">(${p.l}, ${p.a}, ${p.b})</text>`;
+                } else {
+                    html += `<text x="${textX}" y="${textY - 24}" font-family="Serif, Times New Roman" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">${p.name}</text>`;
+                    html += `<text x="${textX}" y="${textY - 8}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">L* &nbsp;${p.l}</text>`;
+                    html += `<text x="${textX}" y="${textY + 7}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">a* &nbsp;${p.a}</text>`;
+                    html += `<text x="${textX}" y="${textY + 22}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">b* &nbsp;${p.b}</text>`;
+                }
+            });
 
             svg.innerHTML = html;
         }
