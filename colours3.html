@@ -243,6 +243,40 @@
             font-weight: 700;
         }
 
+        /* TAB NAVIGATION STYLES */
+        .view-tab-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 12px;
+            color: #475569;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .view-tab-btn:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
+        .view-tab-btn.active {
+            background-color: #B4E3F8;
+            color: #0369a1;
+            border-color: #22ACEC;
+            font-weight: 700;
+        }
+
+        /* INTERSECTION SWATCH HOVER */
+        .interval-swatch {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .interval-swatch:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to { opacity: 1; transform: translateY(0); }
@@ -302,16 +336,66 @@
                     </div>
                 </div>
 
+                <!-- Tab Switcher -->
+                <div class="flex items-center gap-2">
+                    <button id="tab-wheel-btn" onclick="switchMainTab('wheel')" class="view-tab-btn active">
+                        <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel
+                    </button>
+                    <button id="tab-graph-btn" onclick="switchMainTab('graph')" class="view-tab-btn">
+                        <i class="fa-solid fa-diagram-project mr-1.5"></i> Color Opponency Graph & Intervals
+                    </button>
+                </div>
+
             </div>
         </div>
     </header>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="max-w-11xl mx-auto px-8 sm:px-10 lg:px-12 py-10 flex-grow w-full space-y-10 flex flex-col items-center">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6 flex flex-col items-center">
 
-        <!-- HUE WHEEL CONTAINER -->
-        <div class="relative w-full max-w-[640px] aspect-square flex items-center justify-center my-2 p-3 glass-card rounded-3xl border border-slate-200 shadow-md">
-            <svg id="hue-wheel-svg" class="w-full h-full overflow-visible select-none" viewBox="0 0 500 500"></svg>
+        <!-- TAB 1: HUE WHEEL CONTAINER -->
+        <div id="tab-wheel-content" class="w-full flex justify-center">
+            <div class="relative w-full max-w-[640px] aspect-square flex items-center justify-center my-2 p-3 glass-card rounded-3xl border border-slate-200 shadow-md">
+                <svg id="hue-wheel-svg" class="w-full h-full overflow-visible select-none" viewBox="0 0 500 500"></svg>
+            </div>
+        </div>
+
+        <!-- TAB 2: COLOR OPPONENCY GRAPH & INTERVALS -->
+        <div id="tab-graph-content" class="w-full max-w-5xl space-y-8 hidden">
+            
+            <!-- Graph Visual Card -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md flex flex-col items-center">
+                <h2 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-nodes text-sky-600"></i> Opponency & Color Space Geometry Diagram
+                </h2>
+                <p class="text-xs text-slate-500 mb-6 text-center max-w-xl">
+                    Interactive geometry showing chromatic opponency vectors, barycentric triad intersections, and projection planes.
+                </p>
+
+                <div class="w-full max-w-[850px] bg-slate-900/5 rounded-2xl p-4 border border-slate-200/80 flex justify-center">
+                    <svg id="opponency-graph-svg" viewBox="0 0 850 620" class="w-full h-auto select-none"></svg>
+                </div>
+            </div>
+
+            <!-- Interval Rows Splitter Card -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Color Spectrum Interval Generator</h3>
+                        <p class="text-xs text-slate-500">Divide key hue steps into custom equal interval interpolations.</p>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-sky-50 p-2.5 rounded-2xl border border-sky-200">
+                        <label for="interval-steps-input" class="text-xs font-bold text-sky-900 whitespace-nowrap">Intervals per Transition:</label>
+                        <input id="interval-steps-input" type="number" min="1" max="24" value="5" oninput="renderIntervalRows()" class="w-16 px-2.5 py-1 text-center font-mono font-bold text-sm bg-white border border-sky-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 shadow-sm">
+                    </div>
+                </div>
+
+                <div id="interval-rows-container" class="space-y-4">
+                    <!-- Dynamic Interval Rows Injected Here -->
+                </div>
+            </div>
+
         </div>
 
     </main>
@@ -417,6 +501,29 @@
 
     <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script>
+        /* TAB SWITCHING LOGIC */
+        function switchMainTab(tab) {
+            const wheelBtn = document.getElementById('tab-wheel-btn');
+            const graphBtn = document.getElementById('tab-graph-btn');
+            const wheelContent = document.getElementById('tab-wheel-content');
+            const graphContent = document.getElementById('tab-graph-content');
+
+            if (tab === 'wheel') {
+                wheelBtn.classList.add('active');
+                graphBtn.classList.remove('active');
+                wheelContent.classList.remove('hidden');
+                graphContent.classList.add('hidden');
+            } else {
+                graphBtn.classList.add('active');
+                wheelBtn.classList.remove('active');
+                graphContent.classList.remove('hidden');
+                wheelContent.classList.add('hidden');
+                
+                renderOpponencyGraph();
+                renderIntervalRows();
+            }
+        }
+
         /* DROPDOWN NAVIGATION LOGIC */
         function toggleNavDropdown(event) {
             event.stopPropagation();
@@ -534,6 +641,188 @@
             html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Click me ;)</text>`;
 
             svg.innerHTML = html;
+        }
+
+        /* OPPONENCY GRAPH GRAPHIC RENDERER */
+        function renderOpponencyGraph() {
+            const svg = document.getElementById('opponency-graph-svg');
+            if (!svg) return;
+
+            let html = '';
+
+            // Vector helper
+            const circleNode = (cx, cy, r, fill, label, sublabel, tx, ty) => {
+                let s = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="#334155" stroke-width="1.5" />`;
+                if (label) {
+                    s += `<text x="${tx || cx}" y="${ty || cy}" text-anchor="middle" dominant-baseline="central" font-family="Inter, sans-serif" font-weight="800" font-size="13" fill="#0f172a">${label}</text>`;
+                }
+                if (sublabel) {
+                    s += `<text x="${tx || cx}" y="${(ty || cy) + 16}" text-anchor="middle" dominant-baseline="central" font-family="JetBrains Mono, monospace" font-style="italic" font-weight="600" font-size="11" fill="#475569">${sublabel}</text>`;
+                }
+                return s;
+            };
+
+            // Top Left Circle Diagram (Triangle Y-C-M and K center)
+            const c1 = { x: 200, y: 170, r: 120 };
+            html += `<circle cx="${c1.x}" cy="${c1.y}" r="${c1.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
+            
+            // Triangle Vertices (Y, C, M)
+            const Y1 = { x: c1.x, y: c1.y - c1.r };
+            const C1 = { x: c1.x - c1.r * 0.866, y: c1.y + c1.r * 0.5 };
+            const M1 = { x: c1.x + c1.r * 0.866, y: c1.y + c1.r * 0.5 };
+
+            html += `<polygon points="${Y1.x},${Y1.y} ${C1.x},${C1.y} ${M1.x},${M1.y}" fill="none" stroke="#334155" stroke-width="1.5" />`;
+
+            // Axis line passing through K
+            const ym_point = { x: (Y1.x + M1.x)/2 + 20, y: (Y1.y + M1.y)/2 };
+            const opp_point = { x: c1.x - c1.r * 0.7, y: c1.y + c1.r * 0.7 };
+            html += `<line x1="${c1.x - 70}" y1="${c1.y + 70}" x2="${c1.x + 95}" y2="${c1.y - 65}" stroke="#818cf8" stroke-width="1.5" />`;
+
+            // Nodes for Diagram 1
+            html += circleNode(Y1.x, Y1.y, 11, '#ffeb3b', 'Y');
+            html += circleNode(C1.x, C1.y, 11, '#00e5ff', 'C');
+            html += circleNode(M1.x, M1.y, 11, '#e91e63', 'M');
+            html += circleNode(c1.x, c1.y, 12, '#475569', 'K', null, c1.x + 18, c1.y);
+
+            // Intersections and opp dots
+            html += `<circle cx="${c1.x + 52}" cy="${c1.y - 36}" r="4" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
+            html += `<text x="${c1.x + 72}" y="${c1.y - 36}" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#0f172a">y,m</text>`;
+
+            html += `<circle cx="${c1.x - 42}" cy="${c1.y + 42}" r="4" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
+            html += `<text x="${c1.x - 30}" y="${c1.y + 58}" font-family="JetBrains Mono, monospace" font-size="14" font-weight="800" fill="#0f172a">?</text>`;
+
+            html += circleNode(c1.x + 90, c1.y - 62, 9, '#ff9800');
+            html += circleNode(c1.x - 65, c1.y + 65, 9, '#00b0ff');
+
+
+            // Top Right Circle Diagram (Opponency Axes y,o <-> v,c)
+            const c2 = { x: 600, y: 170, r: 120 };
+            html += `<circle cx="${c2.x}" cy="${c2.y}" r="${c2.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
+
+            // Opponency Axis line
+            html += `<line x1="${c2.x - c2.r * 0.7}" y1="${c2.y + c2.r * 0.7}" x2="${c2.x + c2.r * 0.8}" y2="${c2.y - c2.r * 0.8}" stroke="#818cf8" stroke-width="1.5" />`;
+
+            html += circleNode(c2.x, c2.y - c2.r, 11, '#ffeb3b', 'Y');
+            html += circleNode(c2.x - c2.r * 0.866, c2.y - c2.r * 0.1, 11, '#00e676', 'G');
+            html += circleNode(c2.x - c2.r * 0.866, c2.y + c2.r * 0.5, 11, '#00e5ff', 'C');
+            html += circleNode(c2.x + c2.r * 0.866, c2.y + c2.r * 0.5, 11, '#e91e63', 'M');
+            html += circleNode(c2.x + c2.r * 0.2, c2.y + c2.r * 0.98, 11, '#651fff', 'V');
+            html += circleNode(c2.x, c2.y, 12, '#475569', 'K', null, c2.x + 18, c2.y);
+
+            // Orange & Cyan opponency points
+            html += circleNode(c2.x + c2.r * 0.82, c2.y - c2.r * 0.82, 9, '#ff9800', null, null);
+            html += `<text x="${c2.x + c2.r * 0.82 + 18}" y="${c2.y - c2.r * 0.82 - 2}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">y,o</text>`;
+
+            html += circleNode(c2.x + c2.r * 0.96, c2.y - c2.r * 0.4, 9, '#ff5722', 'O');
+
+            html += circleNode(c2.x - c2.r * 0.7, c2.y + c2.r * 0.7, 9, '#00b0ff');
+            html += `<text x="${c2.x - c2.r * 0.7 - 50}" y="${c2.y + c2.r * 0.7 + 22}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">-y,-o = v,c</text>`;
+
+
+            // Bottom Center Diagram (Cartesian Opponency Coordinates)
+            const c3 = { x: 425, y: 460, r: 135 };
+            html += `<circle cx="${c3.x}" cy="${c3.y}" r="${c3.r}" fill="none" stroke="#38bdf8" stroke-width="1.5" />`;
+
+            // Axes
+            html += `<line x1="${c3.x}" y1="${c3.y - c3.r - 10}" x2="${c3.x}" y2="${c3.y + c3.r + 10}" stroke="#334155" stroke-width="2" />`;
+            html += `<line x1="${c3.x - c3.r - 10}" y1="${c3.y}" x2="${c3.x + c3.r + 10}" y2="${c3.y}" stroke="#334155" stroke-width="2" />`;
+
+            // Projection Lines
+            const pt1 = { x: c3.x + c3.r * 0.7, y: c3.y - c3.r * 0.7 };
+            const pt2 = { x: c3.x - c3.r * 0.45, y: c3.y + c3.r * 0.88 };
+
+            html += `<line x1="${c3.x}" y1="${c3.y}" x2="${pt1.x}" y2="${pt1.y}" stroke="#818cf8" stroke-width="1.2" />`;
+            html += `<line x1="${pt1.x}" y1="${pt1.y}" x2="${c3.x}" y2="${pt1.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
+            html += `<line x1="${pt1.x}" y1="${pt1.y}" x2="${pt1.x}" y2="${c3.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
+
+            html += `<line x1="${c3.x}" y1="${c3.y}" x2="${pt2.x}" y2="${pt2.y}" stroke="#818cf8" stroke-width="1.2" />`;
+            html += `<line x1="${pt2.x}" y1="${pt2.y}" x2="${c3.x}" y2="${pt2.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
+            html += `<line x1="${pt2.x}" y1="${pt2.y}" x2="${pt2.x}" y2="${c3.y}" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />`;
+
+            // Nodes
+            html += circleNode(c3.x, c3.y - c3.r, 11, '#ffeb3b', 'Y');
+            html += circleNode(c3.x + c3.r, c3.y, 11, '#e91e63', 'R');
+            html += circleNode(c3.x, c3.y + c3.r, 11, '#651fff', 'V');
+            html += circleNode(c3.x - c3.r, c3.y, 11, '#00e676', 'G');
+            html += circleNode(c3.x, c3.y, 12, '#475569', 'K');
+
+            // Projection Axis ticks
+            html += `<circle cx="${c3.x}" cy="${pt1.y}" r="3.5" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
+            html += `<text x="${c3.x - 18}" y="${pt1.y}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="800" fill="#0f172a">q_y</text>`;
+
+            html += `<circle cx="${pt1.x}" cy="${c3.y}" r="3.5" fill="#ffffff" stroke="#334155" stroke-width="1.5" />`;
+            html += `<text x="${pt1.x}" y="${c3.y + 16}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="800" fill="#0f172a">q_r</text>`;
+
+            html += circleNode(pt1.x, pt1.y, 9, '#ff9800');
+            html += `<text x="${pt1.x + 16}" y="${pt1.y - 2}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">y,r</text>`;
+
+            html += circleNode(pt2.x, pt2.y, 9, '#00b0ff');
+            html += `<text x="${pt2.x - 85}" y="${pt2.y + 16}" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#0f172a">-y,-r = v,g</text>`;
+
+            svg.innerHTML = html;
+        }
+
+        /* INTERVAL ROWS SPLITTER GENERATOR */
+        const SPECTRUM_NODES = [
+            { name: "Cyan", rgb: [0, 229, 255] },
+            { name: "Green", rgb: [0, 230, 118] },
+            { name: "Yellow", rgb: [255, 235, 59] },
+            { name: "Orange", rgb: [255, 152, 0] },
+            { name: "Red", rgb: [227, 0, 34] },
+            { name: "Magenta", rgb: [233, 30, 99] },
+            { name: "Blue", rgb: [0, 135, 202] }
+        ];
+
+        function renderIntervalRows() {
+            const container = document.getElementById('interval-rows-container');
+            const input = document.getElementById('interval-steps-input');
+            if (!container || !input) return;
+
+            let numIntervals = parseInt(input.value) || 1;
+            if (numIntervals < 1) numIntervals = 1;
+            if (numIntervals > 30) numIntervals = 30;
+
+            let html = '';
+
+            for (let i = 0; i < SPECTRUM_NODES.length - 1; i++) {
+                const startNode = SPECTRUM_NODES[i];
+                const endNode = SPECTRUM_NODES[i + 1];
+
+                html += `<div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-3">
+                            <div class="flex items-center justify-between text-xs font-bold text-slate-700">
+                                <span class="flex items-center gap-2">
+                                    <span class="w-3 h-3 rounded-full border border-black/10" style="background-color: rgb(${startNode.rgb.join(',')})"></span>
+                                    ${startNode.name}
+                                </span>
+                                <i class="fa-solid fa-arrow-right text-slate-400"></i>
+                                <span class="flex items-center gap-2">
+                                    ${endNode.name}
+                                    <span class="w-3 h-3 rounded-full border border-black/10" style="background-color: rgb(${endNode.rgb.join(',')})"></span>
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 overflow-x-auto py-1">`;
+
+                for (let step = 0; step <= numIntervals; step++) {
+                    const t = step / numIntervals;
+                    const r = Math.round(startNode.rgb[0] * (1 - t) + endNode.rgb[0] * t);
+                    const g = Math.round(startNode.rgb[1] * (1 - t) + endNode.rgb[1] * t);
+                    const b = Math.round(startNode.rgb[2] * (1 - t) + endNode.rgb[2] * t);
+                    const hex = rgbToHex(r, g, b);
+                    const textColor = getContrastTextColor(hex);
+
+                    html += `<div onclick="addToPalette('${hex}'); copyToClipboard('${hex}');" 
+                                  class="interval-swatch flex-1 min-w-[48px] h-12 rounded-xl border border-black/10 flex flex-col items-center justify-center shadow-sm relative group"
+                                  style="background-color: ${hex}" title="${hex} (Click to copy & add to palette)">
+                                <span class="text-[9px] font-mono font-bold" style="color: ${textColor}">${hex}</span>
+                             </div>`;
+                }
+
+                html += `   </div>
+                        </div>`;
+            }
+
+            container.innerHTML = html;
         }
 
         /* COLOR MATH UTILITIES */
