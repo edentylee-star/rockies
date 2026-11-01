@@ -719,14 +719,12 @@
 
             // Key CMYK/Canon Lucia Color Points Data
             const labPoints = [
-                { name: "Yellow", l: 89, a: -5, b: 93, color: "#FFE600", textColor: "#0f172a", align: "left", offsetX: 18, offsetY: -10 },
-                { name: "Red", l: 47, a: 68, b: 48, color: "#E30022", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0 },
-                { name: "Magenta", l: 48, a: 74, b: -3, color: "#E91E63", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 18 },
-                { name: "Canon Lucia Blue", l: 35, a: 27, b: -43, color: "#4d53b7", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0, isCanon: true },
-                { name: "Blue", l: 24, a: 17, b: -46, color: "#1a237e", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
-                { name: "Canon Cyan", l: 43, a: -19, b: -53, color: "#0083c9", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: -15, isCanon: true },
-                { name: "Cyan", l: 55, a: -37, b: -50, color: "#00a3e0", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
-                { name: "Green", l: 50, a: -68, b: 25, color: "#009e60", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 0 }
+                { name: "Yellow", l: 89, a: -5, b: 93, color: "#FFFF00", textColor: "#0f172a", align: "left", offsetX: 18, offsetY: -10 },
+                { name: "Red", l: 47, a: 68, b: 48, color: "#FF0000", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0 },
+                { name: "Magenta", l: 48, a: 74, b: -3, color: "#FF00FF", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 18 },
+                { name: "Blue", l: 24, a: 17, b: -46, color: "#0000FF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+                { name: "Cyan", l: 55, a: -37, b: -50, color: "#00FFFF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+                { name: "Green", l: 50, a: -68, b: 25, color: "#00FF00", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 0 }
             ];
 
             // Helper to map (a*, b*) to SVG Canvas coordinates
@@ -734,26 +732,6 @@
                 x: cx + a * scale,
                 y: cy - b * scale
             });
-
-            // Draw Gamut Polygon Outline connecting main cornerstones: Yellow -> Red -> Magenta -> Blue -> Cyan -> Green -> Yellow
-            const polygonOrder = ["Yellow", "Red", "Magenta", "Blue", "Cyan", "Green"];
-            const polyPoints = polygonOrder.map(pName => {
-                const pt = labPoints.find(p => p.name === pName);
-                const pos = getLabPos(pt.a, pt.b);
-                return `${pos.x},${pos.y}`;
-            }).join(" ");
-
-            html += `<polygon points="${polyPoints}" fill="none" stroke="#ffffff" stroke-width="3.5" opacity="0.9" />`;
-            html += `<polygon points="${polyPoints}" fill="none" stroke="#0284c7" stroke-width="2" stroke-dasharray="6,4" />`;
-
-            // Draw Connection line between Cyan & Canon Cyan, Blue & Canon Lucia Blue
-            const bluePt = getLabPos(17, -46);
-            const luciaBluePt = getLabPos(27, -43);
-            const cyanPt = getLabPos(-37, -50);
-            const canonCyanPt = getLabPos(-19, -53);
-
-            html += `<line x1="${bluePt.x}" y1="${bluePt.y}" x2="${luciaBluePt.x}" y2="${luciaBluePt.y}" stroke="#ffffff" stroke-width="2.5" />`;
-            html += `<line x1="${cyanPt.x}" y1="${cyanPt.y}" x2="${canonCyanPt.x}" y2="${canonCyanPt.y}" stroke="#ffffff" stroke-width="2.5" />`;
 
             // Render Nodes and Text Overlays
             labPoints.forEach(p => {
