@@ -146,6 +146,16 @@
             z-index: 40;
         }
 
+        /* Draggable Nodes Styling */
+        .draggable-node {
+            cursor: grab;
+            transition: filter 0.15s ease;
+        }
+        .draggable-node:active {
+            cursor: grabbing;
+            filter: drop-shadow(0 0 8px rgba(2, 132, 199, 0.8));
+        }
+
         /* Palette Slot Drag and Drop Styling */
         .palette-slot {
             transition: all 0.15s ease;
@@ -370,16 +380,35 @@
                         CIE L*a*b* color space
                     </h2>
                     <p class="text-xs text-slate-500 mt-1">
-                        Canon Lucia & CMYK Gamut Cornerstones Plane Projection
+                        Canon Lucia & CMYK Gamut Cornerstones Plane Projection • <span class="text-sky-600 font-semibold">Drag nodes to adjust color positioning!</span>
                     </p>
                 </div>
 
-                <div class="w-full max-w-[720px] bg-white rounded-2xl p-2 sm:p-4 border border-slate-200 flex justify-center shadow-inner">
+                <div class="w-full max-w-[720px] bg-white rounded-2xl p-2 sm:p-4 border border-slate-200 flex justify-center shadow-inner relative">
                     <svg id="opponency-graph-svg" viewBox="0 0 800 800" class="w-full h-auto select-none"></svg>
                 </div>
 
+                <!-- Custom Interactive Color Node Controls -->
+                <div class="w-full mt-4 p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+                    <div class="flex items-center gap-3">
+                        <div id="custom-node-preview" class="w-7 h-7 rounded-lg border border-slate-400 shadow-sm" style="background-color: #0284c7;"></div>
+                        <div>
+                            <div id="custom-node-label" class="font-bold text-slate-800">Custom Node</div>
+                            <div id="custom-node-coords" class="text-slate-500 text-[11px]">a*: 0, b*: 0</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="addCustomNode()" class="px-3 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-plus text-xs"></i> Add Draggable Node
+                        </button>
+                        <button onclick="addSelectedNodeToPalette()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
+                            <i class="fa-solid fa-swatchbook text-xs text-sky-400"></i> Save Node Color
+                        </button>
+                    </div>
+                </div>
+
                 <div class="w-full flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 italic mt-4 pt-3 border-t border-slate-100">
-                    <span>The six corner stones of the cmyk color space: Cyan, magenta, yellow, red, green and blue.</span>
+                    <span>Drag any color node across the CIE L*a*b* plane to recalculate its a* and b* parameters live.</span>
                 </div>
             </div>
 
@@ -649,7 +678,20 @@
             svg.innerHTML = html;
         }
 
-        /* STANDARDIZED CIE L*a*b* COLOR SPACE PLANE RENDERER */
+        /* STANDARDIZED CIE L*a*b* COLOR SPACE PLANE RENDERER WITH DRAGGABLE NODES */
+        let labPoints = [
+            { id: 0, name: "Yellow", l: 89, a: -5, b: 93, color: "#FFFF00", textColor: "#0f172a", align: "left", offsetX: 18, offsetY: -10 },
+            { id: 1, name: "Red", l: 47, a: 68, b: 48, color: "#FF0000", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0 },
+            { id: 2, name: "Magenta", l: 48, a: 74, b: -3, color: "#FF00FF", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 18 },
+            { id: 3, name: "Blue", l: 24, a: 17, b: -46, color: "#0000FF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+            { id: 4, name: "Cyan", l: 55, a: -37, b: -50, color: "#00FFFF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
+            { id: 5, name: "Green", l: 50, a: -68, b: 25, color: "#00FF00", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 0 }
+        ];
+
+        let selectedNodeIndex = 0;
+        let isDraggingNode = false;
+        let activeDraggedIndex = null;
+
         function renderCieLabGraph() {
             const svg = document.getElementById('opponency-graph-svg');
             if (!svg) return;
@@ -660,7 +702,6 @@
 
             let html = `
             <defs>
-                <!-- Chromatic Circle Smooth Conic Gradient Emulation via SVG Radial Mesh -->
                 <radialGradient id="lab-bg-gradient" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#ffffff" />
                     <stop offset="70%" stop-color="#f1f5f9" stop-opacity="0.2" />
@@ -668,10 +709,8 @@
                 </radialGradient>
             </defs>`;
 
-            // Outer Colorful Ring / Disc Base
             html += `<circle cx="${cx}" cy="${cy}" r="${rCircle}" fill="url(#lab-bg-gradient)" stroke="#0f172a" stroke-width="1.5" />`;
 
-            // Draw smooth background gradient slices representing the CIE L*a*b* hue wheel plane
             const totalSlices = 120;
             for (let i = 0; i < totalSlices; i++) {
                 const a1 = (i * 360 / totalSlices) * Math.PI / 180;
@@ -682,83 +721,171 @@
                 const x2 = cx + rCircle * Math.cos(a2);
                 const y2 = cy - rCircle * Math.sin(a2);
 
-                // Convert angle to RGB color for standard CIE L*a*b* plane perimeter
                 const deg = i * 360 / totalSlices;
                 let color = `hsl(${deg}, 85%, 52%)`;
 
                 html += `<path d="M ${cx} ${cy} L ${x1} ${y1} A ${rCircle} ${rCircle} 0 0 0 ${x2} ${y2} Z" fill="${color}" opacity="0.85" />`;
             }
 
-            // Center White overlay disc for clarity
             html += `<circle cx="${cx}" cy="${cy}" r="${rCircle - 8}" fill="none" stroke="#ffffff" stroke-width="2" />`;
 
-            // Axes: Horizontal (a*) and Vertical (b*)
+            // Axes
             html += `<line x1="40" y1="${cy}" x2="760" y2="${cy}" stroke="#0f172a" stroke-width="1.5" />`;
             html += `<line x1="${cx}" y1="40" x2="${cx}" y2="760" stroke="#0f172a" stroke-width="1.5" />`;
 
-            // Axis Ticks and Numeric Labels (-90 to +90)
+            // Ticks & Labels
             const tickVals = [-90, -80, -70, -60, -50, -40, -30, -20, -10, 10, 20, 30, 40, 50, 60, 70, 80, 90];
-            
             tickVals.forEach(v => {
-                // a* axis (Horizontal)
                 const tx = cx + v * scale;
                 html += `<line x1="${tx}" y1="${cy - 4}" x2="${tx}" y2="${cy + 4}" stroke="#0f172a" stroke-width="1.2" />`;
                 html += `<text x="${tx}" y="${cy + 15}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0f172a" text-anchor="middle">${v}</text>`;
 
-                // b* axis (Vertical, flipped Y coordinates)
                 const ty = cy - v * scale;
                 html += `<line x1="${cx - 4}" y1="${ty}" x2="${cx + 4}" y2="${ty}" stroke="#0f172a" stroke-width="1.2" />`;
                 html += `<text x="${cx - 14}" y="${ty + 3}" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#0f172a" text-anchor="end">${v}</text>`;
             });
 
-            // Axis End Titles
             html += `<text x="778" y="${cy + 4}" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="start">a*</text>`;
             html += `<text x="22" y="${cy + 4}" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="end">-a*</text>`;
             html += `<text x="${cx}" y="24" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">b*</text>`;
             html += `<text x="${cx}" y="785" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">-b*</text>`;
 
-            // Key CMYK/Canon Lucia Color Points Data
-            const labPoints = [
-                { name: "Yellow", l: 89, a: -5, b: 93, color: "#FFFF00", textColor: "#0f172a", align: "left", offsetX: 18, offsetY: -10 },
-                { name: "Red", l: 47, a: 68, b: 48, color: "#FF0000", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 0 },
-                { name: "Magenta", l: 48, a: 74, b: -3, color: "#FF00FF", textColor: "#ffffff", align: "left", offsetX: 18, offsetY: 18 },
-                { name: "Blue", l: 24, a: 17, b: -46, color: "#0000FF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
-                { name: "Cyan", l: 55, a: -37, b: -50, color: "#00FFFF", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 25 },
-                { name: "Green", l: 50, a: -68, b: 25, color: "#00FF00", textColor: "#ffffff", align: "right", offsetX: -18, offsetY: 0 }
-            ];
+            // Render Interactive Draggable Nodes
+            labPoints.forEach((p, idx) => {
+                const pos = { x: cx + p.a * scale, y: cy - p.b * scale };
+                const rNode = 16;
+                const isSelected = selectedNodeIndex === idx;
 
-            // Helper to map (a*, b*) to SVG Canvas coordinates
-            const getLabPos = (a, b) => ({
-                x: cx + a * scale,
-                y: cy - b * scale
-            });
+                html += `<g class="draggable-node" onmousedown="startNodeDrag(event, ${idx})" onclick="selectNode(${idx})">`;
+                
+                if (isSelected) {
+                    html += `<circle cx="${pos.x}" cy="${pos.y}" r="${rNode + 6}" fill="none" stroke="#0284c7" stroke-width="3" stroke-dasharray="4 2" />`;
+                }
 
-            // Render Nodes and Text Overlays
-            labPoints.forEach(p => {
-                const pos = getLabPos(p.a, p.b);
-                const rNode = p.isCanon ? 14 : 16;
-
-                // Node Circle
                 html += `<circle cx="${pos.x}" cy="${pos.y}" r="${rNode + 2}" fill="#ffffff" />`;
                 html += `<circle cx="${pos.x}" cy="${pos.y}" r="${rNode}" fill="${p.color}" stroke="#0f172a" stroke-width="1.5" />`;
 
-                // Text Annotation Box
                 const textX = pos.x + p.offsetX;
                 const textY = pos.y + p.offsetY;
                 const textAnchor = p.align === "right" ? "end" : "start";
 
-                if (p.isCanon) {
-                    html += `<text x="${textX}" y="${textY}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">${p.name}</text>`;
-                    html += `<text x="${textX}" y="${textY + 15}" font-family="Serif, Times New Roman" font-size="12" fill="#ffffff" text-anchor="${textAnchor}">(${p.l}, ${p.a}, ${p.b})</text>`;
-                } else {
-                    html += `<text x="${textX}" y="${textY - 24}" font-family="Serif, Times New Roman" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">${p.name}</text>`;
-                    html += `<text x="${textX}" y="${textY - 8}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">L* &nbsp;${p.l}</text>`;
-                    html += `<text x="${textX}" y="${textY + 7}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">a* &nbsp;${p.a}</text>`;
-                    html += `<text x="${textX}" y="${textY + 22}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="${textAnchor}">b* &nbsp;${p.b}</text>`;
-                }
+                html += `<text x="${textX}" y="${textY - 24}" font-family="Serif, Times New Roman" font-size="15" font-weight="bold" fill="#0f172a" text-anchor="${textAnchor}">${p.name}</text>`;
+                html += `<text x="${textX}" y="${textY - 8}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="${textAnchor}">L* &nbsp;${p.l}</text>`;
+                html += `<text x="${textX}" y="${textY + 7}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="${textAnchor}">a* &nbsp;${p.a}</text>`;
+                html += `<text x="${textX}" y="${textY + 22}" font-family="Serif, Times New Roman" font-size="13" font-weight="bold" fill="#0f172a" text-anchor="${textAnchor}">b* &nbsp;${p.b}</text>`;
+
+                html += `</g>`;
             });
 
             svg.innerHTML = html;
+            updateCustomNodeControl();
+        }
+
+        /* NODE DRAGGING INTERACTION */
+        function selectNode(index) {
+            selectedNodeIndex = index;
+            renderCieLabGraph();
+        }
+
+        function startNodeDrag(e, index) {
+            e.preventDefault();
+            isDraggingNode = true;
+            activeDraggedIndex = index;
+            selectedNodeIndex = index;
+
+            document.addEventListener('mousemove', onNodeDrag);
+            document.addEventListener('mouseup', stopNodeDrag);
+        }
+
+        function onNodeDrag(e) {
+            if (!isDraggingNode || activeDraggedIndex === null) return;
+
+            const svg = document.getElementById('opponency-graph-svg');
+            const rect = svg.getBoundingClientRect();
+            
+            const mouseX = ((e.clientX - rect.left) / rect.width) * 800;
+            const mouseY = ((e.clientY - rect.top) / rect.height) * 800;
+
+            const cx = 400, cy = 400;
+            const scale = 3.2;
+
+            let newA = Math.round((mouseX - cx) / scale);
+            let newB = Math.round((cy - mouseY) / scale);
+
+            newA = Math.max(-100, Math.min(100, newA));
+            newB = Math.max(-100, Math.min(100, newB));
+
+            labPoints[activeDraggedIndex].a = newA;
+            labPoints[activeDraggedIndex].b = newB;
+
+            // Recalculate Node Dynamic Color Preview from Angle/Distance
+            const angleDeg = (Math.atan2(newB, newA) * 180 / Math.PI + 360) % 360;
+            labPoints[activeDraggedIndex].color = `hsl(${angleDeg}, 85%, 52%)`;
+
+            renderCieLabGraph();
+        }
+
+        function stopNodeDrag() {
+            isDraggingNode = false;
+            activeDraggedIndex = null;
+            document.removeEventListener('mousemove', onNodeDrag);
+            document.removeEventListener('mouseup', stopNodeDrag);
+        }
+
+        function updateCustomNodeControl() {
+            const p = labPoints[selectedNodeIndex];
+            if (!p) return;
+
+            const preview = document.getElementById('custom-node-preview');
+            const label = document.getElementById('custom-node-label');
+            const coords = document.getElementById('custom-node-coords');
+
+            if (preview) preview.style.backgroundColor = p.color;
+            if (label) label.innerText = `${p.name} Node`;
+            if (coords) coords.innerText = `a*: ${p.a}, b*: ${p.b} | L*: ${p.l}`;
+        }
+
+        function addCustomNode() {
+            const newId = labPoints.length;
+            const newPoint = {
+                id: newId,
+                name: `Custom ${newId}`,
+                l: 60,
+                a: Math.round((Math.random() - 0.5) * 120),
+                b: Math.round((Math.random() - 0.5) * 120),
+                color: "#0284c7",
+                textColor: "#ffffff",
+                align: "left",
+                offsetX: 18,
+                offsetY: 0
+            };
+
+            const angleDeg = (Math.atan2(newPoint.b, newPoint.a) * 180 / Math.PI + 360) % 360;
+            newPoint.color = `hsl(${angleDeg}, 85%, 52%)`;
+
+            labPoints.push(newPoint);
+            selectedNodeIndex = newId;
+            renderCieLabGraph();
+            showToast(`Added ${newPoint.name} Draggable Node!`);
+        }
+
+        function addSelectedNodeToPalette() {
+            const p = labPoints[selectedNodeIndex];
+            if (!p) return;
+
+            // Convert current HSL/Color to HEX format
+            const tempDiv = document.createElement('div');
+            tempDiv.style.color = p.color;
+            document.body.appendChild(tempDiv);
+            const computedRGB = window.getComputedStyle(tempDiv).color;
+            document.body.removeChild(tempDiv);
+
+            const rgbMatch = computedRGB.match(/\d+/g);
+            if (rgbMatch && rgbMatch.length >= 3) {
+                const hex = rgbToHex(parseInt(rgbMatch[0]), parseInt(rgbMatch[1]), parseInt(rgbMatch[2]));
+                addToPalette(hex);
+                copyToClipboard(hex);
+            }
         }
 
         /* INTERVAL ROWS SPLITTER GENERATOR */
@@ -817,7 +944,7 @@
                              </div>`;
                 }
 
-                html += `   </div>
+                html += `    </div>
                         </div>`;
             }
 
@@ -831,7 +958,7 @@
             const w = 1 - s - c;
 
             const W_RGB = [255, 255, 255];
-            const S_RGB = [25, 20, 15]; // Pure black perception base
+            const S_RGB = [25, 20, 15];
 
             const r = Math.round(w * W_RGB[0] + s * S_RGB[0] + c * pureRGB[0]);
             const g = Math.round(w * W_RGB[1] + s * S_RGB[1] + c * pureRGB[1]);
@@ -905,7 +1032,6 @@
             const hueObj = HUE_STEPS[hueIndex];
             svg.innerHTML = '';
 
-            // Barycentric Vertices
             const W_pos = { x: 80, y: 40 };
             const S_pos = { x: 80, y: 720 };
             const C_pos = { x: 820, y: 420 };
@@ -923,7 +1049,6 @@
 
             let html = '';
 
-            // Top Right Title & Mini Wheel
             const titleX = 760, titleY = 55;
             html += `<text x="${titleX}" y="${titleY}" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#0369a1" text-anchor="middle">${hueObj.name}</text>`;
 
@@ -957,12 +1082,7 @@
 
             html += `<line x1="${mcx}" y1="${mcy - mrOuter - 2}" x2="${mcx}" y2="${mcy + mrOuter + 2}" stroke="#94a3b8" stroke-width="0.8" />`;
             html += `<line x1="${mcx - mrOuter - 2}" y1="${mcy}" x2="${mcx + mrOuter + 2}" y2="${mcy}" stroke="#94a3b8" stroke-width="0.8" />`;
-            html += `<text x="${mcx}" y="${mcy - mrOuter - 6}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-Y</text>`;
-            html += `<text x="${mcx + mrOuter + 12}" y="${mcy + 3}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-R</text>`;
-            html += `<text x="${mcx}" y="${mcy + mrOuter + 13}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-B</text>`;
-            html += `<text x="${mcx - mrOuter - 12}" y="${mcy + 3}" font-family="sans-serif" font-size="10" font-weight="700" fill="#0369a1" text-anchor="middle">-G</text>`;
 
-            // Grid lines
             const sScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
             const cScaleVals = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90];
 
@@ -978,26 +1098,6 @@
                 html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#cbd5e1" stroke-width="0.8" />`;
             });
 
-            [10, 20, 30, 40, 50, 60, 70, 80, 90].forEach(w => {
-                const p1 = getCoord(100 - w, 0);
-                const p2 = getCoord(0, 100 - w);
-                html += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="#e2e8f0" stroke-width="0.8" />`;
-            });
-
-            // Axis Labels
-            sScaleVals.forEach(s => {
-                const p = getCoord(s, 0);
-                const labelStr = s < 10 ? `0${s}` : `${s}`;
-                html += `<text x="${p.x - 18}" y="${p.y + 4}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" fill="#64748b" text-anchor="end">${labelStr}</text>`;
-            });
-
-            cScaleVals.forEach(c => {
-                const p = getCoord(100 - c, c);
-                const labelStr = c < 10 ? `0${c}` : `${c}`;
-                html += `<text x="${p.x}" y="${p.y + 24}" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" fill="#0369a1" text-anchor="middle">${labelStr}</text>`;
-            });
-
-            // Swatch Grid
             const standardSwatches = [
                 {s:5, c:5}, {s:5, c:10}, {s:5, c:20}, {s:5, c:30}, {s:5, c:40}, {s:5, c:50}, {s:5, c:60}, {s:5, c:70}, {s:5, c:80},
                 {s:10, c:5}, {s:10, c:10}, {s:10, c:20}, {s:10, c:30}, {s:10, c:40}, {s:10, c:50}, {s:10, c:60}, {s:10, c:70}, {s:10, c:80},
@@ -1007,8 +1107,7 @@
                 {s:50, c:10}, {s:50, c:20}, {s:50, c:30}, {s:50, c:40},
                 {s:60, c:10}, {s:60, c:20}, {s:60, c:30},
                 {s:70, c:10}, {s:70, c:20},
-                {s:80, c:10},
-                {s:35, c:60}, {s:45, c:50}
+                {s:80, c:10}
             ];
 
             const swatchWidth = 36;
