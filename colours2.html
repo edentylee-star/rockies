@@ -2541,4 +2541,140 @@
                 const hslS = hsl.s;
                 const hslL = hsl.l;
 
-                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1
+                const lumPct = (getPerceivedLuminance(rgbR, rgbG, rgbB) * 100).toFixed(1);
+
+                const textX = swatchX + swatchS + 20;
+
+                ctx.fillStyle = '#0F172A';
+                ctx.font = 'bold 22px "JetBrains Mono", monospace';
+                ctx.fillText(hex.toUpperCase(), textX, y + 46);
+
+                ctx.fillStyle = '#64748B';
+                ctx.font = '14px "JetBrains Mono", monospace';
+                ctx.fillText(`RGB: ${rgbR}, ${rgbG}, ${rgbB}`, textX, y + 74);
+
+                ctx.fillStyle = '#94A3B8';
+                ctx.font = '13px "JetBrains Mono", monospace';
+                ctx.fillText(`HSL: ${hslH}°, ${hslS}%, ${hslL}% • Lum: ${lumPct}%`, textX, y + 98);
+            });
+
+            const mimeType = fileType === 'jpeg' ? 'image/jpeg' : 'image/png';
+            const fileExt = fileType === 'jpeg' ? 'jpg' : 'png';
+            const fileName = `${paletteObj.name.toLowerCase().replace(/\s+/g, '_')}_specifications.${fileExt}`;
+
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", canvas.toDataURL(mimeType, 0.95));
+            downloadAnchor.setAttribute("download", fileName);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            showToast(`Downloaded Expanded Specification Card!`);
+        }
+
+        function roundRect(ctx, x, y, w, h, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + w - radius, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+            ctx.lineTo(x + w, y + h - radius);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+            ctx.lineTo(x + radius, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
+        }
+
+        function handleDragStart(e) {
+            const index = parseInt(this.dataset.index);
+            if (isNaN(index) || index >= paletteColors.length) {
+                e.preventDefault();
+                return;
+            }
+            draggedIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            this.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const targetIndex = parseInt(this.dataset.index);
+            if (draggedIndex !== null && !isNaN(targetIndex) && targetIndex < paletteColors.length) {
+                const movedColor = paletteColors.splice(draggedIndex, 1)[0];
+                paletteColors.splice(targetIndex, 0, movedColor);
+                updatePaletteUI();
+            }
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.palette-slot').forEach(slot => {
+                slot.classList.remove('dragging', 'drag-over');
+            });
+            draggedIndex = null;
+        }
+
+        function updatePaletteUI() {
+            const counter = document.getElementById('palette-counter');
+            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length})`;
+
+            const container = document.getElementById('palette-slots-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            paletteColors.forEach((hex, i) => {
+                const slot = document.createElement('div');
+                slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+                slot.style.backgroundColor = hex;
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group shrink-0';
+                slot.setAttribute('draggable', 'true');
+
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
+
+                slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                removeBtn.innerHTML = '×';
+                removeBtn.title = 'Remove color';
+                removeBtn.onclick = (e) => removeFromPalette(i, e);
+                slot.appendChild(removeBtn);
+
+                slot.onclick = () => copyToClipboard(hex);
+                container.appendChild(slot);
+            });
+        }
+
+        window.onload = () => {
+            updatePaletteUI();
+            onModeChange();
+            renderTab2Custom();
+            renderPreSavedPalettes();
+            updateTab2Controls();
+            renderTab3();
+            renderHsRgbGrids();
+            renderDynamicCmykGrids();
+            renderFgdcReferenceChart();
+            renderTab4();
+        };
+    </script>
+</body>
+</html>
