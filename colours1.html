@@ -269,7 +269,7 @@
                     <!-- Logo & Title -->
                     <div class="flex items-center space-x-2.5">
                         <div class="w-9 h-9 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-inner font-bold text-lg">
-                            <i class="fa-solid fa-[#0369a1] fa-chart-line"></i>
+                            <i class="fa-solid fa-chart-line"></i>
                         </div>
                         <div>
                             <h1 class="text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2">
@@ -308,23 +308,11 @@
             
             <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-3">  
-                </div>
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <!-- Step Size Dropdown -->
+                    <!-- Step Size Resolution (Free Text Input) -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Step Size Resolution</label>
-                        <select id="rgb-step" onchange="renderRGBEdgesTab()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-[#B4E3F8]">
-                            <option value="1">1 (256 Rows)</option>
-                            <option value="5" selected>5 (52 Rows)</option>
-                            <option value="10">10 (26 Rows)</option>
-                            <option value="15">15 (18 Rows)</option>
-                            <option value="17">17 (16 Rows)</option>
-                            <option value="20">20 (? Rows)</option>
-                            <option value="24">24 (? Rows)</option>
-                            <option value="51">51 (6 Rows)</option>
-                        </select>
+                        <input type="number" id="rgb-step" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
                     </div>
 
                     <!-- Display Format Dropdown -->
@@ -573,7 +561,7 @@
                     <div class="w-7 h-7 rounded-lg bg-[#B4E3F8] text-[#0369a1] border border-[#22ACEC] flex items-center justify-center text-xs font-bold shadow-sm">
                         <i class="fa-solid fa-swatchbook"></i>
                     </div>
-                    <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Palette (0/16)</span>
+                    <span id="palette-counter" class="font-bold text-slate-900 text-xs md:text-sm">Global Palette (0)</span>
                 </div>
                 <button onclick="clearPalette()" class="p-1.5 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 transition-colors" title="Clear All Swatches">
                     <i class="fa-solid fa-trash-can text-sm"></i>
@@ -581,8 +569,8 @@
             </div>
 
             <!-- Swatch Slots Container -->
-            <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1">
-                <!-- 16 slots injected dynamically -->
+            <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full md:max-w-2xl">
+                <!-- Dynamic swatches injected here -->
             </div>
 
             <!-- Action Controls -->
@@ -617,23 +605,21 @@
     <!-- ========================================================= -->
     <script>
         /* APPLICATION STATE */
-        const MAX_PALETTE = 16;
         let paletteColors = [];
         let draggedIndex = null;
 
         /* NAVIGATION SWITCHER DROPDOWN */
         function toggleNavDropdown(event) {
             if (event) event.stopPropagation();
-            const menu = document.getElementById('nav-dropdown-menu');
-            if (menu) menu.classList.toggle('hidden');
+            const container = document.getElementById('nav-dropdown-container');
+            if (container) container.classList.toggle('open');
         }
 
         document.addEventListener('click', function(e) {
-            const menu = document.getElementById('nav-dropdown-menu');
-            const btn = document.getElementById('nav-dropdown-btn');
-            if (menu && !menu.classList.contains('hidden')) {
-                if (btn && !btn.contains(e.target) && !menu.contains(e.target)) {
-                    menu.classList.add('hidden');
+            const container = document.getElementById('nav-dropdown-container');
+            if (container && container.classList.contains('open')) {
+                if (!container.contains(e.target)) {
+                    container.classList.remove('open');
                 }
             }
         });
@@ -780,7 +766,10 @@
         /* TAB 1: RGB EDGES MATRIX RENDERER */
         /* ========================================================= */
         function renderRGBEdgesTab() {
-            const step = parseInt(document.getElementById("rgb-step").value);
+            let step = parseInt(document.getElementById("rgb-step").value);
+            if (isNaN(step) || step < 1) step = 1;
+            if (step > 255) step = 255;
+
             const format = document.getElementById("rgb-format").value;
             const tbody = document.getElementById("rgb-table-body");
 
@@ -1173,14 +1162,14 @@
         }
 
         /* ========================================================= */
-        /* GLOBAL COMPARISON PALETTE DRAWER & EXPORTERS */
+        /* UNLIMITED GLOBAL PALETTE DRAWER & EXPORTERS */
         /* ========================================================= */
         function initPalette() {
             updatePaletteUI();
         }
 
         function addToPalette(hex) {
-            if (!paletteColors.includes(hex) && paletteColors.length < MAX_PALETTE) {
+            if (!paletteColors.includes(hex)) {
                 paletteColors.push(hex);
                 updatePaletteUI();
                 updatePaletteDropdown();
@@ -1383,48 +1372,41 @@
 
         function updatePaletteUI() {
             const counter = document.getElementById('palette-counter');
-            if (counter) counter.innerText = `Global Palette (${paletteColors.length}/16)`;
+            if (counter) counter.innerText = `Global Palette (${paletteColors.length})`;
 
             const container = document.getElementById('palette-slots-container');
             if (!container) return;
 
             container.innerHTML = '';
 
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                if (i < paletteColors.length) {
-                    const hex = paletteColors[i];
-                    const [r, g, b] = hexToRgb(hex);
-                    const contrastColor = getContrastTextColor(r, g, b);
-
-                    const slot = document.createElement('div');
-                    slot.className = 'relative w-11 h-9 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center cursor-pointer group overflow-hidden transition-transform duration-200 hover:scale-105';
-                    slot.style.backgroundColor = hex;
-                    slot.draggable = true;
-
-                    slot.ondragstart = (e) => handleDragStart(e, i);
-                    slot.ondragover = (e) => handleDragOver(e);
-                    slot.ondrop = (e) => handleDrop(e, i);
-
-                    slot.onclick = () => copyToClipboard(hex);
-
-                    slot.innerHTML = `
-                        <span class="text-[9px] font-mono font-bold" style="color:${contrastColor}">${hex}</span>
-                        <button onclick="event.stopPropagation(); removePaletteIndex(${i});" class="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-xs" title="Remove Swatch">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    `;
-                    container.appendChild(slot);
-                } else {
-                    const emptySlot = document.createElement('div');
-                    emptySlot.className = 'w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300 text-xs font-mono font-medium';
-                    emptySlot.innerText = i + 1;
-
-                    emptySlot.ondragover = (e) => handleDragOver(e);
-                    emptySlot.ondrop = (e) => handleDrop(e, i);
-
-                    container.appendChild(emptySlot);
-                }
+            if (paletteColors.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic">Click any swatch to add to palette...</span>`;
+                return;
             }
+
+            paletteColors.forEach((hex, i) => {
+                const [r, g, b] = hexToRgb(hex);
+                const contrastColor = getContrastTextColor(r, g, b);
+
+                const slot = document.createElement('div');
+                slot.className = 'relative shrink-0 w-11 h-9 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center cursor-pointer group overflow-hidden transition-transform duration-200 hover:scale-105';
+                slot.style.backgroundColor = hex;
+                slot.draggable = true;
+
+                slot.ondragstart = (e) => handleDragStart(e, i);
+                slot.ondragover = (e) => handleDragOver(e);
+                slot.ondrop = (e) => handleDrop(e, i);
+
+                slot.onclick = () => copyToClipboard(hex);
+
+                slot.innerHTML = `
+                    <span class="text-[9px] font-mono font-bold" style="color:${contrastColor}">${hex}</span>
+                    <button onclick="event.stopPropagation(); removePaletteIndex(${i});" class="absolute inset-0 bg-black/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-xs" title="Remove Swatch">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                container.appendChild(slot);
+            });
         }
 
         /* INITIALIZATION ON WINDOW LOAD */
