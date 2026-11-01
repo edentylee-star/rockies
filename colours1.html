@@ -308,13 +308,38 @@
             
             <!-- Controls Bar -->
             <div class="glass-card rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-                    <!-- Step Size Resolution (Free Text Input) -->
-                    <div class="space-y-1">
-                        <label class="font-semibold text-slate-600 block">Step Size Resolution</label>
-                        <input type="number" id="rgb-step" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-xl p-2.5 font-mono font-bold focus:ring-2 focus:ring-[#B4E3F8]">
+                <!-- Per-Column Step Size Controls Grid -->
+                <div class="space-y-2 border-b border-slate-100 pb-4">
+                    <label class="font-semibold text-slate-700 text-xs block uppercase tracking-wider">Per-Column Step Sizes Resolution</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
+                        <div class="space-y-1 bg-red-50/50 p-2 rounded-xl border border-red-200">
+                            <label class="font-bold text-red-700 block truncate text-[11px]">Red (FFxx00)</label>
+                            <input type="number" id="step-col-0" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-red-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-red-400">
+                        </div>
+                        <div class="space-y-1 bg-yellow-50/50 p-2 rounded-xl border border-yellow-200">
+                            <label class="font-bold text-amber-700 block truncate text-[11px]">Yellow (xxFF00)</label>
+                            <input type="number" id="step-col-1" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-yellow-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-yellow-400">
+                        </div>
+                        <div class="space-y-1 bg-emerald-50/50 p-2 rounded-xl border border-emerald-200">
+                            <label class="font-bold text-emerald-700 block truncate text-[11px]">Green (00FFxx)</label>
+                            <input type="number" id="step-col-2" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-emerald-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-emerald-400">
+                        </div>
+                        <div class="space-y-1 bg-cyan-50/50 p-2 rounded-xl border border-cyan-200">
+                            <label class="font-bold text-cyan-700 block truncate text-[11px]">Cyan (00xxFF)</label>
+                            <input type="number" id="step-col-3" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-cyan-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-cyan-400">
+                        </div>
+                        <div class="space-y-1 bg-blue-50/50 p-2 rounded-xl border border-blue-200">
+                            <label class="font-bold text-blue-700 block truncate text-[11px]">Blue (xx00FF)</label>
+                            <input type="number" id="step-col-4" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-blue-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-blue-400">
+                        </div>
+                        <div class="space-y-1 bg-fuchsia-50/50 p-2 rounded-xl border border-fuchsia-200">
+                            <label class="font-bold text-fuchsia-700 block truncate text-[11px]">Magenta (FF00xx)</label>
+                            <input type="number" id="step-col-5" value="5" min="1" max="255" oninput="renderRGBEdgesTab()" class="w-full bg-white border border-fuchsia-300 text-slate-800 rounded-lg p-1.5 font-mono font-bold text-center focus:ring-2 focus:ring-fuchsia-400">
+                        </div>
                     </div>
+                </div>
 
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-1">
                     <!-- Display Format Dropdown -->
                     <div class="space-y-1">
                         <label class="font-semibold text-slate-600 block">Display Code Format</label>
@@ -357,7 +382,7 @@
                     <table class="w-full text-center border-collapse">
                         <thead>
                             <tr class="bg-[#B4E3F8] text-[#0369a1] text-xs font-bold uppercase tracking-wider border-b border-[#22ACEC]">
-                                <th class="py-3 px-3 border-r border-[#22ACEC]/40 w-20">Value</th>
+                                <th class="py-3 px-3 border-r border-[#22ACEC]/40 w-20">Row</th>
                                 <th class="py-2 px-2 border-r border-[#22ACEC]/40">Red Edge<br><span class="text-[10px] opacity-80 font-mono">FFxx00</span></th>
                                 <th class="py-2 px-2 border-r border-[#22ACEC]/40">Yellow Edge<br><span class="text-[10px] opacity-80 font-mono">xxFF00</span></th>
                                 <th class="py-2 px-2 border-r border-[#22ACEC]/40">Green Edge<br><span class="text-[10px] opacity-80 font-mono">00FFxx</span></th>
@@ -763,13 +788,9 @@
         }
 
         /* ========================================================= */
-        /* TAB 1: RGB EDGES MATRIX RENDERER */
+        /* TAB 1: RGB EDGES MATRIX RENDERER (PER-COLUMN STEP SIZES) */
         /* ========================================================= */
         function renderRGBEdgesTab() {
-            let step = parseInt(document.getElementById("rgb-step").value);
-            if (isNaN(step) || step < 1) step = 1;
-            if (step > 255) step = 255;
-
             const format = document.getElementById("rgb-format").value;
             const tbody = document.getElementById("rgb-table-body");
 
@@ -779,64 +800,95 @@
 
             tbody.innerHTML = "";
 
-            for (let i = 0; i <= 255; i += step) {
-                if (i > 255) i = 255;
+            // Read individual step sizes for each edge column
+            const steps = [];
+            for (let c = 0; c < 6; c++) {
+                let val = parseInt(document.getElementById(`step-col-${c}`).value);
+                if (isNaN(val) || val < 1) val = 1;
+                if (val > 255) val = 255;
+                steps.push(val);
+            }
+
+            // Generate row array per column
+            const colRows = [];
+            let maxRows = 0;
+            for (let colIdx = 0; colIdx < 6; colIdx++) {
+                const step = steps[colIdx];
+                const vals = [];
+                for (let i = 0; i <= 255; i += step) {
+                    vals.push(i);
+                    if (i === 255) break;
+                    if (i + step > 255) { vals.push(255); break; }
+                }
+                colRows.push(vals);
+                if (vals.length > maxRows) maxRows = vals.length;
+            }
+
+            // Render table grid
+            for (let r = 0; r < maxRows; r++) {
                 const tr = document.createElement("tr");
 
                 const tdVal = document.createElement("td");
                 tdVal.className = "py-2 px-3 font-bold bg-slate-100 border-r border-slate-200 text-slate-700";
-                tdVal.innerText = i;
+                tdVal.innerText = `Row ${r + 1}`;
                 tr.appendChild(tdVal);
 
-                const edges = [
-                    { r: 255, g: i, b: 0 },   // FFxx00
-                    { r: i, g: 255, b: 0 },   // xxFF00
-                    { r: 0, g: 255, b: i },   // 00FFxx
-                    { r: 0, g: i, b: 255 },   // 00xxFF
-                    { r: i, g: 0, b: 255 },   // xx00FF
-                    { r: 255, g: 0, b: i }    // FF00xx
-                ];
-
-                edges.forEach(color => {
+                for (let colIdx = 0; colIdx < 6; colIdx++) {
                     const td = document.createElement("td");
-                    td.className = "py-2 px-2 cursor-pointer font-bold transition-all relative swatch-interactive border-r border-slate-100";
-                    const hexCode = rgbToHex(color.r, color.g, color.b);
-                    td.style.backgroundColor = hexCode;
-                    td.style.color = getContrastTextColor(color.r, color.g, color.b);
+                    const vals = colRows[colIdx];
 
-                    let pVal = getPerceivedValue(color.r, color.g, color.b);
+                    if (r < vals.length) {
+                        const i = vals[r];
+                        let color;
+                        switch (colIdx) {
+                            case 0: color = { r: 255, g: i, b: 0 }; break;  // Red
+                            case 1: color = { r: i, g: 255, b: 0 }; break;  // Yellow
+                            case 2: color = { r: 0, g: 255, b: i }; break;  // Green
+                            case 3: color = { r: 0, g: i, b: 255 }; break;  // Cyan
+                            case 4: color = { r: i, g: 0, b: 255 }; break;  // Blue
+                            case 5: color = { r: 255, g: 0, b: i }; break;  // Magenta
+                        }
 
-                    let mainText = hexCode;
-                    if (format === 'rgb') mainText = `${color.r},${color.g},${color.b}`;
-                    else if (format === 'hsl') {
-                        const [h, s, l] = rgbToHsl(color.r, color.g, color.b);
-                        mainText = `${h}°,${s}%`;
-                    } else if (format === 'cmyk') {
-                        mainText = rgbToCmyk(color.r, color.g, color.b);
-                    }
+                        td.className = "py-2 px-2 cursor-pointer font-bold transition-all relative swatch-interactive border-r border-slate-100";
+                        const hexCode = rgbToHex(color.r, color.g, color.b);
+                        td.style.backgroundColor = hexCode;
+                        td.style.color = getContrastTextColor(color.r, color.g, color.b);
 
-                    if (showPV) {
-                        td.innerHTML = `<div class="leading-tight text-[11px]">${mainText}</div><div class="text-[9px] opacity-80">${pVal}%</div>`;
+                        let pVal = getPerceivedValue(color.r, color.g, color.b);
+
+                        let mainText = hexCode;
+                        if (format === 'rgb') mainText = `${color.r},${color.g},${color.b}`;
+                        else if (format === 'hsl') {
+                            const [h, s, l] = rgbToHsl(color.r, color.g, color.b);
+                            mainText = `${h}°,${s}%`;
+                        } else if (format === 'cmyk') {
+                            mainText = rgbToCmyk(color.r, color.g, color.b);
+                        }
+
+                        if (showPV) {
+                            td.innerHTML = `<div class="leading-tight text-[11px]">${mainText}</div><div class="text-[9px] opacity-80">${pVal}%</div>`;
+                        } else {
+                            td.innerText = mainText;
+                        }
+
+                        if (trackIso) {
+                            if (Math.abs(pVal - tIso) <= 3) td.classList.add("iso-highlight");
+                            else td.classList.add("iso-dimmed");
+                        }
+
+                        td.onclick = () => {
+                            addToPalette(hexCode);
+                            copyToClipboard(hexCode);
+                        };
                     } else {
-                        td.innerText = mainText;
+                        td.className = "bg-slate-50/50 border-r border-slate-100 text-slate-300 font-mono text-[10px]";
+                        td.innerText = "-";
                     }
-
-                    if (trackIso) {
-                        if (Math.abs(pVal - tIso) <= 3) td.classList.add("iso-highlight");
-                        else td.classList.add("iso-dimmed");
-                    }
-
-                    td.onclick = () => {
-                        addToPalette(hexCode);
-                        copyToClipboard(hexCode);
-                    };
 
                     tr.appendChild(td);
-                });
+                }
 
                 tbody.appendChild(tr);
-                if (i === 255) break;
-                if (i + step > 255 && i !== 255) { i = 255 - step; }
             }
         }
 
