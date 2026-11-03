@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>colour wheel & munsell reference</title>
+    <title>colour wheel & reference spectrum</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -390,10 +390,13 @@
                 <!-- Tab Switcher -->
                 <div class="flex flex-wrap items-center gap-2">
                     <button id="tab-wheel-btn" onclick="switchMainTab('wheel')" class="view-tab-btn active">
-                        <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel & Munsell Reference
+                        <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel & Full Spectrum
                     </button>
                     <button id="tab-graph-btn" onclick="switchMainTab('graph')" class="view-tab-btn">
                         <i class="fa-solid fa-diagram-project mr-1.5"></i> CIE L*a*b* & Intervals
+                    </button>
+                    <button id="tab-vault-btn" onclick="switchMainTab('vault')" class="view-tab-btn">
+                        <i class="fa-solid fa-sliders mr-1.5"></i> Palette Vault & Analyzer
                     </button>
                 </div>
 
@@ -404,7 +407,7 @@
     <!-- MAIN CONTENT AREA -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6 flex flex-col items-center">
 
-        <!-- TAB 1: HUE WHEEL & COMPLETE MUNSELL SPECTRUM SWATCH LIST -->
+        <!-- TAB 1: HUE WHEEL & COMPLETE 40-STEP NCS SPECTRUM -->
         <div id="tab-wheel-content" class="w-full flex flex-col items-center space-y-8">
             
             <!-- Wheel Container -->
@@ -426,14 +429,14 @@
                 </div>
             </div>
 
-            <!-- COMPLETE MUNSELL SPECTRUM WITH VISUAL RECTANGLE SWATCHES -->
+            <!-- COMPLETE 40-STEP NCS SPECTRUM GRID -->
             <div class="w-full max-w-5xl glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-2">
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Complete Munsell Color Spectrum Reference
+                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Complete NCS Spectrum Reference (All 40 Hue Steps)
                         </h3>
-                        <p class="text-xs text-slate-500">Every Munsell hue across the full spectrum featuring visual color swatches, Munsell notations, HEX codes, and RGB values.</p>
+                        <p class="text-xs text-slate-500">Complete listing of every hue step around the spectrum (Y, Y10R, Y20R... R, R10B... B, B10G... G, G10Y). Click any swatch rectangle to copy its code and add it to your global drawer.</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="copyAllMunsellCodes()" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
@@ -442,9 +445,9 @@
                     </div>
                 </div>
 
-                <!-- Complete 10 Hue Families & Neutral Scale Container -->
+                <!-- 40 Hue Steps Container -->
                 <div id="munsell-palettes-container" class="space-y-6">
-                    <!-- Dynamic rendering of all Munsell Spectrum Families & Neutral Axis -->
+                    <!-- Dynamic rendering of all 40 Spectrum Hue Steps -->
                 </div>
             </div>
 
@@ -505,6 +508,78 @@
 
                 <div id="interval-rows-container" class="space-y-4">
                     <!-- Dynamic Interval Rows Injected Here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB 3: PALETTE VAULT & ANALYZER -->
+        <div id="tab-vault-content" class="w-full max-w-5xl space-y-6 hidden">
+            
+            <!-- Dynamic Controls Card -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+                    <div class="text-left">
+                        <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Interactive HSL & Luminance Synthesizer</h2>
+                        <p class="text-xs text-slate-500">Tweak parameters to generate variations and save them to your global drawer.</p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div id="vault-active-swatch-preview" class="w-10 h-10 rounded-xl border border-slate-300 shadow-sm transition-all" style="background-color: #0284c7;"></div>
+                        <div class="text-left">
+                            <div id="vault-active-hex" class="font-mono font-bold text-sm text-slate-900">#0284C7</div>
+                            <div id="vault-active-specs" class="font-mono text-[11px] text-slate-500">H:201° S:97% L:45%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sliders Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    <!-- Hue Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <label for="vault-hue-range" class="text-slate-700">Hue Angle (H)</label>
+                            <span id="vault-hue-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">201°</span>
+                        </div>
+                        <input id="vault-hue-range" type="range" min="0" max="360" value="201" oninput="updateVaultSynthesizer()">
+                    </div>
+
+                    <!-- Saturation Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <label for="vault-sat-range" class="text-slate-700">Saturation (S)</label>
+                            <span id="vault-sat-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">97%</span>
+                        </div>
+                        <input id="vault-sat-range" type="range" min="0" max="100" value="97" oninput="updateVaultSynthesizer()">
+                    </div>
+
+                    <!-- Lightness Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <label for="vault-light-range" class="text-slate-700">Lightness (L)</label>
+                            <span id="vault-light-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">45%</span>
+                        </div>
+                        <input id="vault-light-range" type="range" min="0" max="100" value="45" oninput="updateVaultSynthesizer()">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button onclick="addSynthesizerToPalette()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Save Color to Global Palette</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preset Palettes Vault Grid -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-4 text-left">
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Curated Rockie Palettes</h3>
+                    <p class="text-xs text-slate-500">Click any color swatch to copy its HEX value or send it straight to your global comparison drawer.</p>
+                </div>
+
+                <div id="vault-presets-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Preset Cards Injected Dynamically -->
                 </div>
             </div>
 
@@ -829,159 +904,98 @@
             svg.innerHTML = html;
         }
 
-        /* MUNSELL SPECTRUM & SWATCH RECTANGLES */
-        const MUNSELL_FULL_SPECTRUM_DATA = [
-            {
-                groupTitle: "Red Hue Family (R)",
-                swatches: [
-                    { hue: "2.5R", munsell: "2.5R 5/14", hex: "#F52222", rgb: "245, 34, 34" },
-                    { hue: "5R", munsell: "5R 4/14", hex: "#E60000", rgb: "230, 0, 0" },
-                    { hue: "7.5R", munsell: "7.5R 5/14", hex: "#E03800", rgb: "224, 56, 0" },
-                    { hue: "10R", munsell: "10R 5/12", hex: "#DC4C00", rgb: "220, 76, 0" }
-                ]
-            },
-            {
-                groupTitle: "Yellow-Red / Orange Family (YR)",
-                swatches: [
-                    { hue: "2.5YR", munsell: "2.5YR 6/12", hex: "#D95300", rgb: "217, 83, 0" },
-                    { hue: "5YR", munsell: "5YR 6/12", hex: "#D95300", rgb: "217, 83, 0" },
-                    { hue: "7.5YR", munsell: "7.5YR 6/12", hex: "#CE6B00", rgb: "206, 107, 0" },
-                    { hue: "10YR", munsell: "10YR 7/10", hex: "#C27B00", rgb: "194, 123, 0" }
-                ]
-            },
-            {
-                groupTitle: "Yellow Hue Family (Y)",
-                swatches: [
-                    { hue: "2.5Y", munsell: "2.5Y 7/10", hex: "#BC8200", rgb: "188, 130, 0" },
-                    { hue: "5Y", munsell: "5Y 8/12", hex: "#B88600", rgb: "184, 134, 0" },
-                    { hue: "7.5Y", munsell: "7.5Y 8/10", hex: "#A38E00", rgb: "163, 142, 0" },
-                    { hue: "10Y", munsell: "10Y 7/10", hex: "#8F9300", rgb: "143, 147, 0" }
-                ]
-            },
-            {
-                groupTitle: "Green-Yellow Family (GY)",
-                swatches: [
-                    { hue: "2.5GY", munsell: "2.5GY 7/10", hex: "#7B9800", rgb: "123, 152, 0" },
-                    { hue: "5GY", munsell: "5GY 7/10", hex: "#709B00", rgb: "112, 155, 0" },
-                    { hue: "7.5GY", munsell: "7.5GY 6/10", hex: "#539E1B", rgb: "83, 158, 27" },
-                    { hue: "10GY", munsell: "10GY 6/10", hex: "#2FA033", rgb: "47, 160, 51" }
-                ]
-            },
-            {
-                groupTitle: "Green Hue Family (G)",
-                swatches: [
-                    { hue: "2.5G", munsell: "2.5G 5/10", hex: "#009C3B", rgb: "0, 156, 59" },
-                    { hue: "5G", munsell: "5G 5/10", hex: "#009944", rgb: "0, 153, 68" },
-                    { hue: "7.5G", munsell: "7.5G 5/10", hex: "#009A5A", rgb: "0, 154, 90" },
-                    { hue: "10G", munsell: "10G 5/8", hex: "#009B70", rgb: "0, 155, 112" }
-                ]
-            },
-            {
-                groupTitle: "Blue-Green / Teal Family (BG)",
-                swatches: [
-                    { hue: "2.5BG", munsell: "2.5BG 5/8", hex: "#009B7D", rgb: "0, 155, 125" },
-                    { hue: "5BG", munsell: "5BG 5/8", hex: "#009B85", rgb: "0, 155, 133" },
-                    { hue: "7.5BG", munsell: "7.5BG 5/8", hex: "#009A94", rgb: "0, 154, 148" },
-                    { hue: "10BG", munsell: "10BG 5/8", hex: "#0096A4", rgb: "0, 150, 164" }
-                ]
-            },
-            {
-                groupTitle: "Blue Hue Family (B)",
-                swatches: [
-                    { hue: "2.5B", munsell: "2.5B 5/8", hex: "#008EB8", rgb: "0, 142, 184" },
-                    { hue: "5B", munsell: "5B 5/10", hex: "#0080C8", rgb: "0, 128, 200" },
-                    { hue: "7.5B", munsell: "7.5B 5/10", hex: "#0072D0", rgb: "0, 114, 208" },
-                    { hue: "10B", munsell: "10B 4/10", hex: "#0062D0", rgb: "0, 98, 208" }
-                ]
-            },
-            {
-                groupTitle: "Purple-Blue / Cobalt Family (PB)",
-                swatches: [
-                    { hue: "2.5PB", munsell: "2.5PB 4/10", hex: "#005BCE", rgb: "0, 91, 206" },
-                    { hue: "5PB", munsell: "5PB 4/12", hex: "#2A52BE", rgb: "42, 82, 190" },
-                    { hue: "7.5PB", munsell: "7.5PB 4/12", hex: "#4848B8", rgb: "72, 72, 184" },
-                    { hue: "10PB", munsell: "10PB 4/10", hex: "#5E3FB2", rgb: "94, 63, 178" }
-                ]
-            },
-            {
-                groupTitle: "Purple Hue Family (P)",
-                swatches: [
-                    { hue: "2.5P", munsell: "2.5P 4/10", hex: "#6E38AD", rgb: "110, 56, 173" },
-                    { hue: "5P", munsell: "5P 4/10", hex: "#7A30A5", rgb: "122, 48, 165" },
-                    { hue: "7.5P", munsell: "7.5P 4/10", hex: "#8E299C", rgb: "142, 41, 156" },
-                    { hue: "10P", munsell: "10P 4/10", hex: "#A12192", rgb: "161, 33, 146" }
-                ]
-            },
-            {
-                groupTitle: "Red-Purple Family (RP)",
-                swatches: [
-                    { hue: "2.5RP", munsell: "2.5RP 4/10", hex: "#B61A8C", rgb: "182, 26, 140" },
-                    { hue: "5RP", munsell: "5RP 5/12", hex: "#C71585", rgb: "199, 21, 133" },
-                    { hue: "7.5RP", munsell: "7.5RP 5/12", hex: "#D31376", rgb: "211, 19, 118" },
-                    { hue: "10RP", munsell: "10RP 5/12", hex: "#E21262", rgb: "226, 18, 98" }
-                ]
-            },
-            {
-                groupTitle: "Neutral Gray Scale (N0 to N10)",
-                swatches: [
-                    { hue: "N0 Black", munsell: "N 0/", hex: "#000000", rgb: "0, 0, 0" },
-                    { hue: "N2", munsell: "N 2/", hex: "#333333", rgb: "51, 51, 51" },
-                    { hue: "N4", munsell: "N 4/", hex: "#666666", rgb: "102, 102, 102" },
-                    { hue: "N5 Mid Gray", munsell: "N 5/", hex: "#808080", rgb: "128, 128, 128" },
-                    { hue: "N6", munsell: "N 6/", hex: "#999999", rgb: "153, 153, 153" },
-                    { hue: "N8", munsell: "N 8/", hex: "#CCCCCC", rgb: "204, 204, 204" },
-                    { hue: "N10 White", munsell: "N 10/", hex: "#FFFFFF", rgb: "255, 255, 255" }
-                ]
-            }
-        ];
+        /* DYNAMIC GENERATION OF ALL 40 NCS SPECTRUM HUE STEPS */
+        function generateNcsSpectrumData() {
+            const hueNames = [
+                "Y", "Y10R", "Y20R", "Y30R", "Y40R", "Y50R", "Y60R", "Y70R", "Y80R", "Y90R",
+                "R", "R10B", "R20B", "R30B", "R40B", "R50B", "R60B", "R70B", "R80B", "R90B",
+                "B", "B10G", "B20G", "B30G", "B40G", "B50G", "B60G", "B70G", "B80G", "B90G",
+                "G", "G10Y", "G20Y", "G30Y", "G40Y", "G50Y", "G60Y", "G70Y", "G80Y", "G90Y"
+            ];
+
+            const standardNuances = [
+                ["0530", "0550", "0580", "2070", "3560"],
+                ["0510", "1030", "1070", "3050", "5040"],
+                ["0505", "2010", "2050", "4030", "6020"]
+            ];
+
+            return hueNames.map((hueName, idx) => {
+                const baseRgb = HUE_STEPS[idx] ? HUE_STEPS[idx].rgb : [255, 213, 0];
+                const rows = standardNuances.map(rowCodes => {
+                    return rowCodes.map(code => {
+                        const s = parseInt(code.substring(0, 2), 10);
+                        const c = parseInt(code.substring(2, 4), 10);
+                        const rgb = calculateNuanceRGB(baseRgb, s, c);
+                        const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+                        return {
+                            code: `${code}-${hueName}`,
+                            hex: hex
+                        };
+                    });
+                });
+
+                return {
+                    hueLabel: `Palette -${hueName}`,
+                    hueName: hueName,
+                    rows: rows
+                };
+            });
+        }
 
         function renderMunsellPalettesList() {
             const container = document.getElementById('munsell-palettes-container');
             if (!container) return;
 
+            const spectrumData = generateNcsSpectrumData();
             let html = '';
 
-            MUNSELL_FULL_SPECTRUM_DATA.forEach(fam => {
-                html += `<div class="space-y-3">
-                    <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${fam.groupTitle}</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">`;
+            spectrumData.forEach(pal => {
+                html += `
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <span class="font-bold text-sm text-sky-800 font-mono tracking-tight">${pal.hueLabel}</span>
+                        <span class="text-[11px] font-mono font-semibold text-slate-400">15 Nuances</span>
+                    </div>
+                    
+                    <div class="space-y-2">`;
 
-                fam.swatches.forEach(sw => {
-                    const textColor = getContrastTextColor(sw.hex);
-                    html += `
-                    <div onclick="addToPalette('${sw.hex}'); copyToClipboard('${sw.hex}');" 
-                         class="bg-white border border-slate-200 hover:border-sky-400 rounded-2xl p-3 flex items-center gap-3 cursor-pointer shadow-xs transition-all hover:shadow-md group">
-                        
-                        <!-- RECTANGLE COLOR SWATCH -->
-                        <div class="w-12 h-12 rounded-xl border border-black/10 shadow-inner flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105" 
-                             style="background-color: ${sw.hex};">
-                        </div>
-
-                        <!-- DETAILS TEXT -->
-                        <div class="space-y-0.5 overflow-hidden">
-                            <div class="font-extrabold text-xs text-slate-900 font-mono flex items-center justify-between">
-                                <span>${sw.hue}</span>
-                                <span class="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${sw.hex}</span>
-                            </div>
-                            <div class="text-[11px] font-semibold text-slate-600 font-mono truncate">${sw.munsell}</div>
-                            <div class="text-[10px] text-slate-400 font-mono">RGB: ${sw.rgb}</div>
-                        </div>
-                    </div>`;
+                pal.rows.forEach(row => {
+                    html += `<div class="grid grid-cols-2 sm:grid-cols-5 gap-2">`;
+                    row.forEach(item => {
+                        const textColor = getContrastTextColor(item.hex);
+                        html += `
+                        <div onclick="addToPalette('${item.hex}'); copyToClipboard('${item.code}');" 
+                             class="flex items-center justify-center p-2.5 rounded-xl border border-black/10 shadow-xs cursor-pointer transition-all hover:scale-[1.03] hover:shadow-md active:scale-95 group relative h-11"
+                             style="background-color: ${item.hex};"
+                             title="${item.code} (${item.hex})">
+                            <span class="font-mono font-bold text-[10px] tracking-tight truncate px-1" style="color: ${textColor};">
+                                ${item.code}
+                            </span>
+                        </div>`;
+                    });
+                    html += `</div>`;
                 });
 
-                html += `</div></div>`;
+                html += `
+                    </div>
+                </div>`;
             });
 
             container.innerHTML = html;
         }
 
         function copyAllMunsellCodes() {
+            const spectrumData = generateNcsSpectrumData();
             let allCodes = [];
-            MUNSELL_FULL_SPECTRUM_DATA.forEach(group => {
-                group.swatches.forEach(sw => allCodes.push(`${sw.hue} (${sw.munsell}): ${sw.hex}`));
+            spectrumData.forEach(pal => {
+                pal.rows.forEach(row => {
+                    row.forEach(item => {
+                        allCodes.push(`${item.code} (${item.hex})`);
+                    });
+                });
             });
             copyToClipboard(allCodes.join(',\n'));
-            showToast("Copied all Munsell Spectrum Notation Codes!");
+            showToast("Copied all 600 NCS Spectrum Codes!");
         }
 
         /* STANDARDIZED CIE L*a*b* COLOR SPACE PLANE RENDERER WITH DRAGGABLE NODES */
@@ -1251,6 +1265,80 @@
             }
 
             container.innerHTML = html;
+        }
+
+        /* TAB 3: PALETTE VAULT & SYNTHESIZER LOGIC */
+        function updateVaultSynthesizer() {
+            const h = document.getElementById('vault-hue-range').value;
+            const s = document.getElementById('vault-sat-range').value;
+            const l = document.getElementById('vault-light-range').value;
+
+            document.getElementById('vault-hue-val').innerText = `${h}°`;
+            document.getElementById('vault-sat-val').innerText = `${s}%`;
+            document.getElementById('vault-light-val').innerText = `${l}%`;
+
+            const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.color = hslColor;
+            document.body.appendChild(tempDiv);
+            const computedRGB = window.getComputedStyle(tempDiv).color;
+            document.body.removeChild(tempDiv);
+
+            const match = computedRGB.match(/\d+/g);
+            if (match && match.length >= 3) {
+                const hex = rgbToHex(parseInt(match[0]), parseInt(match[1]), parseInt(match[2]));
+                document.getElementById('vault-active-swatch-preview').style.backgroundColor = hex;
+                document.getElementById('vault-active-hex').innerText = hex;
+                document.getElementById('vault-active-specs').innerText = `H:${h}° S:${s}% L:${l}%`;
+            }
+        }
+
+        function addSynthesizerToPalette() {
+            const hex = document.getElementById('vault-active-hex').innerText;
+            addToPalette(hex);
+            copyToClipboard(hex);
+        }
+
+        const VAULT_PRESETS = [
+            { name: "Oceanic Rockies", colors: ["#0284c7", "#38bdf8", "#7dd3fc", "#e0f2fe", "#0369a1"] },
+            { name: "Autumn Forest", colors: ["#b45309", "#d97706", "#f59e0b", "#fef3c7", "#78350f"] },
+            { name: "Neon Cyberpunk", colors: ["#d946ef", "#8b5cf6", "#06b6d4", "#10b981", "#f43f5e"] },
+            { name: "Pastel Meadow", colors: ["#fbcfe8", "#fef08a", "#bbf7d0", "#bae6fd", "#e9d5ff"] },
+            { name: "Monochrome Slate", colors: ["#0f172a", "#334155", "#64748b", "#cbd5e1", "#f8fafc"] },
+            { name: "Sunset Horizon", colors: ["#be123c", "#fb923c", "#facc15", "#4c1d95", "#881337"] }
+        ];
+
+        function renderVaultPresets() {
+            const container = document.getElementById('vault-presets-container');
+            if (!container) return;
+
+            let html = '';
+            VAULT_PRESETS.forEach(p => {
+                html += `<div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-xs text-slate-800">${p.name}</span>
+                        <button onclick="addPresetPalette('${p.colors.join(',')}')" class="text-[11px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Add All
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 h-10">`;
+
+                p.colors.forEach(hex => {
+                    html += `<div onclick="addToPalette('${hex}'); copyToClipboard('${hex}');" class="swatch-card rounded-lg h-full cursor-pointer shadow-sm relative group" style="background-color: ${hex};" title="${hex} (Click to copy & add)">
+                        <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 rounded-lg text-white font-mono text-[8px] font-bold transition-opacity">Copy</span>
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function addPresetPalette(csvHex) {
+            const colors = csvHex.split(',');
+            colors.forEach(hex => addToPalette(hex));
+            showToast("Added preset palette to global drawer!");
         }
 
         /* COLOR MATH UTILITIES */
