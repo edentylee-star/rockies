@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>colour wheel</title>
+    <title>colour wheel & munsell reference</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -212,7 +212,7 @@
             box-shadow: 0 6px 12px -2px rgba(0,0,0,0.12);
         }
 
-        /* TOP-LEFT ROCKIE NAVIGATION PANEL */
+        /* TOP-LEFT NAVIGATION PANEL */
         .nav-header-left {
             display: flex;
             align-items: center;
@@ -342,10 +342,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
                 
-                <!-- Left Container: Dropdown Navigation & Logo + Title -->
+                <!-- Left Container: Dropdown Navigation & Title -->
                 <div class="flex flex-wrap items-center gap-3 sm:gap-4">
                     <div class="nav-header-left">
-                        <!-- Navigation Dropdown Switcher -->
                         <div id="nav-dropdown-container" class="nav-tools-dropdown">
                             <button onclick="toggleNavDropdown(event)" class="nav-dropdown-btn">
                                 <span>Rockie Navigation</span>
@@ -380,7 +379,7 @@
 
                     <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
 
-                    <!-- Logo & Title -->
+                    <!-- Title -->
                     <div class="flex items-center space-x-3">
                         <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                             rockies in a circle
@@ -391,7 +390,7 @@
                 <!-- Tab Switcher -->
                 <div class="flex flex-wrap items-center gap-2">
                     <button id="tab-wheel-btn" onclick="switchMainTab('wheel')" class="view-tab-btn active">
-                        <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel
+                        <i class="fa-solid fa-circle-notch mr-1.5"></i> Colour Wheel & Munsell Reference
                     </button>
                     <button id="tab-graph-btn" onclick="switchMainTab('graph')" class="view-tab-btn">
                         <i class="fa-solid fa-diagram-project mr-1.5"></i> CIE L*a*b* & Intervals
@@ -408,7 +407,7 @@
     <!-- MAIN CONTENT AREA -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full space-y-6 flex flex-col items-center">
 
-        <!-- TAB 1: HUE WHEEL & MUNSELL/NCS LISTING CONTAINER -->
+        <!-- TAB 1: HUE WHEEL & COMPLETE MUNSELL SPECTRUM SWATCH LIST -->
         <div id="tab-wheel-content" class="w-full flex flex-col items-center space-y-8">
             
             <!-- Wheel Container -->
@@ -430,14 +429,14 @@
                 </div>
             </div>
 
-            <!-- Bottom listing of Munsell & NCS Colour Palettes from photos -->
+            <!-- COMPLETE MUNSELL SPECTRUM WITH VISUAL RECTANGLE SWATCHES -->
             <div class="w-full max-w-5xl glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-2">
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Munsell / NCS Reference Palette List
+                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Complete Munsell Color Spectrum Reference
                         </h3>
-                        <p class="text-xs text-slate-500">Complete listing of swatch codes extracted from reference palette sheets (Blue-Green, Yellow, Yellow-Red).</p>
+                        <p class="text-xs text-slate-500">Every Munsell hue across the full spectrum featuring visual color swatches, Munsell notations, HEX codes, and RGB values.</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="copyAllMunsellCodes()" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
@@ -446,8 +445,9 @@
                     </div>
                 </div>
 
+                <!-- Complete 10 Hue Families & Neutral Scale Container -->
                 <div id="munsell-palettes-container" class="space-y-6">
-                    <!-- Complete Munsell / NCS List rendered dynamically below -->
+                    <!-- Dynamic rendering of all Munsell Spectrum Families & Neutral Axis -->
                 </div>
             </div>
 
@@ -645,7 +645,7 @@
                     <div class="w-8 h-8 rounded-xl bg-[#B4E3F8] flex items-center justify-center text-[#0369a1] border border-[#22ACEC] shadow-sm">
                         <i class="fa-solid fa-swatchbook text-sm"></i>
                     </div>
-                    <span id="palette-counter" class="font-bold text-slate-900 text-xs sm:text-sm">Global Comparison Palette (0/16)</span>
+                    <span id="palette-counter" class="font-bold text-slate-900 text-xs sm:text-sm">Global Comparison Palette (0)</span>
                 </div>
                 <button onclick="clearPalette()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 border border-slate-200 hover:border-red-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-trash-can text-[11px]"></i>
@@ -655,7 +655,7 @@
 
             <!-- Swatch Slots Container -->
             <div id="palette-slots-container" class="flex items-center gap-1.5 overflow-x-auto py-1">
-                <!-- 16 slots injected dynamically -->
+                <!-- Slots dynamically injected -->
             </div>
 
             <!-- Action Controls -->
@@ -698,9 +698,7 @@
             const graphContent = document.getElementById('tab-graph-content');
             const vaultContent = document.getElementById('tab-vault-content');
 
-            // Reset tab button states
             [wheelBtn, graphBtn, vaultBtn].forEach(btn => btn && btn.classList.remove('active'));
-            // Hide all tab contents
             [wheelContent, graphContent, vaultContent].forEach(content => content && content.classList.add('hidden'));
 
             if (tab === 'wheel') {
@@ -735,12 +733,12 @@
             }
         });
 
-        /* NCS COLOR CONSTANTS & ENDPOINTS */
+        /* NCS / HUE CIRCLE CONSTANTS & ENDPOINTS */
         const NCS_PRIMARIES = {
-            Y: [255, 213, 0],   // Primary Yellow
-            R: [227, 0, 34],    // Primary Red
-            B: [0, 135, 202],   // Primary Blue
-            G: [0, 158, 96]     // Primary Green
+            Y: [255, 213, 0],   // Yellow
+            R: [227, 0, 34],    // Red
+            B: [0, 135, 202],   // Blue
+            G: [0, 158, 96]     // Green
         };
 
         const HUE_STEPS = [];
@@ -758,13 +756,7 @@
                 const c2 = NCS_PRIMARIES[q.end];
 
                 for (let i = 0; i < 10; i++) {
-                    let name = "";
-                    if (i === 0) {
-                        name = `-${q.start}`;
-                    } else {
-                        name = `-${q.start}${i * 10}${q.end}`;
-                    }
-
+                    let name = (i === 0) ? `-${q.start}` : `-${q.start}${i * 10}${q.end}`;
                     const t = i / 10;
                     const r = Math.round(c1[0] * (1 - t) + c2[0] * t);
                     const g = Math.round(c1[1] * (1 - t) + c2[1] * t);
@@ -835,12 +827,12 @@
 
             html += `<circle cx="${cx}" cy="${cy}" r="${rInner - 6}" fill="#f8fafc" stroke="#38bdf8" stroke-width="1.5" />`;
             html += `<text x="${cx}" y="${cy - 8}" text-anchor="middle" font-size="15" font-weight="800" fill="#0369a1">Colour Wheel</text>`;
-            html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Click me ;)</text>`;
+            html += `<text x="${cx}" y="${cy + 12}" text-anchor="middle" font-size="11" font-weight="600" fill="#64748b">Click wedge to inspect</text>`;
 
             svg.innerHTML = html;
         }
 
-        /* ITEM 1: PERCEIVED VALUE GRAPH RENDERER */
+        /* PERCEIVED VALUE GRAPH RENDERER */
         function renderPerceivedValueGraph() {
             const svg = document.getElementById('perceived-value-graph-svg');
             if (!svg) return;
@@ -864,14 +856,12 @@
 
             let html = '';
 
-            // Grid Lines & Axis Labels
             for (let v = 0; v <= 10; v += 2) {
                 const y = mapY(v);
                 html += `<line x1="${margin.left}" y1="${y}" x2="${margin.left + width}" y2="${y}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3 3"/>`;
                 html += `<text x="${margin.left - 12}" y="${y + 4}" font-family="JetBrains Mono" font-size="10" font-weight="600" fill="#64748b" text-anchor="end">${v * 10}%</text>`;
             }
 
-            // Curve Line Construction
             let pathD = `M ${mapX(nodes[0].deg)} ${mapY(nodes[0].val)}`;
             for (let i = 0; i < nodes.length - 1; i++) {
                 const p0 = nodes[i];
@@ -884,7 +874,6 @@
                 pathD += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1} ${y1}`;
             }
 
-            // Curve Gradient Area
             html += `<defs>
                 <linearGradient id="pv-curve-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="#FF0000"/>
@@ -899,9 +888,8 @@
 
             html += `<path d="${pathD}" fill="none" stroke="url(#pv-curve-grad)" stroke-width="4" stroke-linecap="round"/>`;
 
-            // Data Points & Annotations
             nodes.forEach((n, idx) => {
-                if (idx === nodes.length - 1) return; // avoid duplicate red at 360°
+                if (idx === nodes.length - 1) return;
                 const x = mapX(n.deg);
                 const y = mapY(n.val);
 
@@ -910,43 +898,114 @@
                 html += `<text x="${x}" y="${margin.top + height + 20}" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#475569" text-anchor="middle">${n.deg}°</text>`;
             });
 
-            // Axes Lines
             html += `<line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + height}" stroke="#0f172a" stroke-width="1.5"/>`;
             html += `<line x1="${margin.left}" y1="${margin.top + height}" x2="${margin.left + width}" y2="${margin.top + height}" stroke="#0f172a" stroke-width="1.5"/>`;
 
             svg.innerHTML = html;
         }
 
-        /* ITEM 2: MUNSELL / NCS REFERENCE PALETTES COMPLETE LISTING */
-        const MUNSELL_SERIES_DATA = [
+        /* MUNSELL SPECTRUM & SWATCH RECTANGLES */
+        const MUNSELL_FULL_SPECTRUM_DATA = [
             {
-                series: "Blue-Green Series (B50G to B90G)",
-                palettes: [
-                    { title: "Palette - B50G", codes: ["0530-B50G", "1030-B50G", "2060-B50G", "3055-B50G", "4550-B50G", "0520-B50G", "2030-B50G", "3040-B50G", "4040-B50G", "6030-B50G", "1010-B50G", "3010-B50G", "4020-B50G", "5020-B50G", "7020-B50G"] },
-                    { title: "Palette - B60G", codes: ["1030-B60G", "1050-B60G", "2555-B60G", "3555-B60G", "4050-B60G", "0530-B60G", "1040-B60G", "2050-B60G", "3050-B60G", "5040-B60G", "0520-B60G", "2030-B60G", "3040-B60G", "4040-B60G", "6035-B60G"] },
-                    { title: "Palette - B70G", codes: ["0530-B70G", "1050-B70G", "2060-B70G", "3060-B70G", "5040-B70G", "0520-B70G", "2030-B70G", "3040-B70G", "4040-B70G", "6020-B70G", "0510-B70G", "3010-B70G", "4020-B70G", "5020-B70G", "7010-B70G"] },
-                    { title: "Palette - B80G", codes: ["1050-B80G", "2050-B80G", "2555-B80G", "3555-B80G", "4550-B80G", "1040-B80G", "2040-B80G", "3050-B80G", "4050-B80G", "5040-B80G", "1005-B80G", "2005-B80G", "3040-B80G", "4040-B80G", "5540-B80G"] },
-                    { title: "Palette - B90G", codes: ["0530-B90G", "1050-B90G", "2060-B90G", "3060-B90G", "4050-B90G", "0520-B90G", "2030-B90G", "3040-B90G", "4040-B90G", "5030-B90G", "0510-B90G", "3020-B90G", "4020-B90G", "5020-B90G", "6010-B90G"] }
+                groupTitle: "Red Hue Family (R)",
+                swatches: [
+                    { hue: "2.5R", munsell: "2.5R 5/14", hex: "#F52222", rgb: "245, 34, 34" },
+                    { hue: "5R", munsell: "5R 4/14", hex: "#E60000", rgb: "230, 0, 0" },
+                    { hue: "7.5R", munsell: "7.5R 5/14", hex: "#E03800", rgb: "224, 56, 0" },
+                    { hue: "10R", munsell: "10R 5/12", hex: "#DC4C00", rgb: "220, 76, 0" }
                 ]
             },
             {
-                series: "Yellow Series (Y to Y40R)",
-                palettes: [
-                    { title: "Palette - Y", codes: ["0530-Y", "0550-Y", "0585-Y", "1080-Y", "3560-Y", "0510-Y", "1030-Y", "1060-Y", "2060-Y", "5040-Y", "0505-Y", "2010-Y", "2040-Y", "4020-Y", "6020-Y"] },
-                    { title: "Palette - Y10R", codes: ["0530-Y10R", "0550-Y10R", "0580-Y10R", "1080-Y10R", "4050-Y10R", "0520-Y10R", "1030-Y10R", "1060-Y10R", "2060-Y10R", "5030-Y10R", "0505-Y10R", "2010-Y10R", "2040-Y10R", "4020-Y10R", "6010-Y10R"] },
-                    { title: "Palette - Y20R", codes: ["0520-Y20R", "0550-Y20R", "0585-Y20R", "2070-Y20R", "3560-Y20R", "0510-Y20R", "1030-Y20R", "1070-Y20R", "3050-Y20R", "5040-Y20R", "1005-Y20R", "2010-Y20R", "2050-Y20R", "4030-Y20R", "6020-Y20R"] },
-                    { title: "Palette - Y30R", codes: ["0530-Y30R", "0550-Y30R", "0585-Y30R", "2070-Y30R", "3560-Y30R", "0520-Y30R", "1030-Y30R", "1070-Y30R", "3050-Y30R", "5040-Y30R", "1010-Y30R", "2010-Y30R", "2050-Y30R", "4030-Y30R", "6020-Y30R"] },
-                    { title: "Palette - Y40R", codes: ["0520-Y40R", "0550-Y40R", "0585-Y40R", "2070-Y40R", "3560-Y40R", "1010-Y40R", "1030-Y40R", "1070-Y40R", "3050-Y40R", "5040-Y40R", "1005-Y40R", "2010-Y40R", "2050-Y40R", "4030-Y40R", "6020-Y40R"] }
+                groupTitle: "Yellow-Red / Orange Family (YR)",
+                swatches: [
+                    { hue: "2.5YR", munsell: "2.5YR 6/12", hex: "#D95300", rgb: "217, 83, 0" },
+                    { hue: "5YR", munsell: "5YR 6/12", hex: "#D95300", rgb: "217, 83, 0" },
+                    { hue: "7.5YR", munsell: "7.5YR 6/12", hex: "#CE6B00", rgb: "206, 107, 0" },
+                    { hue: "10YR", munsell: "10YR 7/10", hex: "#C27B00", rgb: "194, 123, 0" }
                 ]
             },
             {
-                series: "Yellow-Red / Red-Orange Series (Y50R to Y90R)",
-                palettes: [
-                    { title: "Palette - Y50R", codes: ["0530-Y50R", "0550-Y50R", "0585-Y50R", "2070-Y50R", "3560-Y50R", "0520-Y50R", "1030-Y50R", "1070-Y50R", "3050-Y50R", "5040-Y50R", "1010-Y50R", "2010-Y50R", "2050-Y50R", "4030-Y50R", "6020-Y50R"] },
-                    { title: "Palette - Y60R", codes: ["0520-Y60R", "0550-Y60R", "0585-Y60R", "2070-Y60R", "3560-Y60R", "0510-Y60R", "1030-Y60R", "1070-Y60R", "3050-Y60R", "5040-Y60R", "0505-Y60R", "2010-Y60R", "2050-Y60R", "4030-Y60R", "6020-Y60R"] },
-                    { title: "Palette - Y70R", codes: ["0530-Y70R", "0550-Y70R", "0585-Y70R", "2075-Y70R", "4550-Y70R", "0510-Y70R", "1030-Y70R", "1070-Y70R", "3060-Y70R", "6030-Y70R", "0505-Y70R", "2010-Y70R", "2050-Y70R", "4040-Y70R", "7010-Y70R"] },
-                    { title: "Palette - Y80R", codes: ["0530-Y80R", "0560-Y80R", "0585-Y80R", "1580-Y80R", "3560-Y80R", "1020-Y80R", "1040-Y80R", "1070-Y80R", "3060-Y80R", "5040-Y80R", "1010-Y80R", "2020-Y80R", "2050-Y80R", "4040-Y80R", "6020-Y80R"] },
-                    { title: "Palette - Y90R", codes: ["0530-Y90R", "0560-Y90R", "0580-Y90R", "1085-Y90R", "3560-Y40R", "1020-Y90R", "1040-Y90R", "1060-Y90R", "2070-Y90R", "5040-Y40R", "1010-Y90R", "2020-Y90R", "2040-Y90R", "3050-Y90R", "6020-Y40R"] }
+                groupTitle: "Yellow Hue Family (Y)",
+                swatches: [
+                    { hue: "2.5Y", munsell: "2.5Y 7/10", hex: "#BC8200", rgb: "188, 130, 0" },
+                    { hue: "5Y", munsell: "5Y 8/12", hex: "#B88600", rgb: "184, 134, 0" },
+                    { hue: "7.5Y", munsell: "7.5Y 8/10", hex: "#A38E00", rgb: "163, 142, 0" },
+                    { hue: "10Y", munsell: "10Y 7/10", hex: "#8F9300", rgb: "143, 147, 0" }
+                ]
+            },
+            {
+                groupTitle: "Green-Yellow Family (GY)",
+                swatches: [
+                    { hue: "2.5GY", munsell: "2.5GY 7/10", hex: "#7B9800", rgb: "123, 152, 0" },
+                    { hue: "5GY", munsell: "5GY 7/10", hex: "#709B00", rgb: "112, 155, 0" },
+                    { hue: "7.5GY", munsell: "7.5GY 6/10", hex: "#539E1B", rgb: "83, 158, 27" },
+                    { hue: "10GY", munsell: "10GY 6/10", hex: "#2FA033", rgb: "47, 160, 51" }
+                ]
+            },
+            {
+                groupTitle: "Green Hue Family (G)",
+                swatches: [
+                    { hue: "2.5G", munsell: "2.5G 5/10", hex: "#009C3B", rgb: "0, 156, 59" },
+                    { hue: "5G", munsell: "5G 5/10", hex: "#009944", rgb: "0, 153, 68" },
+                    { hue: "7.5G", munsell: "7.5G 5/10", hex: "#009A5A", rgb: "0, 154, 90" },
+                    { hue: "10G", munsell: "10G 5/8", hex: "#009B70", rgb: "0, 155, 112" }
+                ]
+            },
+            {
+                groupTitle: "Blue-Green / Teal Family (BG)",
+                swatches: [
+                    { hue: "2.5BG", munsell: "2.5BG 5/8", hex: "#009B7D", rgb: "0, 155, 125" },
+                    { hue: "5BG", munsell: "5BG 5/8", hex: "#009B85", rgb: "0, 155, 133" },
+                    { hue: "7.5BG", munsell: "7.5BG 5/8", hex: "#009A94", rgb: "0, 154, 148" },
+                    { hue: "10BG", munsell: "10BG 5/8", hex: "#0096A4", rgb: "0, 150, 164" }
+                ]
+            },
+            {
+                groupTitle: "Blue Hue Family (B)",
+                swatches: [
+                    { hue: "2.5B", munsell: "2.5B 5/8", hex: "#008EB8", rgb: "0, 142, 184" },
+                    { hue: "5B", munsell: "5B 5/10", hex: "#0080C8", rgb: "0, 128, 200" },
+                    { hue: "7.5B", munsell: "7.5B 5/10", hex: "#0072D0", rgb: "0, 114, 208" },
+                    { hue: "10B", munsell: "10B 4/10", hex: "#0062D0", rgb: "0, 98, 208" }
+                ]
+            },
+            {
+                groupTitle: "Purple-Blue / Cobalt Family (PB)",
+                swatches: [
+                    { hue: "2.5PB", munsell: "2.5PB 4/10", hex: "#005BCE", rgb: "0, 91, 206" },
+                    { hue: "5PB", munsell: "5PB 4/12", hex: "#2A52BE", rgb: "42, 82, 190" },
+                    { hue: "7.5PB", munsell: "7.5PB 4/12", hex: "#4848B8", rgb: "72, 72, 184" },
+                    { hue: "10PB", munsell: "10PB 4/10", hex: "#5E3FB2", rgb: "94, 63, 178" }
+                ]
+            },
+            {
+                groupTitle: "Purple Hue Family (P)",
+                swatches: [
+                    { hue: "2.5P", munsell: "2.5P 4/10", hex: "#6E38AD", rgb: "110, 56, 173" },
+                    { hue: "5P", munsell: "5P 4/10", hex: "#7A30A5", rgb: "122, 48, 165" },
+                    { hue: "7.5P", munsell: "7.5P 4/10", hex: "#8E299C", rgb: "142, 41, 156" },
+                    { hue: "10P", munsell: "10P 4/10", hex: "#A12192", rgb: "161, 33, 146" }
+                ]
+            },
+            {
+                groupTitle: "Red-Purple Family (RP)",
+                swatches: [
+                    { hue: "2.5RP", munsell: "2.5RP 4/10", hex: "#B61A8C", rgb: "182, 26, 140" },
+                    { hue: "5RP", munsell: "5RP 5/12", hex: "#C71585", rgb: "199, 21, 133" },
+                    { hue: "7.5RP", munsell: "7.5RP 5/12", hex: "#D31376", rgb: "211, 19, 118" },
+                    { hue: "10RP", munsell: "10RP 5/12", hex: "#E21262", rgb: "226, 18, 98" }
+                ]
+            },
+            {
+                groupTitle: "Neutral Gray Scale (N0 to N10)",
+                swatches: [
+                    { hue: "N0 Black", munsell: "N 0/", hex: "#000000", rgb: "0, 0, 0" },
+                    { hue: "N2", munsell: "N 2/", hex: "#333333", rgb: "51, 51, 51" },
+                    { hue: "N4", munsell: "N 4/", hex: "#666666", rgb: "102, 102, 102" },
+                    { hue: "N5 Mid Gray", munsell: "N 5/", hex: "#808080", rgb: "128, 128, 128" },
+                    { hue: "N6", munsell: "N 6/", hex: "#999999", rgb: "153, 153, 153" },
+                    { hue: "N8", munsell: "N 8/", hex: "#CCCCCC", rgb: "204, 204, 204" },
+                    { hue: "N10 White", munsell: "N 10/", hex: "#FFFFFF", rgb: "255, 255, 255" }
                 ]
             }
         ];
@@ -957,21 +1016,32 @@
 
             let html = '';
 
-            MUNSELL_SERIES_DATA.forEach(sec => {
+            MUNSELL_FULL_SPECTRUM_DATA.forEach(fam => {
                 html += `<div class="space-y-3">
-                    <h4 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider font-mono bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${sec.series}</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
+                    <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider font-mono bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">${fam.groupTitle}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">`;
 
-                sec.palettes.forEach(pal => {
-                    html += `<div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
-                        <div class="font-bold text-xs text-sky-800 font-mono">${pal.title}</div>
-                        <div class="flex flex-wrap gap-1.5">`;
+                fam.swatches.forEach(sw => {
+                    const textColor = getContrastTextColor(sw.hex);
+                    html += `
+                    <div onclick="addToPalette('${sw.hex}'); copyToClipboard('${sw.hex}');" 
+                         class="bg-white border border-slate-200 hover:border-sky-400 rounded-2xl p-3 flex items-center gap-3 cursor-pointer shadow-xs transition-all hover:shadow-md group">
+                        
+                        <!-- RECTANGLE COLOR SWATCH -->
+                        <div class="w-12 h-12 rounded-xl border border-black/10 shadow-inner flex-shrink-0 flex items-center justify-center transition-transform group-hover:scale-105" 
+                             style="background-color: ${sw.hex};">
+                        </div>
 
-                    pal.codes.forEach(code => {
-                        html += `<span onclick="copyToClipboard('${code}')" class="font-mono text-[11px] font-semibold bg-white hover:bg-sky-50 text-slate-700 hover:text-sky-700 px-2 py-1 rounded-md border border-slate-200 cursor-pointer transition-all shadow-2xs" title="Click to copy code">${code}</span>`;
-                    });
-
-                    html += `</div></div>`;
+                        <!-- DETAILS TEXT -->
+                        <div class="space-y-0.5 overflow-hidden">
+                            <div class="font-extrabold text-xs text-slate-900 font-mono flex items-center justify-between">
+                                <span>${sw.hue}</span>
+                                <span class="text-[10px] text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">${sw.hex}</span>
+                            </div>
+                            <div class="text-[11px] font-semibold text-slate-600 font-mono truncate">${sw.munsell}</div>
+                            <div class="text-[10px] text-slate-400 font-mono">RGB: ${sw.rgb}</div>
+                        </div>
+                    </div>`;
                 });
 
                 html += `</div></div>`;
@@ -982,9 +1052,11 @@
 
         function copyAllMunsellCodes() {
             let allCodes = [];
-            MUNSELL_SERIES_DATA.forEach(s => s.palettes.forEach(p => allCodes.push(...p.codes)));
-            copyToClipboard(allCodes.join(', '));
-            showToast("Copied all Munsell & NCS Notation Codes!");
+            MUNSELL_FULL_SPECTRUM_DATA.forEach(group => {
+                group.swatches.forEach(sw => allCodes.push(`${sw.hue} (${sw.munsell}): ${sw.hex}`));
+            });
+            copyToClipboard(allCodes.join(',\n'));
+            showToast("Copied all Munsell Spectrum Notation Codes!");
         }
 
         /* STANDARDIZED CIE L*a*b* COLOR SPACE PLANE RENDERER WITH DRAGGABLE NODES */
@@ -1007,7 +1079,7 @@
 
             const cx = 400, cy = 400;
             const rCircle = 340;
-            const scale = 3.2; // 100 units = 320px
+            const scale = 3.2;
 
             let html = `
             <defs>
@@ -1038,11 +1110,9 @@
 
             html += `<circle cx="${cx}" cy="${cy}" r="${rCircle - 8}" fill="none" stroke="#ffffff" stroke-width="2" />`;
 
-            // Axes
             html += `<line x1="40" y1="${cy}" x2="760" y2="${cy}" stroke="#0f172a" stroke-width="1.5" />`;
             html += `<line x1="${cx}" y1="40" x2="${cx}" y2="760" stroke="#0f172a" stroke-width="1.5" />`;
 
-            // Ticks & Labels
             const tickVals = [-90, -80, -70, -60, -50, -40, -30, -20, -10, 10, 20, 30, 40, 50, 60, 70, 80, 90];
             tickVals.forEach(v => {
                 const tx = cx + v * scale;
@@ -1059,7 +1129,6 @@
             html += `<text x="${cx}" y="24" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">b*</text>`;
             html += `<text x="${cx}" y="785" font-family="Serif, Times New Roman" font-size="18" font-weight="bold" fill="#0f172a" text-anchor="middle">-b*</text>`;
 
-            // Render Interactive Draggable Nodes
             labPoints.forEach((p, idx) => {
                 const pos = { x: cx + p.a * scale, y: cy - p.b * scale };
                 const rNode = 16;
@@ -1127,7 +1196,6 @@
             labPoints[activeDraggedIndex].a = newA;
             labPoints[activeDraggedIndex].b = newB;
 
-            // Recalculate Node Dynamic Color Preview from Angle/Distance
             const angleDeg = (Math.atan2(newB, newA) * 180 / Math.PI + 360) % 360;
             labPoints[activeDraggedIndex].color = `hsl(${angleDeg}, 85%, 52%)`;
 
@@ -1556,39 +1624,17 @@
             copyToClipboard(currentModalSwatchHex);
         }
 
-        /* GLOBAL PALETTE DRAWER LOGIC */
-        const MAX_PALETTE = 16;
+        /* UNLIMITED GLOBAL COMPARISON PALETTE LOGIC */
         let paletteColors = [];
         let draggedIndex = null;
 
         function initPalette() {
-            const container = document.getElementById('palette-slots-container');
-            if (!container) return; 
-            container.innerHTML = '';
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                let slot = document.createElement('div');
-                slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all relative overflow-hidden';
-                slot.id = 'p-slot-' + i;
-                slot.dataset.index = i;
-
-                slot.addEventListener('dragstart', handleDragStart);
-                slot.addEventListener('dragover', handleDragOver);
-                slot.addEventListener('dragleave', handleDragLeave);
-                slot.addEventListener('drop', handleDrop);
-                slot.addEventListener('dragend', handleDragEnd);
-
-                container.appendChild(slot);
-            }
             updatePaletteUI();
         }
 
         function addToPalette(hex) {
-            if (paletteColors.length < MAX_PALETTE) {
-                paletteColors.push(hex);
-                updatePaletteUI();
-            } else {
-                showToast("Palette Bank is Full (16/16)");
-            }
+            paletteColors.push(hex);
+            updatePaletteUI();
         }
 
         function removeFromPalette(index, event) {
@@ -1611,13 +1657,13 @@
             copyToClipboard(paletteColors.join(', '));
         }
 
-        /* MINIMALIST CARD GENERATION (8-COLUMN HIGH-RES GRID) */
+        /* MINIMALIST CARD GENERATION */
         function downloadMinimalPaletteCard(fileType = 'jpeg') {
             if (!paletteColors || paletteColors.length === 0) {
                 showToast("No active palette colors to download!");
                 return;
             }
-            const activeExportPalette = { name: "circle_rockies_palette", colors: paletteColors };
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
             generateHighResCardDownload(activeExportPalette, fileType);
         }
 
@@ -1675,7 +1721,7 @@
                 showToast("No active palette colors to download!");
                 return;
             }
-            const activeExportPalette = { name: "circle_rockies_palette", colors: paletteColors };
+            const activeExportPalette = { name: "rockie_palette", colors: paletteColors };
             generateExpandedSpecCardDownload(activeExportPalette, fileType);
         }
 
@@ -1826,35 +1872,38 @@
 
         function updatePaletteUI() {
             const counter = document.getElementById('palette-counter');
-            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length}/16)`;
+            if (counter) counter.innerText = `Global Comparison Palette (${paletteColors.length})`;
 
-            for (let i = 0; i < MAX_PALETTE; i++) {
-                const slot = document.getElementById('p-slot-' + i);
-                if (!slot) continue;
-                slot.innerHTML = '';
-                if (i < paletteColors.length) {
-                    const hex = paletteColors[i];
-                    slot.style.backgroundColor = hex;
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group';
-                    slot.setAttribute('draggable', 'true');
+            const container = document.getElementById('palette-slots-container');
+            if (!container) return;
+            container.innerHTML = '';
 
-                    slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+            paletteColors.forEach((hex, i) => {
+                const slot = document.createElement('div');
+                slot.id = 'p-slot-' + i;
+                slot.dataset.index = i;
+                slot.style.backgroundColor = hex;
+                slot.className = 'palette-slot w-11 h-9 rounded-xl border border-black/20 flex items-center justify-center cursor-grab transition-all shadow-sm hover:scale-105 relative group shrink-0';
+                slot.setAttribute('draggable', 'true');
 
-                    const removeBtn = document.createElement('button');
-                    removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
-                    removeBtn.innerHTML = '×';
-                    removeBtn.title = 'Remove color';
-                    removeBtn.onclick = (e) => removeFromPalette(i, e);
-                    slot.appendChild(removeBtn);
+                slot.addEventListener('dragstart', handleDragStart);
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragend', handleDragEnd);
 
-                    slot.onclick = () => copyToClipboard(hex);
-                } else {
-                    slot.style.backgroundColor = 'transparent';
-                    slot.className = 'palette-slot w-11 h-9 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center transition-all';
-                    slot.removeAttribute('draggable');
-                    slot.onclick = null;
-                }
-            }
+                slot.innerHTML = `<span class="text-[8px] font-mono font-bold" style="color:${getContrastTextColor(hex)}">${hex.substring(1)}</span>`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] font-bold hidden group-hover:flex items-center justify-center shadow cursor-pointer border border-white';
+                removeBtn.innerHTML = '×';
+                removeBtn.title = 'Remove color';
+                removeBtn.onclick = (e) => removeFromPalette(i, e);
+                slot.appendChild(removeBtn);
+
+                slot.onclick = () => copyToClipboard(hex);
+                container.appendChild(slot);
+            });
         }
 
         function copyToClipboard(text) {
