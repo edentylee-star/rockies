@@ -395,9 +395,6 @@
                     <button id="tab-graph-btn" onclick="switchMainTab('graph')" class="view-tab-btn">
                         <i class="fa-solid fa-diagram-project mr-1.5"></i> CIE L*a*b* & Intervals
                     </button>
-                    <button id="tab-vault-btn" onclick="switchMainTab('vault')" class="view-tab-btn">
-                        <i class="fa-solid fa-sliders mr-1.5"></i> Palette Vault & Analyzer
-                    </button>
                 </div>
 
             </div>
@@ -508,78 +505,6 @@
 
                 <div id="interval-rows-container" class="space-y-4">
                     <!-- Dynamic Interval Rows Injected Here -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TAB 3: PALETTE VAULT & ANALYZER -->
-        <div id="tab-vault-content" class="w-full max-w-5xl space-y-6 hidden">
-            
-            <!-- Dynamic Controls Card -->
-            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-                    <div class="text-left">
-                        <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Interactive HSL & Luminance Synthesizer</h2>
-                        <p class="text-xs text-slate-500">Tweak parameters to generate variations and save them to your global drawer.</p>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        <div id="vault-active-swatch-preview" class="w-10 h-10 rounded-xl border border-slate-300 shadow-sm transition-all" style="background-color: #0284c7;"></div>
-                        <div class="text-left">
-                            <div id="vault-active-hex" class="font-mono font-bold text-sm text-slate-900">#0284C7</div>
-                            <div id="vault-active-specs" class="font-mono text-[11px] text-slate-500">H:201° S:97% L:45%</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sliders Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                    <!-- Hue Slider -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs font-bold">
-                            <label for="vault-hue-range" class="text-slate-700">Hue Angle (H)</label>
-                            <span id="vault-hue-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">201°</span>
-                        </div>
-                        <input id="vault-hue-range" type="range" min="0" max="360" value="201" oninput="updateVaultSynthesizer()">
-                    </div>
-
-                    <!-- Saturation Slider -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs font-bold">
-                            <label for="vault-sat-range" class="text-slate-700">Saturation (S)</label>
-                            <span id="vault-sat-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">97%</span>
-                        </div>
-                        <input id="vault-sat-range" type="range" min="0" max="100" value="97" oninput="updateVaultSynthesizer()">
-                    </div>
-
-                    <!-- Lightness Slider -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center text-xs font-bold">
-                            <label for="vault-light-range" class="text-slate-700">Lightness (L)</label>
-                            <span id="vault-light-val" class="font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">45%</span>
-                        </div>
-                        <input id="vault-light-range" type="range" min="0" max="100" value="45" oninput="updateVaultSynthesizer()">
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                    <button onclick="addSynthesizerToPalette()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Save Color to Global Palette</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Preset Palettes Vault Grid -->
-            <div class="glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-4 text-left">
-                <div>
-                    <h3 class="text-base font-bold text-slate-900">Curated Rockie Palettes</h3>
-                    <p class="text-xs text-slate-500">Click any color swatch to copy its HEX value or send it straight to your global comparison drawer.</p>
-                </div>
-
-                <div id="vault-presets-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Preset Cards Injected Dynamically -->
                 </div>
             </div>
 
@@ -1326,80 +1251,6 @@
             }
 
             container.innerHTML = html;
-        }
-
-        /* TAB 3: PALETTE VAULT & SYNTHESIZER LOGIC */
-        function updateVaultSynthesizer() {
-            const h = document.getElementById('vault-hue-range').value;
-            const s = document.getElementById('vault-sat-range').value;
-            const l = document.getElementById('vault-light-range').value;
-
-            document.getElementById('vault-hue-val').innerText = `${h}°`;
-            document.getElementById('vault-sat-val').innerText = `${s}%`;
-            document.getElementById('vault-light-val').innerText = `${l}%`;
-
-            const hslColor = `hsl(${h}, ${s}%, ${l}%)`;
-            const tempDiv = document.createElement('div');
-            tempDiv.style.color = hslColor;
-            document.body.appendChild(tempDiv);
-            const computedRGB = window.getComputedStyle(tempDiv).color;
-            document.body.removeChild(tempDiv);
-
-            const match = computedRGB.match(/\d+/g);
-            if (match && match.length >= 3) {
-                const hex = rgbToHex(parseInt(match[0]), parseInt(match[1]), parseInt(match[2]));
-                document.getElementById('vault-active-swatch-preview').style.backgroundColor = hex;
-                document.getElementById('vault-active-hex').innerText = hex;
-                document.getElementById('vault-active-specs').innerText = `H:${h}° S:${s}% L:${l}%`;
-            }
-        }
-
-        function addSynthesizerToPalette() {
-            const hex = document.getElementById('vault-active-hex').innerText;
-            addToPalette(hex);
-            copyToClipboard(hex);
-        }
-
-        const VAULT_PRESETS = [
-            { name: "Oceanic Rockies", colors: ["#0284c7", "#38bdf8", "#7dd3fc", "#e0f2fe", "#0369a1"] },
-            { name: "Autumn Forest", colors: ["#b45309", "#d97706", "#f59e0b", "#fef3c7", "#78350f"] },
-            { name: "Neon Cyberpunk", colors: ["#d946ef", "#8b5cf6", "#06b6d4", "#10b981", "#f43f5e"] },
-            { name: "Pastel Meadow", colors: ["#fbcfe8", "#fef08a", "#bbf7d0", "#bae6fd", "#e9d5ff"] },
-            { name: "Monochrome Slate", colors: ["#0f172a", "#334155", "#64748b", "#cbd5e1", "#f8fafc"] },
-            { name: "Sunset Horizon", colors: ["#be123c", "#fb923c", "#facc15", "#4c1d95", "#881337"] }
-        ];
-
-        function renderVaultPresets() {
-            const container = document.getElementById('vault-presets-container');
-            if (!container) return;
-
-            let html = '';
-            VAULT_PRESETS.forEach(p => {
-                html += `<div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-xs text-slate-800">${p.name}</span>
-                        <button onclick="addPresetPalette('${p.colors.join(',')}')" class="text-[11px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1">
-                            <i class="fa-solid fa-plus text-[10px]"></i> Add All
-                        </button>
-                    </div>
-                    <div class="grid grid-cols-5 gap-1.5 h-10">`;
-
-                p.colors.forEach(hex => {
-                    html += `<div onclick="addToPalette('${hex}'); copyToClipboard('${hex}');" class="swatch-card rounded-lg h-full cursor-pointer shadow-sm relative group" style="background-color: ${hex};" title="${hex} (Click to copy & add)">
-                        <span class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/30 rounded-lg text-white font-mono text-[8px] font-bold transition-opacity">Copy</span>
-                    </div>`;
-                });
-
-                html += `</div></div>`;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function addPresetPalette(csvHex) {
-            const colors = csvHex.split(',');
-            colors.forEach(hex => addToPalette(hex));
-            showToast("Added preset palette to global drawer!");
         }
 
         /* COLOR MATH UTILITIES */
