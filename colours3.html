@@ -415,12 +415,8 @@
             <!-- Perceived Value Graph Card -->
             <div class="w-full max-w-5xl glass-card rounded-3xl p-6 border border-slate-200 shadow-md space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <h3 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-sky-600"></i> Perceived Value Graph ($Y\%$) Across Hues
-                    </h3>
                     <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">Lightness Curve</span>
                 </div>
-                <p class="text-xs text-slate-500">Visual representation of relative perceived luminance/lightness ($Y\%$) across the hue spectrum.</p>
                 <div class="w-full bg-white rounded-2xl p-4 border border-slate-200 shadow-inner flex justify-center overflow-x-auto">
                     <svg id="perceived-value-graph-svg" viewBox="0 0 800 320" class="w-full h-auto min-w-[600px] select-none"></svg>
                 </div>
@@ -431,9 +427,8 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-2">
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Complete NCS Spectrum Reference (All 40 Hue Steps)
+                            <i class="fa-solid fa-swatchbook text-sky-600"></i> Complete 40 Hue Step Reference
                         </h3>
-                        <p class="text-xs text-slate-500">Complete listing of every hue step around the spectrum (Y, Y10R, Y20R... R, R10B... B, B10G... G, G10Y). Click any swatch rectangle to copy its code and add it to your global drawer.</p>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="copyAllMunsellCodes()" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold rounded-xl shadow-sm transition-all flex items-center gap-1.5">
